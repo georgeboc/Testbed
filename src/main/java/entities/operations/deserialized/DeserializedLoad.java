@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeserializedLoad implements DeserializedOperation {
-    private String datasetPath;
-    private String datasetProfilePath;
+    private String datasetDirectoryPath;
     private String outputTag;
 
     @Override

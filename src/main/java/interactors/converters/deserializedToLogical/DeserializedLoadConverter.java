@@ -9,6 +9,6 @@ public class DeserializedLoadConverter implements DeserializedOperationConverter
     @Override
     public LogicalOperation convert(DeserializedOperation deserializedOperation) {
         DeserializedLoad deserializedLoad = (DeserializedLoad) deserializedOperation;
-        return new LogicalLoad(deserializedLoad.getDatasetPath(), deserializedLoad.getDatasetProfilePath());
+        return new LogicalLoad(deserializedLoad.getDatasetDirectoryPath());
     }
 }

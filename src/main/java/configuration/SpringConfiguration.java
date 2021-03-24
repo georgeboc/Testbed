@@ -1,11 +1,9 @@
 package configuration;
 
-import boundary.deserializers.DatasetProfileDeserializer;
-import boundary.deserializers.JsonDatasetProfileDeserializer;
+import boundary.deserializers.AvroProfileDeserializer;
 import boundary.deserializers.JsonOperationsDeserializer;
 import boundary.deserializers.OperationsDeserializer;
-import boundary.readers.FileReader;
-import boundary.readers.Reader;
+import boundary.deserializers.ProfileDeserializer;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import factories.InteractorFactory;
@@ -17,7 +15,6 @@ import interactors.converters.logicalToPhysical.LogicalLoadConverter;
 import interactors.converters.logicalToPhysical.LogicalOperationConverter;
 import interactors.converters.logicalToPhysical.LogicalOperationsConverter;
 import interactors.converters.logicalToPhysical.LogicalSelectConverter;
-import interactors.converters.logicalToPhysical.LogicalSinkConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +26,6 @@ public class SpringConfiguration {
     private static final String LOGICAL_SELECT_CONVERTER = "logicalSelectConverter";
     private static final String DESERIALIZED_LOAD_CONVERTER = "deserializedLoadConverter";
     private static final String LOGICAL_LOAD_CONVERTER = "logicalLoadConverter";
-    private static final String LOGICAL_SINK_CONVERTER = "logicalSinkConverter";
 
     private static final String DESERIALIZED_CONVERTERS_MAPPING = "deserializedConvertersMapping";
     private static final String LOGICAL_CONVERTERS_MAPPING = "logicalConvertersMapping";
@@ -38,7 +34,6 @@ public class SpringConfiguration {
     private static final String LOGICAL_SELECT = "LogicalSelect";
     private static final String DESERIALIZED_LOAD = "DeserializedLoad";
     private static final String LOGICAL_LOAD = "LogicalLoad";
-    private static final String LOGICAL_SINK = "LogicalSink";
 
     @Bean
     public OperationsDeserializer getPipelineDeserializer() {
@@ -46,13 +41,13 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public DatasetProfileDeserializer getDatasetProfileDeserializer() {
-        return new JsonDatasetProfileDeserializer();
+    public ProfileDeserializer getProfileDeserializer() {
+        return new AvroProfileDeserializer();
     }
-
     @Bean
     public InteractorFactory getReadJsonAndPrintContentFactory() {
-        return new InteractorFactory(getPipelineDeserializer(), getDeserializedOperationsConverter(), getReader());
+        return new InteractorFactory(getPipelineDeserializer(),
+                getDeserializedOperationsConverter());
     }
 
     @Bean(name=DESERIALIZED_LOAD_CONVERTER)
@@ -88,27 +83,17 @@ public class SpringConfiguration {
         return new LogicalSelectConverter();
     }
 
-    @Bean(name=LOGICAL_SINK_CONVERTER)
-    public LogicalOperationConverter getLogicalSinkConverter() {
-        return new LogicalSinkConverter();
-    }
 
     @Bean(name=LOGICAL_CONVERTERS_MAPPING)
     public Map<String, LogicalOperationConverter> getLogicalConvertersMapping() {
         return Maps.newHashMap(ImmutableMap.of(
                 LOGICAL_LOAD, getLogicalLoadConverter(),
-                LOGICAL_SELECT, getLogicalSelectConverter(),
-                LOGICAL_SINK, getLogicalSinkConverter()
+                LOGICAL_SELECT, getLogicalSelectConverter()
         ));
     }
 
     @Bean
     public LogicalOperationsConverter getLogicalOperationsConverter() {
-         return new LogicalOperationsConverter(getReader(), getDatasetProfileDeserializer(), getLogicalConvertersMapping());
-    }
-
-    @Bean
-    public Reader getReader() {
-        return new FileReader();
+         return new LogicalOperationsConverter(getProfileDeserializer(), getLogicalConvertersMapping());
     }
 }

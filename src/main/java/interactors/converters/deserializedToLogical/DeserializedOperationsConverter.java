@@ -8,7 +8,6 @@ import entities.operations.deserialized.DeserializedOperations;
 import entities.operations.logical.LogicalLoad;
 import entities.operations.logical.LogicalOperation;
 import entities.operations.logical.LogicalPlan;
-import entities.operations.logical.LogicalSink;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
@@ -66,9 +65,6 @@ public class DeserializedOperationsConverter {
             Mapping currentMapping = mappingQueue.remove();
             String outputTag = currentMapping.deserializedOperation.getOutputTag();
             Collection<Mapping> adjacentLogicalOperations = mappingByInputTags.get(outputTag);
-            if (adjacentLogicalOperations.isEmpty()) {
-                graph.put(currentMapping.logicalOperation, new LogicalSink());
-            }
             for (Mapping adjacentLogicalOperation: adjacentLogicalOperations) {
                 graph.put(currentMapping.logicalOperation, adjacentLogicalOperation.logicalOperation);
                 mappingQueue.add(adjacentLogicalOperation);

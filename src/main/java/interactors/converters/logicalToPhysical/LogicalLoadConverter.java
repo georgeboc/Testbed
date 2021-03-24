@@ -9,6 +9,6 @@ public class LogicalLoadConverter implements LogicalOperationConverter {
     @Override
     public PhysicalOperation convert(LogicalOperation logicalOperation) {
         LogicalLoad logicalLoad = (LogicalLoad) logicalOperation;
-        return new PhysicalLoad(logicalLoad.getDatasetPath());
+        return new PhysicalLoad(logicalLoad.getDatasetDirectoryPath());
     }
 }

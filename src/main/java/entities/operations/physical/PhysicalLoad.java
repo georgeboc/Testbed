@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class PhysicalLoad implements PhysicalOperation {
-    private final String datasetPath;
+    private final String datasetDirectoryPath;
 }
