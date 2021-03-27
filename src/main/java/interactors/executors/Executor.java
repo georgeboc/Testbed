@@ -26,23 +26,29 @@ public class Executor {
 
     public void execute(PhysicalPlan physicalPlan) {
         List<PhysicalOperation> topologicallySortedPhysicalOperations = topologicalSorter.sortTopologically(physicalPlan);
-        Multimap<PhysicalOperation, Result> physicalOperationInputResultsMap = MultimapBuilder.hashKeys().arrayListValues().build();
-        Stream<Executable> executableStream = topologicallySortedPhysicalOperations.stream()
-                .map(physicalOperation -> physicalOperation.getClass().getSimpleName())
-                .map(executableMapper::get);
-        Stream<OperationInput> operationInputStream = topologicallySortedPhysicalOperations.stream()
-                .map(physicalOperation -> createOperationInput(physicalOperationInputResultsMap, physicalOperation));
-        Stream<Result> executionResultStream = Streams.zip(operationInputStream, executableStream,
-                (operationInput, executable) -> executable.execute(operationInput));
 
-        Streams.zip(topologicallySortedPhysicalOperations.stream(),
-                executionResultStream,
-                (physicalOperation, result) -> physicalPlan.getGraph().get(physicalOperation).stream()
-                        .map(predecessorPhysicalOperation -> new AbstractMap.SimpleEntry<>(predecessorPhysicalOperation, result)))
+        Multimap<PhysicalOperation, Result> physicalOperationInputResultsMap = MultimapBuilder.hashKeys().arrayListValues().build();
+        Stream<Executable> executableStream = getExecutableStream(topologicallySortedPhysicalOperations);
+        Stream<OperationInput> operationInputStream = getOperationInputStream(topologicallySortedPhysicalOperations, physicalOperationInputResultsMap);
+        Stream<Result> executionResultStream = getExecutionResultStream(executableStream, operationInputStream);
+
+        Streams.zip(topologicallySortedPhysicalOperations.stream(), executionResultStream,
+                (physicalOperation, result) -> getPredecessorPhysicalOperationAndResult(physicalPlan.getGraph(), physicalOperation, result))
                 .flatMap(Function.identity())
                 .forEach(entry -> physicalOperationInputResultsMap.put(entry.getKey(), entry.getValue()));
 
         LOG.info("Physical operation and Input results Map: " + physicalOperationInputResultsMap.toString());
+    }
+
+    private Stream<Executable> getExecutableStream(List<PhysicalOperation> topologicallySortedPhysicalOperations) {
+        return topologicallySortedPhysicalOperations.stream()
+                .map(physicalOperation -> physicalOperation.getClass().getSimpleName())
+                .map(executableMapper::get);
+    }
+
+    private Stream<OperationInput> getOperationInputStream(List<PhysicalOperation> topologicallySortedPhysicalOperations, Multimap<PhysicalOperation, Result> physicalOperationInputResultsMap) {
+        return topologicallySortedPhysicalOperations.stream()
+                .map(physicalOperation -> createOperationInput(physicalOperationInputResultsMap, physicalOperation));
     }
 
     private OperationInput createOperationInput(Multimap<PhysicalOperation, Result> intermediateResults,
@@ -53,5 +59,15 @@ public class Executor {
                 .build();
     }
 
+    private Stream<Result> getExecutionResultStream(Stream<Executable> executableStream, Stream<OperationInput> operationInputStream) {
+        return Streams.zip(operationInputStream, executableStream,
+                (operationInput, executable) -> executable.execute(operationInput));
+    }
 
+    private Stream<AbstractMap.SimpleEntry<PhysicalOperation, Result>> getPredecessorPhysicalOperationAndResult(Multimap<PhysicalOperation, PhysicalOperation> physicalPlanGraph,
+                                                                                                                PhysicalOperation physicalOperation,
+                                                                                                                Result result) {
+        return physicalPlanGraph.get(physicalOperation).stream()
+                .map(predecessorPhysicalOperation -> new AbstractMap.SimpleEntry<>(predecessorPhysicalOperation, result));
+    }
 }
