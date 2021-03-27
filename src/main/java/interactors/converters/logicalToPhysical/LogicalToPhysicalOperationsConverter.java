@@ -14,10 +14,12 @@ import entities.operations.physical.PhysicalPlan;
 import entities.operations.physical.PhysicalSink;
 import entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
+import org.glassfish.jersey.internal.guava.Sets;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -57,11 +59,12 @@ public class LogicalToPhysicalOperationsConverter {
 
         Stack<ProfileEstimation> operationsStack = new Stack<>();
         operationsStack.addAll(loadProfileEstimations);
+        Set<ProfileEstimation> visitedProfileEstimations = Sets.newHashSet();
         while (!operationsStack.isEmpty()) {
             ProfileEstimation currentProfileEstimation = operationsStack.pop();
             Collection<LogicalOperation> successiveLogicalOperations = logicalPlan.getGraph().successors(currentProfileEstimation.getLogicalOperation());
             List<ProfileEstimation> successiveProfileEstimations = getSuccessiveProfileEstimations(currentProfileEstimation, successiveLogicalOperations);
-            operationsStack.addAll(successiveProfileEstimations);
+            operationsStack.addAll(getUnvisitedSuccessiveProfileEstimations(successiveProfileEstimations, visitedProfileEstimations));
             PhysicalOperation currentPhysicalOperation = getPhysicalOperation(currentProfileEstimation);
             successiveProfileEstimations.stream()
                     .map(this::getPhysicalOperation)
@@ -69,8 +72,16 @@ public class LogicalToPhysicalOperationsConverter {
             if (successiveProfileEstimations.isEmpty()) {
                 physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink());
             }
+            visitedProfileEstimations.add(currentProfileEstimation);
         }
         return physicalGraph;
+    }
+
+    private Collection<ProfileEstimation> getUnvisitedSuccessiveProfileEstimations(List<ProfileEstimation> successiveProfileEstimations,
+                                                                                   Set<ProfileEstimation> visitedProfileEstimations) {
+        return successiveProfileEstimations.stream()
+                .filter(successiveProfileEstimation -> !visitedProfileEstimations.contains(successiveProfileEstimation))
+                .collect(Collectors.toList());
     }
 
     private PhysicalOperation getPhysicalOperation(ProfileEstimation profileEstimation) throws ColumnNotFoundException {

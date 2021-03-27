@@ -11,6 +11,7 @@ import entities.operations.deserialized.DeserializedOperations;
 import entities.operations.logical.LogicalLoad;
 import entities.operations.logical.LogicalOperation;
 import entities.operations.logical.LogicalPlan;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
@@ -51,7 +52,7 @@ public class DeserializedToLogicalOperationsConverter {
 
     private List<Mapping> getLoadMappings(List<Mapping> mappings) {
         return mappings.stream()
-                .filter(mapping -> mapping.logicalOperation.getClass().getSimpleName().equals(LOGICAL_LOAD))
+                .filter(mapping -> mapping.getLogicalOperation().getClass().getSimpleName().equals(LOGICAL_LOAD))
                 .collect(Collectors.toList());
     }
 
@@ -62,30 +63,34 @@ public class DeserializedToLogicalOperationsConverter {
         mappingQueue.addAll(loadMappings);
         while (!mappingQueue.isEmpty()) {
             Mapping currentMapping = mappingQueue.remove();
-            String outputTag = currentMapping.deserializedOperation.getOutputTag();
+            String outputTag = currentMapping.getDeserializedOperation().getOutputTag();
             Collection<Mapping> successiveMappings = mappingByTags.get(outputTag);
-            mappingQueue.addAll(successiveMappings);
+            mappingQueue.addAll(getUnvisitedMappings(logicalGraph, successiveMappings));
             successiveMappings.forEach(successiveMapping ->
-                    logicalGraph.putEdge(currentMapping.logicalOperation, successiveMapping.logicalOperation));
+                    logicalGraph.putEdge(currentMapping.getLogicalOperation(), successiveMapping.getLogicalOperation()));
         }
         return logicalGraph;
     }
 
+    private List<Mapping> getUnvisitedMappings(MutableGraph<LogicalOperation> logicalGraph, Collection<Mapping> successiveMappings) {
+        return successiveMappings.stream().filter(mapping -> !logicalGraph.nodes().contains(mapping.getLogicalOperation())).collect(Collectors.toList());
+    }
+
     private Multimap<String, Mapping> getMappingByTag(List<Mapping> mappings) {
         return mappings.stream()
-                .filter(mapping -> (mapping.deserializedOperation.getInputTag() != null))
+                .filter(mapping -> (mapping.getDeserializedOperation().getInputTag() != null))
                 .collect(ArrayListMultimap::create,
-                        (multimap, mapping) -> multimap.put(mapping.deserializedOperation.getInputTag(), mapping),
+                        (multimap, mapping) -> multimap.put(mapping.getDeserializedOperation().getInputTag(), mapping),
                         Multimap::putAll);
     }
 
     private List<LogicalLoad> getLogicalLoads(List<Mapping> loadMappings) {
         return loadMappings.stream()
-                .map(loadMapping -> (LogicalLoad) loadMapping.logicalOperation)
+                .map(loadMapping -> (LogicalLoad) loadMapping.getLogicalOperation())
                 .collect(Collectors.toList());
     }
 
-    @RequiredArgsConstructor
+    @Data
     private static class Mapping {
         private final LogicalOperation logicalOperation;
         private final DeserializedOperation deserializedOperation;
