@@ -5,7 +5,7 @@ import entities.operations.physical.PhysicalLoad;
 import entities.operations.physical.PhysicalOperation;
 import entities.profiles.ProfileEstimation;
 
-public class LogicalLoadConverter implements LogicalOperationConverter {
+public class LogicalToPhysicalLoadConverter implements LogicalToPhysicalOperationConverter {
     @Override
     public PhysicalOperation convert(ProfileEstimation profileEstimation) {
         LogicalLoad logicalLoad = (LogicalLoad) profileEstimation.getLogicalOperation();

@@ -3,7 +3,9 @@ package interactors.converters.deserializedToLogical;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
 import entities.operations.deserialized.DeserializedOperation;
 import entities.operations.deserialized.DeserializedOperations;
 import entities.operations.logical.LogicalLoad;
@@ -19,21 +21,17 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class DeserializedOperationsConverter {
-    private final static Logger LOG = Logger.getLogger(DeserializedOperationsConverter.class.getName());
+@SuppressWarnings("UnstableApiUsage")
+public class DeserializedToLogicalOperationsConverter {
+    private final static Logger LOG = Logger.getLogger(DeserializedToLogicalOperationsConverter.class.getName());
     private static final String LOGICAL_LOAD = "LogicalLoad";
-    private final Map<String, DeserializedOperationConverter> deserializedOperationConverterMapping;
+    private final Map<String, DeserializedToLogicalOperationConverter> deserializedOperationConverterMapping;
 
     public LogicalPlan convert(DeserializedOperations deserializedOperations) {
-        LOG.info("DeserializedOperations: " + deserializedOperations);
         List<Mapping> mappings = getMappings(deserializedOperations);
-        LOG.info("Mappings: " + mappings);
         List<Mapping> loadMappings = getLoadMappings(mappings);
-        LOG.info("LoadMappings: " + loadMappings);
-        Multimap<LogicalOperation, LogicalOperation> graph = createLogicalGraph(loadMappings, mappings);
-        LOG.info("Graph generated: " + graph);
+        Graph<LogicalOperation> graph = createLogicalGraph(loadMappings, mappings);
         List<LogicalLoad> logicalLoads = getLogicalLoads(loadMappings);
-        LOG.info("LoadOperations: " + logicalLoads);
         return LogicalPlan.builder()
                 .graph(graph)
                 .logicalLoads(logicalLoads)
@@ -43,9 +41,9 @@ public class DeserializedOperationsConverter {
     private List<Mapping> getMappings(DeserializedOperations deserializedOperations) {
         List<Mapping> mappings = Lists.newLinkedList();
         for (DeserializedOperation deserializedOperation: deserializedOperations) {
-            DeserializedOperationConverter deserializedOperationConverter = deserializedOperationConverterMapping
+            DeserializedToLogicalOperationConverter deserializedToLogicalOperationConverter = deserializedOperationConverterMapping
                     .get(deserializedOperation.getClass().getSimpleName());
-            LogicalOperation logicalOperation = deserializedOperationConverter.convert(deserializedOperation);
+            LogicalOperation logicalOperation = deserializedToLogicalOperationConverter.convert(deserializedOperation);
             mappings.add(new Mapping(logicalOperation, deserializedOperation));
         }
         return mappings;
@@ -57,21 +55,18 @@ public class DeserializedOperationsConverter {
                 .collect(Collectors.toList());
     }
 
-    private Multimap<LogicalOperation, LogicalOperation> createLogicalGraph(List<Mapping> loadMappings,
-                                                                            List<Mapping> mappings) {
+    private Graph<LogicalOperation> createLogicalGraph(List<Mapping> loadMappings, List<Mapping> mappings) {
         Multimap<String, Mapping> mappingByTags = getMappingByTag(mappings);
-        LOG.info("Mapping by input tags: " + mappingByTags);
-        Multimap<LogicalOperation, LogicalOperation> logicalGraph = MultimapBuilder.hashKeys().arrayListValues().build();
+        MutableGraph<LogicalOperation> logicalGraph = GraphBuilder.directed().build();
         Queue<Mapping> mappingQueue = Lists.newLinkedList();
         mappingQueue.addAll(loadMappings);
         while (!mappingQueue.isEmpty()) {
             Mapping currentMapping = mappingQueue.remove();
             String outputTag = currentMapping.deserializedOperation.getOutputTag();
-            Collection<Mapping> adjacentMappings = mappingByTags.get(outputTag);
-            for (Mapping adjacentMapping: adjacentMappings) {
-                logicalGraph.put(currentMapping.logicalOperation, adjacentMapping.logicalOperation);
-                mappingQueue.add(adjacentMapping);
-            }
+            Collection<Mapping> successiveMappings = mappingByTags.get(outputTag);
+            mappingQueue.addAll(successiveMappings);
+            successiveMappings.forEach(successiveMapping ->
+                    logicalGraph.putEdge(currentMapping.logicalOperation, successiveMapping.logicalOperation));
         }
         return logicalGraph;
     }

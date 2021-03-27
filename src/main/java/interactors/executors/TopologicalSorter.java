@@ -2,6 +2,7 @@ package interactors.executors;
 
 import com.clearspring.analytics.util.Lists;
 import com.google.common.base.Functions;
+import com.google.common.graph.Graph;
 import entities.operations.physical.PhysicalOperation;
 import entities.operations.physical.PhysicalPlan;
 
@@ -11,37 +12,40 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("UnstableApiUsage")
 public class TopologicalSorter {
     public List<PhysicalOperation> sortTopologically(PhysicalPlan physicalPlan) {
         Stack<PhysicalOperation> physicalOperationStack = new Stack<>();
         List<PhysicalOperation> topologicallySortedPhysicalOperations = Lists.newArrayList();
-        Map<PhysicalOperation, Long> inputDependencyCounter = countInputDependencies(physicalPlan);
+        Map<PhysicalOperation, Integer> inputDependencyCounter = countInputDependencies(physicalPlan);
         physicalOperationStack.addAll(getPhysicalOperationsWithoutDependencies(inputDependencyCounter));
         while (!physicalOperationStack.empty()) {
             PhysicalOperation currentPhysicalOperation = physicalOperationStack.pop();
             inputDependencyCounter.remove(currentPhysicalOperation);
             topologicallySortedPhysicalOperations.add(currentPhysicalOperation);
-            Collection<PhysicalOperation> dependants = physicalPlan.getGraph().get(currentPhysicalOperation);
-            dependants.forEach(dependant -> inputDependencyCounter.put(dependant, inputDependencyCounter.get(dependant) - 1));
+            decreaseInputDependencyCounterForAllSuccessors(physicalPlan, inputDependencyCounter, currentPhysicalOperation);
             physicalOperationStack.addAll(getPhysicalOperationsWithoutDependencies(inputDependencyCounter));
         }
         return topologicallySortedPhysicalOperations;
     }
 
-    private List<PhysicalOperation> getPhysicalOperationsWithoutDependencies(Map<PhysicalOperation, Long> inputDependencyCounter) {
+    private void decreaseInputDependencyCounterForAllSuccessors(PhysicalPlan physicalPlan,
+                                                                Map<PhysicalOperation, Integer> inputDependencyCounter,
+                                                                PhysicalOperation currentPhysicalOperation) {
+        Collection<PhysicalOperation> successors = physicalPlan.getGraph().successors(currentPhysicalOperation);
+        successors.forEach(successor -> inputDependencyCounter.put(successor, inputDependencyCounter.get(successor) - 1));
+    }
+
+    private List<PhysicalOperation> getPhysicalOperationsWithoutDependencies(Map<PhysicalOperation, Integer> inputDependencyCounter) {
         return inputDependencyCounter.entrySet().stream()
                 .filter(physicalOperationLongEntry -> physicalOperationLongEntry.getValue() == 0)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
 
-    private Map<PhysicalOperation, Long> countInputDependencies(PhysicalPlan physicalPlan) {
-        Map<PhysicalOperation, Long> inputDependenciesCounter = physicalPlan.getGraph().values().stream()
-                .collect(Collectors.groupingBy(Functions.identity(), Collectors.counting()));
-        Map<PhysicalOperation, Long> noInputDependencies = physicalPlan.getLoadOperations().stream()
-                .map(physicalLoad -> (PhysicalOperation) physicalLoad)
-                .collect(Collectors.toMap(Functions.identity(), Functions.constant(0L)));
-        inputDependenciesCounter.putAll(noInputDependencies);
-        return inputDependenciesCounter;
+    private Map<PhysicalOperation, Integer> countInputDependencies(PhysicalPlan physicalPlan) {
+        Graph<PhysicalOperation> physicalOperationGraph = physicalPlan.getGraph();
+        return physicalOperationGraph.nodes().stream()
+                .collect(Collectors.toMap(Functions.identity(), physicalOperationGraph::inDegree));
     }
 }

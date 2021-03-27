@@ -5,7 +5,7 @@ import entities.operations.deserialized.DeserializedSelect;
 import entities.operations.logical.LogicalOperation;
 import entities.operations.logical.LogicalSelect;
 
-public class DeserializedSelectConverter implements DeserializedOperationConverter {
+public class DeserializedToLogicalSelectConverter implements DeserializedToLogicalOperationConverter {
     @Override
     public LogicalOperation convert(DeserializedOperation deserializedOperation) {
         DeserializedSelect deserializedSelect = (DeserializedSelect) deserializedOperation;

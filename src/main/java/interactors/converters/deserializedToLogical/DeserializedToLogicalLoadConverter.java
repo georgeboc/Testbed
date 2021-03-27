@@ -5,7 +5,7 @@ import entities.operations.deserialized.DeserializedOperation;
 import entities.operations.logical.LogicalLoad;
 import entities.operations.logical.LogicalOperation;
 
-public class DeserializedLoadConverter implements DeserializedOperationConverter {
+public class DeserializedToLogicalLoadConverter implements DeserializedToLogicalOperationConverter {
     @Override
     public LogicalOperation convert(DeserializedOperation deserializedOperation) {
         DeserializedLoad deserializedLoad = (DeserializedLoad) deserializedOperation;

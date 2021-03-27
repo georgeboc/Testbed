@@ -4,6 +4,6 @@ import entities.exceptions.ColumnNotFoundException;
 import entities.operations.physical.PhysicalOperation;
 import entities.profiles.ProfileEstimation;
 
-public interface LogicalOperationConverter {
+public interface LogicalToPhysicalOperationConverter {
     PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException;
 }

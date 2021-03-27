@@ -13,14 +13,14 @@ import boundary.readers.ColumnReader;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import factories.InteractorFactory;
-import interactors.converters.deserializedToLogical.DeserializedLoadConverter;
-import interactors.converters.deserializedToLogical.DeserializedOperationConverter;
-import interactors.converters.deserializedToLogical.DeserializedOperationsConverter;
-import interactors.converters.deserializedToLogical.DeserializedSelectConverter;
-import interactors.converters.logicalToPhysical.LogicalLoadConverter;
-import interactors.converters.logicalToPhysical.LogicalOperationConverter;
-import interactors.converters.logicalToPhysical.LogicalOperationsConverter;
-import interactors.converters.logicalToPhysical.LogicalSelectConverter;
+import interactors.converters.deserializedToLogical.DeserializedToLogicalLoadConverter;
+import interactors.converters.deserializedToLogical.DeserializedToLogicalOperationConverter;
+import interactors.converters.deserializedToLogical.DeserializedToLogicalOperationsConverter;
+import interactors.converters.deserializedToLogical.DeserializedToLogicalSelectConverter;
+import interactors.converters.logicalToPhysical.LogicalToPhysicalLoadConverter;
+import interactors.converters.logicalToPhysical.LogicalToPhysicalOperationConverter;
+import interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConverter;
+import interactors.converters.logicalToPhysical.LogicalToPhysicalSelectConverter;
 import interactors.executors.Executor;
 import interactors.executors.TopologicalSorter;
 import org.apache.spark.SparkConf;
@@ -85,17 +85,17 @@ public class SpringConfiguration {
     }
 
     @Bean(name=DESERIALIZED_LOAD_CONVERTER)
-    public DeserializedOperationConverter getDeserializedLoadConverter() {
-        return new DeserializedLoadConverter();
+    public DeserializedToLogicalOperationConverter getDeserializedLoadConverter() {
+        return new DeserializedToLogicalLoadConverter();
     }
 
     @Bean(name=DESERIALIZED_SELECT_CONVERTER)
-    public DeserializedOperationConverter getDeserializedSelectConverter() {
-        return new DeserializedSelectConverter();
+    public DeserializedToLogicalOperationConverter getDeserializedSelectConverter() {
+        return new DeserializedToLogicalSelectConverter();
     }
 
     @Bean(name=DESERIALIZED_CONVERTERS_MAPPING)
-    public Map<String, DeserializedOperationConverter> getDeserializedConvertersMapping() {
+    public Map<String, DeserializedToLogicalOperationConverter> getDeserializedConvertersMapping() {
         return Maps.newHashMap(ImmutableMap.of(
                 DESERIALIZED_LOAD, getDeserializedLoadConverter(),
                 DESERIALIZED_SELECT, getDeserializedSelectConverter()
@@ -103,22 +103,22 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public DeserializedOperationsConverter getDeserializedOperationsConverter() {
-        return new DeserializedOperationsConverter(getDeserializedConvertersMapping());
+    public DeserializedToLogicalOperationsConverter getDeserializedOperationsConverter() {
+        return new DeserializedToLogicalOperationsConverter(getDeserializedConvertersMapping());
     }
 
     @Bean(name=LOGICAL_LOAD_CONVERTER)
-    public LogicalOperationConverter getLogicalLoadConverter() {
-        return new LogicalLoadConverter();
+    public LogicalToPhysicalOperationConverter getLogicalLoadConverter() {
+        return new LogicalToPhysicalLoadConverter();
     }
 
     @Bean(name=LOGICAL_SELECT_CONVERTER)
-    public LogicalOperationConverter getLogicalSelectConverter() {
-        return new LogicalSelectConverter(getColumnReader());
+    public LogicalToPhysicalOperationConverter getLogicalSelectConverter() {
+        return new LogicalToPhysicalSelectConverter(getColumnReader());
     }
 
     @Bean(name=LOGICAL_CONVERTERS_MAPPING)
-    public Map<String, LogicalOperationConverter> getLogicalConvertersMapping() {
+    public Map<String, LogicalToPhysicalOperationConverter> getLogicalConvertersMapping() {
         return Maps.newHashMap(ImmutableMap.of(
                 LOGICAL_LOAD, getLogicalLoadConverter(),
                 LOGICAL_SELECT, getLogicalSelectConverter()
@@ -126,8 +126,8 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public LogicalOperationsConverter getLogicalOperationsConverter() {
-         return new LogicalOperationsConverter(getProfileDeserializer(), getLogicalConvertersMapping());
+    public LogicalToPhysicalOperationsConverter getLogicalOperationsConverter() {
+         return new LogicalToPhysicalOperationsConverter(getProfileDeserializer(), getLogicalConvertersMapping());
     }
 
     @Bean

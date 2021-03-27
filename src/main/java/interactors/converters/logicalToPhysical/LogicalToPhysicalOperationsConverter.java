@@ -1,8 +1,9 @@
 package interactors.converters.logicalToPhysical;
 
 import boundary.deserializers.ProfileDeserializer;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.MutableGraph;
 import entities.exceptions.ColumnNotFoundException;
 import entities.operations.logical.LogicalLoad;
 import entities.operations.logical.LogicalOperation;
@@ -21,14 +22,15 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class LogicalOperationsConverter {
+@SuppressWarnings("UnstableApiUsage")
+public class LogicalToPhysicalOperationsConverter {
     private final ProfileDeserializer profileDeserializer;
-    private final Map<String, LogicalOperationConverter> logicalOperationConverterMapping;
+    private final Map<String, LogicalToPhysicalOperationConverter> logicalOperationConverterMapping;
 
     public PhysicalPlan convert(LogicalPlan logicalPlan) {
         List<LogicalLoad> logicalLoads = logicalPlan.getLogicalLoads();
         List<ProfileEstimation> loadProfileEstimations = getLoadProfileEstimations(logicalLoads);
-        Multimap<PhysicalOperation, PhysicalOperation> graph = createPhysicalGraph(loadProfileEstimations, logicalPlan);
+        Graph<PhysicalOperation> graph = createPhysicalGraph(loadProfileEstimations, logicalPlan);
         List<PhysicalLoad> physicalLoads = loadProfileEstimations.stream()
                 .map(this::getPhysicalOperation)
                 .map(physicalOperation -> (PhysicalLoad) physicalOperation)
@@ -49,25 +51,23 @@ public class LogicalOperationsConverter {
                 .collect(Collectors.toList());
     }
 
-    private Multimap<PhysicalOperation, PhysicalOperation> createPhysicalGraph(List<ProfileEstimation> loadProfileEstimations,
-                                                                               LogicalPlan logicalPlan) {
-        Multimap<LogicalOperation, LogicalOperation> logicalGraph = logicalPlan.getGraph();
-        Multimap<PhysicalOperation, PhysicalOperation> physicalGraph = MultimapBuilder.hashKeys().arrayListValues().build();
+    private Graph<PhysicalOperation> createPhysicalGraph(List<ProfileEstimation> loadProfileEstimations,
+                                                         LogicalPlan logicalPlan) {
+        MutableGraph<PhysicalOperation> physicalGraph = GraphBuilder.directed().build();
 
         Stack<ProfileEstimation> operationsStack = new Stack<>();
         operationsStack.addAll(loadProfileEstimations);
         while (!operationsStack.isEmpty()) {
             ProfileEstimation currentProfileEstimation = operationsStack.pop();
-            Collection<LogicalOperation> adjacentLogicalOperations = logicalGraph.get(currentProfileEstimation.getLogicalOperation());
-            List<ProfileEstimation> adjacentProfileEstimations = getAdjacentProfileEstimations(currentProfileEstimation,
-                    adjacentLogicalOperations);
-            operationsStack.addAll(adjacentProfileEstimations);
+            Collection<LogicalOperation> successiveLogicalOperations = logicalPlan.getGraph().successors(currentProfileEstimation.getLogicalOperation());
+            List<ProfileEstimation> successiveProfileEstimations = getSuccessiveProfileEstimations(currentProfileEstimation, successiveLogicalOperations);
+            operationsStack.addAll(successiveProfileEstimations);
             PhysicalOperation currentPhysicalOperation = getPhysicalOperation(currentProfileEstimation);
-            adjacentProfileEstimations.stream()
+            successiveProfileEstimations.stream()
                     .map(this::getPhysicalOperation)
-                    .forEach(adjacentPhysicalOperation -> physicalGraph.put(currentPhysicalOperation, adjacentPhysicalOperation));
-            if (adjacentProfileEstimations.isEmpty()) {
-                physicalGraph.put(currentPhysicalOperation, new PhysicalSink());
+                    .forEach(successivePhysicalOperation -> physicalGraph.putEdge(currentPhysicalOperation, successivePhysicalOperation));
+            if (successiveProfileEstimations.isEmpty()) {
+                physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink());
             }
         }
         return physicalGraph;
@@ -78,9 +78,9 @@ public class LogicalOperationsConverter {
         return logicalOperationConverterMapping.get(logicalOperationName).convert(profileEstimation);
     }
 
-    private List<ProfileEstimation> getAdjacentProfileEstimations(ProfileEstimation currentProfileEstimation,
-                                                                  Collection<LogicalOperation> adjacentLogicalOperations) {
-        return adjacentLogicalOperations.stream()
+    private List<ProfileEstimation> getSuccessiveProfileEstimations(ProfileEstimation currentProfileEstimation,
+                                                                    Collection<LogicalOperation> successiveLogicalOperations) {
+        return successiveLogicalOperations.stream()
                 .map(logicalOperation -> ProfileEstimation.builder()
                         .logicalOperation(logicalOperation)
                         .profile(currentProfileEstimation.getProfile())

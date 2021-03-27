@@ -11,7 +11,7 @@ import entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class LogicalSelectConverter implements LogicalOperationConverter {
+public class LogicalToPhysicalSelectConverter implements LogicalToPhysicalOperationConverter {
     private final ColumnReader columnReader;
 
     @Override
