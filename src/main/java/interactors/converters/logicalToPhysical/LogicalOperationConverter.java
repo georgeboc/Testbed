@@ -1,8 +1,9 @@
 package interactors.converters.logicalToPhysical;
 
-import entities.operations.logical.LogicalOperation;
+import entities.exceptions.ColumnNotFoundException;
 import entities.operations.physical.PhysicalOperation;
+import entities.profiles.ProfileEstimation;
 
 public interface LogicalOperationConverter {
-    PhysicalOperation convert(LogicalOperation logicalOperation);
+    PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException;
 }

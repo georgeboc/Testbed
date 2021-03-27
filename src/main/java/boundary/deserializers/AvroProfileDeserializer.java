@@ -34,9 +34,9 @@ public class AvroProfileDeserializer implements ProfileDeserializer {
 
     private Map<String, ColumnProfile> getColumnProfiles(String path) {
         Pattern columnFileNamePattern = Pattern.compile("count_value_stats_([^/])*\\.avro$");
-        List<String> columnDirectoryPaths = tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
-        Stream<String> columnNamesStream = getColumnNamesStream(columnDirectoryPaths);
-        Stream<ColumnProfile> columnProfilesStream = getColumnProfileStream(columnDirectoryPaths);
+        List<String> columnFilePaths = tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
+        Stream<String> columnNamesStream = getColumnNamesStream(columnFilePaths);
+        Stream<ColumnProfile> columnProfilesStream = getColumnProfileStream(columnFilePaths);
         return Streams.zip(columnNamesStream, columnProfilesStream, AbstractMap.SimpleEntry::new)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
@@ -60,9 +60,9 @@ public class AvroProfileDeserializer implements ProfileDeserializer {
                 .distinct();
     }
 
-    private Stream<ColumnProfile> getColumnProfileStream(List<String> columnDirectoryPaths) {
-        return columnDirectoryPaths.stream()
-                .map(columnDirectoryPath -> columnDirectoryPath + '/' + METADATA_FILENAME)
+    private Stream<ColumnProfile> getColumnProfileStream(List<String> columnFilePaths) {
+        return columnFilePaths.stream()
+                .map(columnFilePath -> columnFilePath + '/' + METADATA_FILENAME)
                 .map(this::tryGetDataFileReaderFromFileName)
                 .map(this::getColumnProfileFromDataFileReader);
     }

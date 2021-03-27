@@ -3,6 +3,7 @@ package interactors.converters.deserializedToLogical;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import entities.operations.deserialized.DeserializedOperation;
 import entities.operations.deserialized.DeserializedOperations;
 import entities.operations.logical.LogicalLoad;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -30,11 +30,14 @@ public class DeserializedOperationsConverter {
         LOG.info("Mappings: " + mappings);
         List<Mapping> loadMappings = getLoadMappings(mappings);
         LOG.info("LoadMappings: " + loadMappings);
-        Multimap<LogicalOperation, LogicalOperation> graph = createGraph(loadMappings, mappings);
+        Multimap<LogicalOperation, LogicalOperation> graph = createLogicalGraph(loadMappings, mappings);
         LOG.info("Graph generated: " + graph);
-        List<LogicalLoad> loadOperations = getLoadOperations(loadMappings);
-        LOG.info("LoadOperations: " + loadOperations);
-        return new LogicalPlan(graph, loadOperations);
+        List<LogicalLoad> logicalLoads = getLogicalLoads(loadMappings);
+        LOG.info("LoadOperations: " + logicalLoads);
+        return LogicalPlan.builder()
+                .graph(graph)
+                .logicalLoads(logicalLoads)
+                .build();
     }
 
     private List<Mapping> getMappings(DeserializedOperations deserializedOperations) {
@@ -54,33 +57,34 @@ public class DeserializedOperationsConverter {
                 .collect(Collectors.toList());
     }
 
-    private Multimap<LogicalOperation, LogicalOperation> createGraph(List<Mapping> loadMappings,
-                                                                      List<Mapping> mappings) {
-        Multimap<String, Mapping> mappingByInputTags = getMappingByInputTags(mappings);
-        LOG.info("Mapping by input tags: " + mappingByInputTags);
-        Multimap<LogicalOperation, LogicalOperation> graph = ArrayListMultimap.create();
+    private Multimap<LogicalOperation, LogicalOperation> createLogicalGraph(List<Mapping> loadMappings,
+                                                                            List<Mapping> mappings) {
+        Multimap<String, Mapping> mappingByTags = getMappingByTag(mappings);
+        LOG.info("Mapping by input tags: " + mappingByTags);
+        Multimap<LogicalOperation, LogicalOperation> logicalGraph = MultimapBuilder.hashKeys().arrayListValues().build();
         Queue<Mapping> mappingQueue = Lists.newLinkedList();
         mappingQueue.addAll(loadMappings);
         while (!mappingQueue.isEmpty()) {
             Mapping currentMapping = mappingQueue.remove();
             String outputTag = currentMapping.deserializedOperation.getOutputTag();
-            Collection<Mapping> adjacentLogicalOperations = mappingByInputTags.get(outputTag);
-            for (Mapping adjacentLogicalOperation: adjacentLogicalOperations) {
-                graph.put(currentMapping.logicalOperation, adjacentLogicalOperation.logicalOperation);
-                mappingQueue.add(adjacentLogicalOperation);
+            Collection<Mapping> adjacentMappings = mappingByTags.get(outputTag);
+            for (Mapping adjacentMapping: adjacentMappings) {
+                logicalGraph.put(currentMapping.logicalOperation, adjacentMapping.logicalOperation);
+                mappingQueue.add(adjacentMapping);
             }
         }
-        return graph;
+        return logicalGraph;
     }
 
-    private Multimap<String, Mapping> getMappingByInputTags(List<Mapping> mappings) {
-        Multimap<String, Mapping> mappingByOutputTags = ArrayListMultimap.create();
-        mappings.forEach(mapping -> Optional.ofNullable(mapping.deserializedOperation.getInputTag())
-                .ifPresent(inputTag -> mappingByOutputTags.put(inputTag, mapping)));
-        return mappingByOutputTags;
+    private Multimap<String, Mapping> getMappingByTag(List<Mapping> mappings) {
+        return mappings.stream()
+                .filter(mapping -> (mapping.deserializedOperation.getInputTag() != null))
+                .collect(ArrayListMultimap::create,
+                        (multimap, mapping) -> multimap.put(mapping.deserializedOperation.getInputTag(), mapping),
+                        Multimap::putAll);
     }
 
-    private List<LogicalLoad> getLoadOperations(List<Mapping> loadMappings) {
+    private List<LogicalLoad> getLogicalLoads(List<Mapping> loadMappings) {
         return loadMappings.stream()
                 .map(loadMapping -> (LogicalLoad) loadMapping.logicalOperation)
                 .collect(Collectors.toList());
