@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 public class LogicalToPhysicalOperationsConverter {
+    private final static String PHYSICAL_LOAD = "PhysicalLoad";
     private final ProfileDeserializer profileDeserializer;
     private final Map<String, LogicalToPhysicalOperationConverter> logicalOperationConverterMapping;
 
@@ -33,10 +34,7 @@ public class LogicalToPhysicalOperationsConverter {
         List<LogicalLoad> logicalLoads = logicalPlan.getLogicalLoads();
         List<ProfileEstimation> loadProfileEstimations = getLoadProfileEstimations(logicalLoads);
         Graph<PhysicalOperation> graph = createPhysicalGraph(loadProfileEstimations, logicalPlan);
-        List<PhysicalLoad> physicalLoads = loadProfileEstimations.stream()
-                .map(this::getPhysicalOperation)
-                .map(physicalOperation -> (PhysicalLoad) physicalOperation)
-                .collect(Collectors.toList());
+        List<PhysicalLoad> physicalLoads = getPhysicalLoads(graph);
         return PhysicalPlan.builder()
                 .graph(graph)
                 .loadOperations(physicalLoads)
@@ -97,6 +95,13 @@ public class LogicalToPhysicalOperationsConverter {
                         .profile(currentProfileEstimation.getProfile())
                         .columnStatsPath(currentProfileEstimation.getColumnStatsPath())
                         .build())
+                .collect(Collectors.toList());
+    }
+
+    private List<PhysicalLoad> getPhysicalLoads(Graph<PhysicalOperation> graph) {
+        return graph.nodes().stream()
+                .filter(physicalOperation -> physicalOperation.getClass().getSimpleName().equals(PHYSICAL_LOAD))
+                .map(physicalOperation -> (PhysicalLoad) physicalOperation)
                 .collect(Collectors.toList());
     }
 }

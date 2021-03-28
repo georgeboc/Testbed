@@ -22,7 +22,7 @@ public class SelectExecutable implements Executable {
         PhysicalSelect physicalSelect = (PhysicalSelect) operationInput.getPhysicalOperation();
         Result inputResult = inputResults.get(0);
         Dataset<Row> inputDataset = (Dataset<Row>) inputResult.getValue();
-        Dataset<Row> outputDataset = inputDataset.filter(physicalSelect.getColumnName() + " < '" + physicalSelect.getLessThanValue() + "'");
+        Dataset<Row> outputDataset = inputDataset.filter(physicalSelect.getColumnName() + " <= '" + physicalSelect.getLessThanValue() + "'");
         return new SparkResult(outputDataset);
     }
 }

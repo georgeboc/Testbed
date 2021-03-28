@@ -37,6 +37,7 @@ public class AvroColumnReader implements ColumnReader {
         try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
             return paths.map(Path::toString)
                     .filter(pattern.asPredicate())
+                    .sorted()
                     .collect(Collectors.toList());
         } catch (IOException exception) {
             throw new RuntimeException(exception);

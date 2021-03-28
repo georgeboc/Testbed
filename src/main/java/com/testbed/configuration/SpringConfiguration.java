@@ -86,7 +86,7 @@ public class SpringConfiguration {
         return new InteractorFactory(getPipelineDeserializer(),
                 getDeserializedOperationsConverter(),
                 getLogicalOperationsConverter(),
-                getExecutor(),
+                getSparkExecutor(),
                 getCallInstrumentations());
     }
 
@@ -137,6 +137,20 @@ public class SpringConfiguration {
     }
 
     @Bean
+    public TopologicalSorter getTopologicalSorter() {
+        return new TopologicalSorter();
+    }
+
+    @Bean
+    public List<CallInstrumentation> getCallInstrumentations() {
+        return Lists.newArrayList();
+    }
+
+    public Executable getInstrumentedExecutable(Executable wrappedExecutable) {
+        return new InstrumentedExecutable(wrappedExecutable, getCallInstrumentations());
+    }
+
+    @Bean
     public SparkSession getSparkSession() {
         SparkConf conf = new SparkConf().setAppName(APP_NAME).setMaster(LOCAL);
         SparkContext sparkContext = new SparkContext(conf);
@@ -158,13 +172,8 @@ public class SpringConfiguration {
         return new SinkExecutable();
     }
 
-    @Bean
-    public TopologicalSorter getTopologicalSorter() {
-        return new TopologicalSorter();
-    }
-
     @Bean(name=SPARK_PHYSICAL_OPERATION_TO_EXECUTABLE_MAPPING)
-    public Map<String, Executable> getPhysicalOperationToExecutableMapper() {
+    public Map<String, Executable> getSparkPhysicalOperationToExecutableMapper() {
         return Maps.newHashMap(ImmutableMap.of(
                 PHYSICAL_LOAD, getSparkLoadExecutable(),
                 PHYSICAL_SELECT, getSparkSelectExecutable(),
@@ -172,13 +181,8 @@ public class SpringConfiguration {
         ));
     }
 
-    @Bean
-    public List<CallInstrumentation> getCallInstrumentations() {
-        return Lists.newArrayList();
-    }
-
     @Bean(name=SPARK_PHYSICAL_OPERATION_TO_INSTRUMENTED_EXECUTABLE_MAPPING)
-    public Map<String, Executable> getPhysicalOperationToInstrumentedExecutableMapper() {
+    public Map<String, Executable> getSparkPhysicalOperationToInstrumentedExecutableMapper() {
         return Maps.newHashMap(ImmutableMap.of(
                 PHYSICAL_LOAD, getInstrumentedExecutable(getSparkLoadExecutable()),
                 PHYSICAL_SELECT, getInstrumentedExecutable(getSparkSelectExecutable()),
@@ -186,12 +190,8 @@ public class SpringConfiguration {
         ));
     }
 
-    public Executable getInstrumentedExecutable(Executable wrappedExecutable) {
-        return new InstrumentedExecutable(wrappedExecutable, getCallInstrumentations());
-    }
-
     @Bean
-    public Executor getExecutor() {
-        return new Executor(getTopologicalSorter(), getPhysicalOperationToInstrumentedExecutableMapper());
+    public Executor getSparkExecutor() {
+        return new Executor(getTopologicalSorter(), getSparkPhysicalOperationToInstrumentedExecutableMapper());
     }
 }
