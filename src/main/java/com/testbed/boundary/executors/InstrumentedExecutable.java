@@ -2,8 +2,6 @@ package com.testbed.boundary.executors;
 
 import com.testbed.entities.instrumentation.CallInstrumentation;
 import lombok.RequiredArgsConstructor;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,8 +10,6 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class InstrumentedExecutable implements Executable {
-    private static final String SPARK_RESULT = "SparkResult";
-    private static final String INTEGER_RESULT = "IntegerResult";
     private final Executable wrappedExecutable;
     private final List<CallInstrumentation> callInstrumentations;
 
@@ -25,7 +21,7 @@ public class InstrumentedExecutable implements Executable {
         Duration executionDuration = Duration.between(instantBeforeExecution, instantAfterExecution);
         String className = wrappedExecutable.getClass().getSimpleName();
         List<Long> inputRowsCounts = getInputRowsCounts(operationInput);
-        long outputRowsCount = getOutputRowsCount(result);
+        long outputRowsCount = result.count();
         callInstrumentations.add(CallInstrumentation.builder()
                 .instantBeforeExecution(instantBeforeExecution)
                 .instantAfterExecution(instantAfterExecution)
@@ -39,17 +35,7 @@ public class InstrumentedExecutable implements Executable {
 
     private List<Long> getInputRowsCounts(OperationInput operationInput) {
         return operationInput.getInputResults().stream()
-                .filter(inputResult -> inputResult.getClass().getSimpleName().equals(SPARK_RESULT))
-                .map(inputResult -> (Dataset<Row>) inputResult.getValue())
-                .map(Dataset::count)
+                .map(Result::count)
                 .collect(Collectors.toList());
-    }
-
-    private long getOutputRowsCount(Result result) {
-        long outputRowsCount = 1;
-        if (result.getClass().getSimpleName().equals(SPARK_RESULT)) {
-            outputRowsCount = ((Dataset<Row>) result.getValue()).count();
-        }
-        return outputRowsCount;
     }
 }

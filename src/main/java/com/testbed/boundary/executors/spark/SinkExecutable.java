@@ -1,12 +1,10 @@
 package com.testbed.boundary.executors.spark;
 
+import com.clearspring.analytics.util.Preconditions;
 import com.testbed.boundary.executors.Executable;
 import com.testbed.boundary.executors.OperationInput;
 import com.testbed.boundary.executors.Result;
-import com.clearspring.analytics.util.Preconditions;
 import lombok.RequiredArgsConstructor;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,7 @@ public class SinkExecutable implements Executable {
 
         List<Result> inputResults = new ArrayList<>(operationInput.getInputResults());
         Result inputResult = inputResults.get(0);
-        Dataset<Row> inputDataset = (Dataset<Row>) inputResult.getValue();
-        return new IntegerResult(inputDataset.count());
+        inputResult.count();
+        return new NoResult();
     }
 }

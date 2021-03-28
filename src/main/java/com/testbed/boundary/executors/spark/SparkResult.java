@@ -7,5 +7,10 @@ import org.apache.spark.sql.Row;
 
 @Data
 public class SparkResult implements Result {
-    private final Dataset<Row> value;
+    private final Dataset<Row> values;
+
+    @Override
+    public long count() {
+        return values.count();
+    }
 }
