@@ -5,13 +5,16 @@ import boundary.deserializers.JsonOperationsDeserializer;
 import boundary.deserializers.OperationsDeserializer;
 import boundary.deserializers.ProfileDeserializer;
 import boundary.executors.Executable;
-import boundary.executors.spark.Load;
-import boundary.executors.spark.Select;
-import boundary.executors.spark.Sink;
+import boundary.executors.InstrumentedExecutable;
+import boundary.executors.spark.LoadExecutable;
+import boundary.executors.spark.SelectExecutable;
+import boundary.executors.spark.SinkExecutable;
 import boundary.readers.AvroColumnReader;
 import boundary.readers.ColumnReader;
+import com.clearspring.analytics.util.Lists;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import entities.instrumentation.CallInstrumentation;
 import factories.InteractorFactory;
 import interactors.converters.deserializedToLogical.DeserializedToLogicalLoadConverter;
 import interactors.converters.deserializedToLogical.DeserializedToLogicalOperationConverter;
@@ -29,6 +32,7 @@ import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -42,6 +46,8 @@ public class SpringConfiguration {
     private static final String DESERIALIZED_CONVERTERS_MAPPING = "deserializedConvertersMapping";
     private static final String LOGICAL_CONVERTERS_MAPPING = "logicalConvertersMapping";
     private static final String SPARK_PHYSICAL_OPERATION_TO_EXECUTABLE_MAPPING = "sparkPhysicalOperationToExecutableMapper";
+    private static final String SPARK_PHYSICAL_OPERATION_TO_INSTRUMENTED_EXECUTABLE_MAPPING = "sparkPhysicalOperationToInstrumentedExecutableMapper";
+
 
     private static final String DESERIALIZED_SELECT = "DeserializedSelect";
     private static final String DESERIALIZED_LOAD = "DeserializedLoad";
@@ -53,9 +59,10 @@ public class SpringConfiguration {
     private static final String PHYSICAL_SELECT = "PhysicalSelect";
     private static final String PHYSICAL_SINK = "PhysicalSink";
 
-    private static final String SPARK_LOAD_EXECUTOR = "sparkLoadExecutor";
-    private static final String SPARK_SELECT_EXECUTOR = "sparkSelectExecutor";
-    private static final String SPARK_SINK_EXECUTOR = "sparkSinkExecutor";
+    private static final String SPARK_LOAD_EXECUTABLE = "sparkLoadExecutable";
+    private static final String SPARK_SELECT_EXECUTABLE = "sparkSelectExecutable";
+    private static final String SPARK_SINK_EXECUTABLE = "sparkSinkExecutable";
+    private static final String SPARK_INSTRUMENTED_EXECUTABLE = "sparkInstrumentedExecutable";
 
     private static final String LOG_LEVEL = "INFO";
     private static final String APP_NAME = "Testbed";
@@ -81,7 +88,8 @@ public class SpringConfiguration {
         return new InteractorFactory(getPipelineDeserializer(),
                 getDeserializedOperationsConverter(),
                 getLogicalOperationsConverter(),
-                getExecutor());
+                getExecutor(),
+                getCallInstrumentations());
     }
 
     @Bean(name=DESERIALIZED_LOAD_CONVERTER)
@@ -138,19 +146,19 @@ public class SpringConfiguration {
         return new SparkSession(sparkContext);
     }
 
-    @Bean(name=SPARK_LOAD_EXECUTOR)
-    public Executable getSparkLoadExecutor() {
-        return new Load(getSparkSession());
+    @Bean(name=SPARK_LOAD_EXECUTABLE)
+    public Executable getSparkLoadExecutable() {
+        return new LoadExecutable(getSparkSession());
     }
 
-    @Bean(name=SPARK_SELECT_EXECUTOR)
-    public Executable getSparkSelectExecutor() {
-        return new Select();
+    @Bean(name=SPARK_SELECT_EXECUTABLE)
+    public Executable getSparkSelectExecutable() {
+        return new SelectExecutable();
     }
 
-    @Bean(name=SPARK_SINK_EXECUTOR)
-    public Executable getSparkSinkExecutor() {
-        return new Sink();
+    @Bean(name=SPARK_SINK_EXECUTABLE)
+    public Executable getSparkSinkExecutable() {
+        return new SinkExecutable();
     }
 
     @Bean
@@ -161,14 +169,32 @@ public class SpringConfiguration {
     @Bean(name=SPARK_PHYSICAL_OPERATION_TO_EXECUTABLE_MAPPING)
     public Map<String, Executable> getPhysicalOperationToExecutableMapper() {
         return Maps.newHashMap(ImmutableMap.of(
-                PHYSICAL_LOAD, getSparkLoadExecutor(),
-                PHYSICAL_SELECT, getSparkSelectExecutor(),
-                PHYSICAL_SINK, getSparkSinkExecutor()
+                PHYSICAL_LOAD, getSparkLoadExecutable(),
+                PHYSICAL_SELECT, getSparkSelectExecutable(),
+                PHYSICAL_SINK, getSparkSinkExecutable()
         ));
     }
 
     @Bean
+    public List<CallInstrumentation> getCallInstrumentations() {
+        return Lists.newArrayList();
+    }
+
+    @Bean(name=SPARK_PHYSICAL_OPERATION_TO_INSTRUMENTED_EXECUTABLE_MAPPING)
+    public Map<String, Executable> getPhysicalOperationToInstrumentedExecutableMapper() {
+        return Maps.newHashMap(ImmutableMap.of(
+                PHYSICAL_LOAD, getInstrumentedExecutable(getSparkLoadExecutable()),
+                PHYSICAL_SELECT, getInstrumentedExecutable(getSparkSelectExecutable()),
+                PHYSICAL_SINK, getInstrumentedExecutable(getSparkSinkExecutable())
+        ));
+    }
+
+    public Executable getInstrumentedExecutable(Executable wrappedExecutable) {
+        return new InstrumentedExecutable(wrappedExecutable, getCallInstrumentations());
+    }
+
+    @Bean
     public Executor getExecutor() {
-        return new Executor(getTopologicalSorter(), getPhysicalOperationToExecutableMapper());
+        return new Executor(getTopologicalSorter(), getPhysicalOperationToInstrumentedExecutableMapper());
     }
 }

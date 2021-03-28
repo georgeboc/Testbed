@@ -11,7 +11,7 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
 @RequiredArgsConstructor
-public class Load implements Executable {
+public class LoadExecutable implements Executable {
     private static final String PARSED_DATASET_FILENAME = "parsed_dataset.parquet";
     private final SparkSession sparkSession;
 

@@ -1,6 +1,7 @@
 package interactors;
 
 import boundary.deserializers.OperationsDeserializer;
+import entities.instrumentation.CallInstrumentation;
 import entities.operations.deserialized.DeserializedOperations;
 import entities.operations.logical.LogicalPlan;
 import entities.operations.physical.PhysicalPlan;
@@ -9,6 +10,7 @@ import interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConve
 import interactors.executors.Executor;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ public class SparkRunnerInteractor implements Interactor {
     private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
     private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
     private final Executor executor;
+    private final List<CallInstrumentation> callInstrumentations;
 
     @Override
     public void execute() throws Exception {
@@ -33,5 +36,6 @@ public class SparkRunnerInteractor implements Interactor {
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Executing Physical Plan");
         executor.execute(physicalPlan);
+        LOG.info("Final Call Instrumentations: " + callInstrumentations);
     }
 }
