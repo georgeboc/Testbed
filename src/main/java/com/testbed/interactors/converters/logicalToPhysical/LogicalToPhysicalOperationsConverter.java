@@ -1,9 +1,9 @@
 package com.testbed.interactors.converters.logicalToPhysical;
 
-import com.testbed.boundary.deserializers.ProfileDeserializer;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.entities.exceptions.ColumnNotFoundException;
 import com.testbed.entities.operations.logical.LogicalLoad;
 import com.testbed.entities.operations.logical.LogicalOperation;
@@ -12,6 +12,7 @@ import com.testbed.entities.operations.physical.PhysicalLoad;
 import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.operations.physical.PhysicalPlan;
 import com.testbed.entities.operations.physical.PhysicalSink;
+import com.testbed.entities.profiles.Profile;
 import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 import org.glassfish.jersey.internal.guava.Sets;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("UnstableApiUsage")
 public class LogicalToPhysicalOperationsConverter {
     private final static String PHYSICAL_LOAD = "PhysicalLoad";
-    private final ProfileDeserializer profileDeserializer;
+    private final Deserializer<Profile> profileDeserializer;
     private final Map<String, LogicalToPhysicalOperationConverter> logicalOperationConverterMapping;
 
     public PhysicalPlan convert(LogicalPlan logicalPlan) {

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AvroProfileDeserializer implements ProfileDeserializer {
+public class AvroProfileDeserializer implements Deserializer<Profile> {
     private static final String ROWS_COUNT = "rows_count";
     private static final String IS_UNIQUE = "is_unique";
     private static final String METADATA_FILENAME = "metadata.avro";

@@ -1,9 +1,11 @@
 package com.testbed.configuration;
 
+import com.clearspring.analytics.util.Lists;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.testbed.boundary.deserializers.AvroProfileDeserializer;
+import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
-import com.testbed.boundary.deserializers.OperationsDeserializer;
-import com.testbed.boundary.deserializers.ProfileDeserializer;
 import com.testbed.boundary.executors.Executable;
 import com.testbed.boundary.executors.InstrumentedExecutable;
 import com.testbed.boundary.executors.spark.LoadExecutable;
@@ -11,10 +13,9 @@ import com.testbed.boundary.executors.spark.SelectExecutable;
 import com.testbed.boundary.executors.spark.SinkExecutable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
-import com.clearspring.analytics.util.Lists;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.testbed.entities.instrumentation.CallInstrumentation;
+import com.testbed.entities.operations.deserialized.DeserializedOperations;
+import com.testbed.entities.profiles.Profile;
 import com.testbed.factories.InteractorFactory;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalLoadConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationConverter;
@@ -67,12 +68,12 @@ public class SpringConfiguration {
     private static final String LOCAL = "local[*]";
 
     @Bean
-    public OperationsDeserializer getPipelineDeserializer() {
+    public Deserializer<DeserializedOperations> getOperationsDeserializer() {
         return new JsonOperationsDeserializer();
     }
 
     @Bean
-    public ProfileDeserializer getProfileDeserializer() {
+    public Deserializer<Profile> getProfileDeserializer() {
         return new AvroProfileDeserializer();
     }
 
@@ -83,7 +84,7 @@ public class SpringConfiguration {
 
     @Bean
     public InteractorFactory getReadJsonAndPrintContentFactory() {
-        return new InteractorFactory(getPipelineDeserializer(),
+        return new InteractorFactory(getOperationsDeserializer(),
                 getDeserializedOperationsConverter(),
                 getLogicalOperationsConverter(),
                 getSparkExecutor(),

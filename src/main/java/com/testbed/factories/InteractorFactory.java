@@ -1,7 +1,8 @@
 package com.testbed.factories;
 
-import com.testbed.boundary.deserializers.OperationsDeserializer;
+import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.entities.instrumentation.CallInstrumentation;
+import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.interactors.Interactor;
 import com.testbed.interactors.SparkRunnerInteractor;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationsConverter;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class InteractorFactory {
-    private final OperationsDeserializer pipelineDeserializer;
+    private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
     private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
     private final Executor executor;
@@ -21,7 +22,7 @@ public class InteractorFactory {
 
     public Interactor getReadJsonAndPrintContent(final String pipelineFileName) {
         return new SparkRunnerInteractor(pipelineFileName,
-                pipelineDeserializer,
+                operationsDeserializer,
                 deserializedToLogicalOperationsConverter,
                 logicalToPhysicalOperationsConverter,
                 executor,

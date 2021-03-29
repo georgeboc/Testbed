@@ -1,6 +1,6 @@
 package com.testbed.interactors;
 
-import com.testbed.boundary.deserializers.OperationsDeserializer;
+import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.entities.instrumentation.CallInstrumentation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalPlan;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class SparkRunnerInteractor implements Interactor {
     private final static Logger LOG = Logger.getLogger(SparkRunnerInteractor.class.getName());
     private final String pipelineFileName;
-    private final OperationsDeserializer operationsDeserializer;
+    private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
     private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
     private final Executor executor;
