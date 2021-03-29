@@ -11,24 +11,26 @@ import java.io.InputStreamReader;
 
 public class Main {
     private static final String DEFAULT_PIPELINE_PATH = "parameters/pipeline.json";
+    private static final String DEFAULT_CALL_INSTRUMENTATIONS_PATH = "output/calls_instrumentation.csv";
 
     public static void main(String[] args) throws Exception {
             System.out.println("Calling Read Json And Print Content Interactor");
         InteractorFactory interactorFactory = getReadJsonAndPrintContentFactory();
 
         System.out.printf("Introduce JSON pipeline file path (default: %s):%n", DEFAULT_PIPELINE_PATH);
-        String pathOrDefault = readLineOrDefault();
-        Interactor interactor = interactorFactory.getReadJsonAndPrintContent(pathOrDefault);
+        String pathOrDefault = readLineOrDefault(DEFAULT_PIPELINE_PATH);
+        System.out.printf("Introduce CSV call instrumentations output file path (default: %s):%n", DEFAULT_CALL_INSTRUMENTATIONS_PATH);
+        String callsInstrumentationOrDefault = readLineOrDefault(DEFAULT_CALL_INSTRUMENTATIONS_PATH);
+        Interactor interactor = interactorFactory.getReadJsonAndPrintContent(pathOrDefault, callsInstrumentationOrDefault);
         interactor.execute();
     }
 
-    private static String readLineOrDefault() throws IOException {
+    private static String readLineOrDefault(String defaultCallInstrumentationsPath) throws IOException {
         String lineRead = getBufferedReader().readLine();
-        String pathOrDefault = lineRead;
         if (lineRead.equals("")) {
-            pathOrDefault = Main.DEFAULT_PIPELINE_PATH;
+            return defaultCallInstrumentationsPath;
         }
-        return pathOrDefault;
+        return lineRead;
     }
 
     private static BufferedReader getBufferedReader() {

@@ -1,6 +1,6 @@
 package com.testbed.boundary.executors;
 
-import com.testbed.entities.instrumentation.CallInstrumentation;
+import com.testbed.entities.instrumentation.OperationInstrumentation;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
@@ -10,8 +10,11 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class InstrumentedExecutable implements Executable {
+    private final static String EXECUTABLE = "Executable";
+    private final static String EMPTY = "";
+
     private final Executable wrappedExecutable;
-    private final List<CallInstrumentation> callInstrumentations;
+    private final List<OperationInstrumentation> operationInstrumentations;
 
     @Override
     public Result execute(OperationInput operationInput) {
@@ -19,14 +22,14 @@ public class InstrumentedExecutable implements Executable {
         Result result = wrappedExecutable.execute(operationInput);
         Instant instantAfterExecution = Instant.now();
         Duration executionDuration = Duration.between(instantBeforeExecution, instantAfterExecution);
-        String className = wrappedExecutable.getClass().getSimpleName();
+        String operationName = wrappedExecutable.getClass().getSimpleName().replace(EXECUTABLE, EMPTY);
         List<Long> inputRowsCounts = getInputRowsCounts(operationInput);
         long outputRowsCount = result.count();
-        callInstrumentations.add(CallInstrumentation.builder()
+        operationInstrumentations.add(OperationInstrumentation.builder()
                 .instantBeforeExecution(instantBeforeExecution)
                 .instantAfterExecution(instantAfterExecution)
                 .executionDuration(executionDuration)
-                .className(className)
+                .operationName(operationName)
                 .inputRowsCount(inputRowsCounts)
                 .outputRowsCount(outputRowsCount)
                 .build());

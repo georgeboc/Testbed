@@ -1,7 +1,8 @@
 package com.testbed.interactors;
 
 import com.testbed.boundary.deserializers.Deserializer;
-import com.testbed.entities.instrumentation.CallInstrumentation;
+import com.testbed.boundary.serializers.Serializer;
+import com.testbed.entities.instrumentation.OperationInstrumentation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalPlan;
 import com.testbed.entities.operations.physical.PhysicalPlan;
@@ -17,11 +18,13 @@ import java.util.logging.Logger;
 public class SparkRunnerInteractor implements Interactor {
     private final static Logger LOG = Logger.getLogger(SparkRunnerInteractor.class.getName());
     private final String pipelineFileName;
+    private final String callInstrumentationsOutputPath;
     private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
     private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
     private final Executor executor;
-    private final List<CallInstrumentation> callInstrumentations;
+    private final List<OperationInstrumentation> operationInstrumentations;
+    private final Serializer<List<OperationInstrumentation>> callInstrumentationsSerializer;
 
     @Override
     public void execute() throws Exception {
@@ -36,6 +39,8 @@ public class SparkRunnerInteractor implements Interactor {
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Executing Physical Plan");
         executor.execute(physicalPlan);
-        LOG.info("Call Instrumentations after execution: " + callInstrumentations);
+        LOG.info("Call Instrumentations after execution: " + operationInstrumentations);
+        LOG.info("Serializing Call Instrumentations to " + callInstrumentationsOutputPath);
+        callInstrumentationsSerializer.serialize(callInstrumentationsOutputPath, operationInstrumentations);
     }
 }

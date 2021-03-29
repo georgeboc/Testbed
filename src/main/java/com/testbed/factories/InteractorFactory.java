@@ -1,7 +1,8 @@
 package com.testbed.factories;
 
 import com.testbed.boundary.deserializers.Deserializer;
-import com.testbed.entities.instrumentation.CallInstrumentation;
+import com.testbed.boundary.serializers.Serializer;
+import com.testbed.entities.instrumentation.OperationInstrumentation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.interactors.Interactor;
 import com.testbed.interactors.SparkRunnerInteractor;
@@ -18,14 +19,18 @@ public class InteractorFactory {
     private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
     private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
     private final Executor executor;
-    private final List<CallInstrumentation> callInstrumentations;
+    private final List<OperationInstrumentation> operationInstrumentations;
+    private final Serializer<List<OperationInstrumentation>> callInstrumentationsSerializer;
 
-    public Interactor getReadJsonAndPrintContent(final String pipelineFileName) {
+    public Interactor getReadJsonAndPrintContent(final String pipelineFileName,
+                                                 final String callInstrumentationsOutputPath) {
         return new SparkRunnerInteractor(pipelineFileName,
+                callInstrumentationsOutputPath,
                 operationsDeserializer,
                 deserializedToLogicalOperationsConverter,
                 logicalToPhysicalOperationsConverter,
                 executor,
-                callInstrumentations);
+                operationInstrumentations,
+                callInstrumentationsSerializer);
     }
 }

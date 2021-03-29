@@ -13,7 +13,9 @@ import com.testbed.boundary.executors.spark.SelectExecutable;
 import com.testbed.boundary.executors.spark.SinkExecutable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
-import com.testbed.entities.instrumentation.CallInstrumentation;
+import com.testbed.boundary.serializers.CSVOperationInstrumentationsSerializer;
+import com.testbed.boundary.serializers.Serializer;
+import com.testbed.entities.instrumentation.OperationInstrumentation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.factories.InteractorFactory;
@@ -68,6 +70,11 @@ public class SpringConfiguration {
     private static final String LOCAL = "local[*]";
 
     @Bean
+    public Serializer<List<OperationInstrumentation>> getCallInstrumentationsSerializer() {
+        return new CSVOperationInstrumentationsSerializer();
+    }
+
+    @Bean
     public Deserializer<DeserializedOperations> getOperationsDeserializer() {
         return new JsonOperationsDeserializer();
     }
@@ -88,7 +95,8 @@ public class SpringConfiguration {
                 getDeserializedOperationsConverter(),
                 getLogicalOperationsConverter(),
                 getSparkExecutor(),
-                getCallInstrumentations());
+                getCallInstrumentations(),
+                getCallInstrumentationsSerializer());
     }
 
     @Bean(name=DESERIALIZED_LOAD_CONVERTER)
@@ -143,7 +151,7 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public List<CallInstrumentation> getCallInstrumentations() {
+    public List<OperationInstrumentation> getCallInstrumentations() {
         return Lists.newArrayList();
     }
 

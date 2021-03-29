@@ -9,8 +9,8 @@ import java.util.List;
 
 @Data
 @Builder
-public class CallInstrumentation {
-    private final String className;
+public class OperationInstrumentation {
+    private final String operationName;
     private final List<Long> inputRowsCount;
     private final long outputRowsCount;
     private final Instant instantBeforeExecution;
