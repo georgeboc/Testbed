@@ -19,11 +19,13 @@ import java.util.stream.Stream;
 
 public class CSVOperationInstrumentationsSerializer implements Serializer<List<OperationInstrumentation>> {
     private static final String OPERATION_NUMBER_FIELD = "Operation #";
+    private static final char UNDERSCORE = '_';
+    private static final char SPACE = ' ';
     private static final String[] HEADERS = Stream.concat(Stream.of(OPERATION_NUMBER_FIELD),
             Arrays.stream(OperationInstrumentation.class.getDeclaredFields())
             .map(Field::getName)
             .map(fieldName -> CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName))
-            .map(fieldName -> fieldName.replace('_', ' '))
+            .map(fieldName -> fieldName.replace(UNDERSCORE, SPACE))
             .map(StringUtils::capitalize))
             .toArray(String[]::new);
 
