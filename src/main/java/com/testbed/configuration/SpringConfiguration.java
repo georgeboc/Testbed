@@ -70,7 +70,7 @@ public class SpringConfiguration {
     private static final String LOCAL = "local[*]";
 
     @Bean
-    public Serializer<List<OperationInstrumentation>> getCallInstrumentationsSerializer() {
+    public Serializer<List<OperationInstrumentation>> getOperationInstrumentationsSerializer() {
         return new CSVOperationInstrumentationsSerializer();
     }
 
@@ -95,8 +95,8 @@ public class SpringConfiguration {
                 getDeserializedOperationsConverter(),
                 getLogicalOperationsConverter(),
                 getSparkExecutor(),
-                getCallInstrumentations(),
-                getCallInstrumentationsSerializer());
+                getOperationInstrumentations(),
+                getOperationInstrumentationsSerializer());
     }
 
     @Bean(name=DESERIALIZED_LOAD_CONVERTER)
@@ -151,12 +151,12 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public List<OperationInstrumentation> getCallInstrumentations() {
+    public List<OperationInstrumentation> getOperationInstrumentations() {
         return Lists.newArrayList();
     }
 
     public Executable getInstrumentedExecutable(Executable wrappedExecutable) {
-        return new InstrumentedExecutable(wrappedExecutable, getCallInstrumentations());
+        return new InstrumentedExecutable(wrappedExecutable, getOperationInstrumentations());
     }
 
     @Bean

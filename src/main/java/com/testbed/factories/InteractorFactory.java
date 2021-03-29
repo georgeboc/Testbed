@@ -20,17 +20,17 @@ public class InteractorFactory {
     private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
     private final Executor executor;
     private final List<OperationInstrumentation> operationInstrumentations;
-    private final Serializer<List<OperationInstrumentation>> callInstrumentationsSerializer;
+    private final Serializer<List<OperationInstrumentation>> operationInstrumentationsSerializer;
 
     public Interactor getReadJsonAndPrintContent(final String pipelineFileName,
-                                                 final String callInstrumentationsOutputPath) {
+                                                 final String operationInstrumentationsOutputPath) {
         return new SparkRunnerInteractor(pipelineFileName,
-                callInstrumentationsOutputPath,
+                operationInstrumentationsOutputPath,
                 operationsDeserializer,
                 deserializedToLogicalOperationsConverter,
                 logicalToPhysicalOperationsConverter,
                 executor,
                 operationInstrumentations,
-                callInstrumentationsSerializer);
+                operationInstrumentationsSerializer);
     }
 }

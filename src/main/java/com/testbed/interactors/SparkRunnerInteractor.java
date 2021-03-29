@@ -18,13 +18,13 @@ import java.util.logging.Logger;
 public class SparkRunnerInteractor implements Interactor {
     private final static Logger LOG = Logger.getLogger(SparkRunnerInteractor.class.getName());
     private final String pipelineFileName;
-    private final String callInstrumentationsOutputPath;
+    private final String operationInstrumentationsOutputPath;
     private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
     private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
     private final Executor executor;
     private final List<OperationInstrumentation> operationInstrumentations;
-    private final Serializer<List<OperationInstrumentation>> callInstrumentationsSerializer;
+    private final Serializer<List<OperationInstrumentation>> operationInstrumentationsSerializer;
 
     @Override
     public void execute() throws Exception {
@@ -39,8 +39,8 @@ public class SparkRunnerInteractor implements Interactor {
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Executing Physical Plan");
         executor.execute(physicalPlan);
-        LOG.info("Call Instrumentations after execution: " + operationInstrumentations);
-        LOG.info("Serializing Call Instrumentations to " + callInstrumentationsOutputPath);
-        callInstrumentationsSerializer.serialize(callInstrumentationsOutputPath, operationInstrumentations);
+        LOG.info("Operation Instrumentations after execution: " + operationInstrumentations);
+        LOG.info("Serializing Operation Instrumentations to " + operationInstrumentationsOutputPath);
+        operationInstrumentationsSerializer.serialize(operationInstrumentationsOutputPath, operationInstrumentations);
     }
 }

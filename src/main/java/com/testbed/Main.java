@@ -11,24 +11,24 @@ import java.io.InputStreamReader;
 
 public class Main {
     private static final String DEFAULT_PIPELINE_PATH = "parameters/pipeline.json";
-    private static final String DEFAULT_CALL_INSTRUMENTATIONS_PATH = "output/calls_instrumentation.csv";
+    private static final String DEFAULT_OPERATION_INSTRUMENTATIONS_PATH = "output/operation_instrumentations.csv";
 
     public static void main(String[] args) throws Exception {
             System.out.println("Calling Read Json And Print Content Interactor");
         InteractorFactory interactorFactory = getReadJsonAndPrintContentFactory();
 
         System.out.printf("Introduce JSON pipeline file path (default: %s):%n", DEFAULT_PIPELINE_PATH);
-        String pathOrDefault = readLineOrDefault(DEFAULT_PIPELINE_PATH);
-        System.out.printf("Introduce CSV call instrumentations output file path (default: %s):%n", DEFAULT_CALL_INSTRUMENTATIONS_PATH);
-        String callsInstrumentationOrDefault = readLineOrDefault(DEFAULT_CALL_INSTRUMENTATIONS_PATH);
-        Interactor interactor = interactorFactory.getReadJsonAndPrintContent(pathOrDefault, callsInstrumentationOrDefault);
+        String pipelinePath = readLineOrDefault(DEFAULT_PIPELINE_PATH);
+        System.out.printf("Introduce CSV operation instrumentations output file path (default: %s):%n", DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
+        String operationInstrumentationsPath = readLineOrDefault(DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
+        Interactor interactor = interactorFactory.getReadJsonAndPrintContent(pipelinePath, operationInstrumentationsPath);
         interactor.execute();
     }
 
-    private static String readLineOrDefault(String defaultCallInstrumentationsPath) throws IOException {
+    private static String readLineOrDefault(String defaultValue) throws IOException {
         String lineRead = getBufferedReader().readLine();
-        if (lineRead.equals("")) {
-            return defaultCallInstrumentationsPath;
+        if (lineRead.isBlank()) {
+            return defaultValue;
         }
         return lineRead;
     }
