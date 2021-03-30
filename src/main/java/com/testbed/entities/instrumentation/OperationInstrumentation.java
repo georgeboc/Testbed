@@ -11,8 +11,10 @@ import java.util.List;
 @Builder
 public class OperationInstrumentation {
     private final String operationName;
-    private final List<Long> inputRowsCount;
+    private final List<Long> inputsRowsCount;
     private final long outputRowsCount;
+    private final List<List<String>> inputsColumnNames;
+    private final List<String> outputColumnNames;
     private final Instant instantBeforeExecution;
     private final Instant instantAfterExecution;
     private final Duration executionDuration;

@@ -23,15 +23,19 @@ public class InstrumentedExecutable implements Executable {
         Instant instantAfterExecution = Instant.now();
         Duration executionDuration = Duration.between(instantBeforeExecution, instantAfterExecution);
         String operationName = wrappedExecutable.getClass().getSimpleName().replace(EXECUTABLE, EMPTY);
-        List<Long> inputRowsCounts = getInputRowsCounts(operationInput);
+        List<Long> inputsRowsCounts = getInputRowsCounts(operationInput);
         long outputRowsCount = result.count();
+        List<List<String>> inputsColumnNames = getInputsColumnNames(operationInput);
+        List<String> outputColumnNames = result.getColumnNames();
         operationInstrumentations.add(OperationInstrumentation.builder()
                 .instantBeforeExecution(instantBeforeExecution)
                 .instantAfterExecution(instantAfterExecution)
                 .executionDuration(executionDuration)
                 .operationName(operationName)
-                .inputRowsCount(inputRowsCounts)
+                .inputsRowsCount(inputsRowsCounts)
                 .outputRowsCount(outputRowsCount)
+                .inputsColumnNames(inputsColumnNames)
+                .outputColumnNames(outputColumnNames)
                 .build());
         return result;
     }
@@ -40,5 +44,9 @@ public class InstrumentedExecutable implements Executable {
         return operationInput.getInputResults().stream()
                 .map(Result::count)
                 .collect(Collectors.toList());
+    }
+
+    private List<List<String>> getInputsColumnNames(OperationInput operationInput) {
+        return operationInput.getInputResults().stream().map(Result::getColumnNames).collect(Collectors.toList());
     }
 }
