@@ -18,12 +18,14 @@ public class LogicalToPhysicalSelectConverter implements LogicalToPhysicalOperat
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
         Profile profile = profileEstimation.getProfile();
         LogicalSelect logicalSelect = (LogicalSelect) profileEstimation.getLogicalOperation();
-        ColumnProfile columnProfile = profile.getColumns().get(logicalSelect.getColumnName());
-        if (columnProfile == null) {
+        if (!profile.getColumns().containsKey(logicalSelect.getColumnName())) {
             throw new ColumnNotFoundException(logicalSelect.getColumnName());
         }
-        long rowId = (long) ((double) columnProfile.getRowsCount() * logicalSelect.getSelectivityFactor());
-        String value = columnReader.getValueFromRowId(rowId, logicalSelect.getColumnName(), profileEstimation.getColumnStatsPath());
+        ColumnProfile columnProfile = profile.getColumns().get(logicalSelect.getColumnName());
+        String value = columnReader.getValueFromSelectivityFactor(logicalSelect.getSelectivityFactor(),
+                columnProfile,
+                logicalSelect.getColumnName(),
+                profileEstimation.getColumnStatsPath());
         return PhysicalSelect.builder()
                 .columnName(logicalSelect.getColumnName())
                 .lessThanValue(value)

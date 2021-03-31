@@ -1,6 +1,7 @@
 package com.testbed.boundary.readers;
 
 import com.google.common.collect.Streams;
+import com.testbed.entities.profiles.ColumnProfile;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -21,27 +22,33 @@ public class AvroColumnReader implements ColumnReader {
     private static final String VALUE = "Value";
 
     @Override
-    public String getValueFromRowId(final long rowId, final String columnName, final String directory) {
-        Pattern columnPartsPattern = Pattern.compile("count_value_stats_" + columnName + ".avro/part-.*\\.avro$");
-        List<String> columnPartsPaths = tryGetFilesInDirectoryByPattern(directory, columnPartsPattern);
-        return columnPartsPaths.stream()
-                .map(this::tryGetDataFileReaderFromFileName)
-                .flatMap(dataFileReader -> Streams.stream((Iterable<GenericRecord>) dataFileReader))
-                .limit(rowId)
-                .reduce((first, second) -> second)
-                .map(genericRecord -> genericRecord.get(VALUE).toString())
-                .get();
+    public String getValueFromSelectivityFactor(final double selectivityFactor,
+                                                final ColumnProfile columnProfile,
+                                                final String columnName,
+                                                final String directory) {
+        List<String> columnPartsPaths = tryGetFilesInDirectoryByPattern(directory, columnName);
+        int columnPartsCount = columnPartsPaths.size();
+        int columnPartId = getColumnPartId(selectivityFactor, columnPartsCount);
+        String columnPartPath = columnPartsPaths.get(columnPartId);
+        DataFileReader<GenericRecord> dataFileReader = tryGetDataFileReaderFromFileName(columnPartPath);
+        long rowId = getRowId(selectivityFactor, columnProfile, columnPartsCount, columnPartId);
+        return getGenericRecordByRowId(dataFileReader, rowId).get(VALUE).toString();
     }
 
-    private List<String> tryGetFilesInDirectoryByPattern(final String directory, final Pattern pattern) {
+    private List<String> tryGetFilesInDirectoryByPattern(final String directory, final String columnName) {
+        Pattern columnPartsPattern = Pattern.compile("count_value_stats_" + columnName + ".avro/part-.*\\.avro$");
         try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
             return paths.map(Path::toString)
-                    .filter(pattern.asPredicate())
+                    .filter(columnPartsPattern.asPredicate())
                     .sorted()
                     .collect(Collectors.toList());
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    private int getColumnPartId(final double selectivityFactor, final double columnPartsCount) {
+        return (int) (columnPartsCount * selectivityFactor);
     }
 
     private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
@@ -51,5 +58,26 @@ public class AvroColumnReader implements ColumnReader {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    private long getRowId(final double selectivityFactor,
+                          final ColumnProfile columnProfile,
+                          final int columnPartsCount,
+                          final double columnPartId) {
+        long rowsPerColumnPart = columnProfile.getRowsCount()/columnPartsCount;
+        double deltaSelectivityFactor = selectivityFactor - columnPartId /((double) columnPartsCount);
+        long rowId = (long) (((double) rowsPerColumnPart) * deltaSelectivityFactor);
+        if (rowId == rowsPerColumnPart) {
+            return rowId - 1;
+        }
+        return rowId;
+    }
+
+    private GenericRecord getGenericRecordByRowId(final Iterable<GenericRecord> dataFileReader,
+                                                  final long accessibleRowId) {
+        return Streams.stream(dataFileReader)
+                .skip(accessibleRowId)
+                .findFirst()
+                .get();
     }
 }

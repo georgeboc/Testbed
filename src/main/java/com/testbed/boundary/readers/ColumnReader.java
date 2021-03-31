@@ -1,5 +1,10 @@
 package com.testbed.boundary.readers;
 
+import com.testbed.entities.profiles.ColumnProfile;
+
 public interface ColumnReader {
-    String getValueFromRowId(final long rowId, final String columnName, final String filePath);
+    String getValueFromSelectivityFactor(final double selectivityFactor,
+                                         final ColumnProfile columnProfile,
+                                         final String columnName,
+                                         final String filePath);
 }
