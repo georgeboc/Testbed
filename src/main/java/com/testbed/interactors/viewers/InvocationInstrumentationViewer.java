@@ -17,7 +17,7 @@ public class InvocationInstrumentationViewer {
     private final CSVSerializer<InvocationInstrumentationView> invocationInstrumentationViewCSVSerializer;
     private final ObjectMapper objectMapper;
 
-    public void view(String path, List<OperationInstrumentation> operationInstrumentations) {
+    public void view(final String path, final List<OperationInstrumentation> operationInstrumentations) {
         LongStream naturalSuccession = LongStream.iterate(1, i -> i + 1);
         List<InvocationInstrumentationView> invocationInstrumentationViews =
                 Streams.zip(naturalSuccession.boxed(), operationInstrumentations.stream(), this::getInvocationInstrumentationView)
@@ -25,8 +25,8 @@ public class InvocationInstrumentationViewer {
         invocationInstrumentationViewCSVSerializer.serialize(path, invocationInstrumentationViews);
     }
 
-    public InvocationInstrumentationView getInvocationInstrumentationView(long invocationOrder,
-                                                                          OperationInstrumentation operationInstrumentation) {
+    public InvocationInstrumentationView getInvocationInstrumentationView(final long invocationOrder,
+                                                                          final OperationInstrumentation operationInstrumentation) {
         InvocationInstrumentationView invocationInstrumentationView = objectMapper.convertValue(operationInstrumentation,
                 InvocationInstrumentationView.class);
         invocationInstrumentationView.invocationOrder = invocationOrder;

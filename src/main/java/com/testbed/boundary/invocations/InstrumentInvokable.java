@@ -41,13 +41,13 @@ public class InstrumentInvokable implements Invokable {
         return result;
     }
 
-    private List<Long> getRowsCounts(Collection<Result> inputResults) {
+    private List<Long> getRowsCounts(final Collection<Result> inputResults) {
         return inputResults.stream()
                 .map(Result::count)
                 .collect(Collectors.toList());
     }
 
-    private List<List<String>> getColumnNames(Collection<Result> inputResults) {
+    private List<List<String>> getColumnNames(final Collection<Result> inputResults) {
         return inputResults.stream()
                 .map(Result::getColumnNames)
                 .collect(Collectors.toList());

@@ -21,7 +21,7 @@ public class CSVSerializer<T> implements Serializer<List<T>> {
     private final Class<T> tType;
 
     @Override
-    public void serialize(String path, List<T> elements) {
+    public void serialize(final String path, final List<T> elements) {
         try (FileWriter fileWriter = new FileWriter(path)) {
             tryPrintElements(fileWriter, elements);
         } catch (IOException exception) {
@@ -29,7 +29,7 @@ public class CSVSerializer<T> implements Serializer<List<T>> {
         }
     }
 
-    private void tryPrintElements(FileWriter fileWriter, List<T> elements) {
+    private void tryPrintElements(final FileWriter fileWriter, final List<T> elements) {
         try (CSVPrinter printer = new CSVPrinter(fileWriter, CSVFormat.DEFAULT.withHeader(getHeaders()))) {
             elements.forEach(element -> tryPrintElement(printer, element));
         } catch (IOException exception) {
@@ -46,7 +46,7 @@ public class CSVSerializer<T> implements Serializer<List<T>> {
                 .toArray(String[]::new);
     }
 
-    private void tryPrintElement(CSVPrinter csvPrinter, T element) {
+    private void tryPrintElement(final CSVPrinter csvPrinter, final T element) {
         try {
             printElement(csvPrinter, element);
         } catch (IOException exception) {
@@ -54,7 +54,7 @@ public class CSVSerializer<T> implements Serializer<List<T>> {
         }
     }
 
-    private void printElement(CSVPrinter csvPrinter, T element) throws IOException {
+    private void printElement(final CSVPrinter csvPrinter, final T element) throws IOException {
         Arrays.stream(tType.getDeclaredFields()).forEach(ReflectionUtils::makeAccessible);
         Object[] fieldsContents = Arrays.stream(tType.getDeclaredFields())
                 .map(field->tryGetFieldsContent(element, field))
@@ -62,7 +62,7 @@ public class CSVSerializer<T> implements Serializer<List<T>> {
         csvPrinter.printRecord(fieldsContents);
     }
 
-    private Object tryGetFieldsContent(T element, Field field) {
+    private Object tryGetFieldsContent(final T element, final Field field) {
         try {
             return field.get(element);
         } catch (IllegalAccessException exception) {

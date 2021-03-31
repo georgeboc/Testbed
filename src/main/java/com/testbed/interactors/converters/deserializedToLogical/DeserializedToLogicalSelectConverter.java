@@ -7,7 +7,7 @@ import com.testbed.entities.operations.logical.LogicalSelect;
 
 public class DeserializedToLogicalSelectConverter implements DeserializedToLogicalOperationConverter {
     @Override
-    public LogicalOperation convert(DeserializedOperation deserializedOperation) {
+    public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedSelect deserializedSelect = (DeserializedSelect) deserializedOperation;
         return new LogicalSelect(deserializedSelect.getSelectivityFactor(), deserializedSelect.getColumnName());
     }

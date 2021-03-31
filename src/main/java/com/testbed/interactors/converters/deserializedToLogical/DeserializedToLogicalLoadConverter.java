@@ -7,7 +7,7 @@ import com.testbed.entities.operations.logical.LogicalOperation;
 
 public class DeserializedToLogicalLoadConverter implements DeserializedToLogicalOperationConverter {
     @Override
-    public LogicalOperation convert(DeserializedOperation deserializedOperation) {
+    public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedLoad deserializedLoad = (DeserializedLoad) deserializedOperation;
         return new LogicalLoad(deserializedLoad.getDatasetDirectoryPath());
     }

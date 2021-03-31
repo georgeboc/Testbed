@@ -15,7 +15,7 @@ public class LogicalToPhysicalSelectConverter implements LogicalToPhysicalOperat
     private final ColumnReader columnReader;
 
     @Override
-    public PhysicalOperation convert(ProfileEstimation profileEstimation) {
+    public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
         Profile profile = profileEstimation.getProfile();
         LogicalSelect logicalSelect = (LogicalSelect) profileEstimation.getLogicalOperation();
         ColumnProfile columnProfile = profile.getColumns().get(logicalSelect.getColumnName());

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.testbed.boundary.deserializers.AvroProfileDeserializer;
+import com.testbed.boundary.deserializers.DeserializedOperationMixin;
 import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
 import com.testbed.boundary.invocations.InstrumentInvokable;
@@ -17,6 +18,7 @@ import com.testbed.boundary.invocations.spark.SinkInvokable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
 import com.testbed.boundary.serializers.CSVSerializer;
+import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.factories.InteractorFactory;
@@ -43,16 +45,16 @@ import java.util.Map;
 
 @Configuration
 public class SpringConfiguration {
-    private static final String DESERIALIZED_TO_LOGICAL_SELECT_CONVERTER = "deserializedSelectConverter";
-    private static final String DESERIALIZED_TO_LOGICAL_LOAD_CONVERTER = "deserializedLoadConverter";
+    private static final String DESERIALIZED_TO_LOGICAL_SELECT_CONVERTER = "deserializedToLogicalSelectConverter";
+    private static final String DESERIALIZED_TO_LOGICAL_LOAD_CONVERTER = "deserializedToLogicalLoadConverter";
 
     private static final String LOGICAL_SELECT_CONVERTER = "logicalSelectConverter";
     private static final String LOGICAL_LOAD_CONVERTER = "logicalLoadConverter";
 
-    private static final String DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING = "deserializedConvertersMapping";
+    private static final String DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING = "deserializedToLogicalConvertersMapping";
     private static final String LOGICAL_CONVERTERS_MAPPING = "logicalConvertersMapping";
-    private static final String SPARK_PHYSICAL_OPERATION_TO_INVOKABLE_MAPPING = "sparkPhysicalOperationToInvocationMapper";
-    private static final String SPARK_PHYSICAL_OPERATION_TO_INSTRUMENT_INVOKABLE_MAPPING = "sparkPhysicalOperationToInstrumentedInvocationMapper";
+    private static final String SPARK_PHYSICAL_OPERATION_TO_INVOKABLE_MAPPING = "sparkPhysicalOperationToInvokableMapping";
+    private static final String SPARK_PHYSICAL_OPERATION_TO_INSTRUMENT_INVOKABLE_MAPPING = "sparkPhysicalOperationToInstrumentInvokableMapping";
 
     private static final String DESERIALIZED_SELECT = "DeserializedSelect";
     private static final String DESERIALIZED_LOAD = "DeserializedLoad";
@@ -64,14 +66,16 @@ public class SpringConfiguration {
     private static final String PHYSICAL_SELECT = "PhysicalSelect";
     private static final String PHYSICAL_SINK = "PhysicalSink";
 
-    private static final String SPARK_LOAD_INVOKABLE = "sparkLoadInvoker";
-    private static final String SPARK_SELECT_INVOKABLE = "sparkSelectInvoker";
-    private static final String SPARK_SINK_INVOKABLE = "sparkSinkInvoker";
+    private static final String SPARK_LOAD_INVOKABLE = "sparkLoadInvokable";
+    private static final String SPARK_SELECT_INVOKABLE = "sparkSelectInvokable";
+    private static final String SPARK_SINK_INVOKABLE = "sparkSinkInvokable";
 
     private static final String SPARK_INVOKER = "sparkInvoker";
     
     private static final String APP_NAME = "Testbed";
     private static final String LOCAL = "local[*]";
+    private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
+    private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
 
     @Bean
     public ColumnReader getColumnReader() {
@@ -91,7 +95,14 @@ public class SpringConfiguration {
 
     @Bean
     public Deserializer<DeserializedOperations> getOperationsDeserializer() {
-        return new JsonOperationsDeserializer();
+        return new JsonOperationsDeserializer(getObjectMapperWithDeserializedOperationMixin());
+    }
+
+    @Bean(name= OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN)
+    public ObjectMapper getObjectMapperWithDeserializedOperationMixin() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.addMixIn(DeserializedOperation.class, DeserializedOperationMixin.class);
+        return objectMapper;
     }
 
     @Bean
@@ -206,11 +217,11 @@ public class SpringConfiguration {
 
     @Bean
     public InvocationInstrumentationViewer getInvocationInstrumentationViewer() {
-        return new InvocationInstrumentationViewer(getInvocationInstrumentationViewCSVSerializer(), getObjectMapper());
+        return new InvocationInstrumentationViewer(getInvocationInstrumentationViewCSVSerializer(), getObjectMapperWithJavaTimeModule());
     }
 
-    @Bean
-    public ObjectMapper getObjectMapper() {
+    @Bean(name= OBJECT_MAPPER_WITH_JAVA_TIME_MODULE)
+    public ObjectMapper getObjectMapperWithJavaTimeModule() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;

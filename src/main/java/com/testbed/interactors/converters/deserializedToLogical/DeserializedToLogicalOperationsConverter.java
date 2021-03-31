@@ -18,17 +18,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
 public class DeserializedToLogicalOperationsConverter {
-    private final static Logger LOG = Logger.getLogger(DeserializedToLogicalOperationsConverter.class.getName());
     private static final String LOGICAL_LOAD = "LogicalLoad";
     private final Map<String, DeserializedToLogicalOperationConverter> deserializedOperationConverterMapping;
 
-    public LogicalPlan convert(DeserializedOperations deserializedOperations) {
+    public LogicalPlan convert(final DeserializedOperations deserializedOperations) {
         List<Mapping> mappings = getMappings(deserializedOperations);
         List<Mapping> loadMappings = getLoadMappings(mappings);
         Graph<LogicalOperation> graph = createLogicalGraph(loadMappings, mappings);
@@ -39,7 +37,7 @@ public class DeserializedToLogicalOperationsConverter {
                 .build();
     }
 
-    private List<Mapping> getMappings(DeserializedOperations deserializedOperations) {
+    private List<Mapping> getMappings(final DeserializedOperations deserializedOperations) {
         List<Mapping> mappings = Lists.newLinkedList();
         for (DeserializedOperation deserializedOperation: deserializedOperations) {
             DeserializedToLogicalOperationConverter deserializedToLogicalOperationConverter = deserializedOperationConverterMapping
@@ -50,13 +48,13 @@ public class DeserializedToLogicalOperationsConverter {
         return mappings;
     }
 
-    private List<Mapping> getLoadMappings(List<Mapping> mappings) {
+    private List<Mapping> getLoadMappings(final List<Mapping> mappings) {
         return mappings.stream()
                 .filter(mapping -> mapping.getLogicalOperation().getClass().getSimpleName().equals(LOGICAL_LOAD))
                 .collect(Collectors.toList());
     }
 
-    private Graph<LogicalOperation> createLogicalGraph(List<Mapping> loadMappings, List<Mapping> mappings) {
+    private Graph<LogicalOperation> createLogicalGraph(final List<Mapping> loadMappings, final List<Mapping> mappings) {
         Multimap<String, Mapping> mappingByTags = getMappingByTag(mappings);
         MutableGraph<LogicalOperation> logicalGraph = GraphBuilder.directed().build();
         Queue<Mapping> mappingQueue = Lists.newLinkedList();
@@ -72,11 +70,14 @@ public class DeserializedToLogicalOperationsConverter {
         return logicalGraph;
     }
 
-    private List<Mapping> getUnvisitedMappings(MutableGraph<LogicalOperation> logicalGraph, Collection<Mapping> successiveMappings) {
-        return successiveMappings.stream().filter(mapping -> !logicalGraph.nodes().contains(mapping.getLogicalOperation())).collect(Collectors.toList());
+    private List<Mapping> getUnvisitedMappings(final MutableGraph<LogicalOperation> logicalGraph,
+                                               final Collection<Mapping> successiveMappings) {
+        return successiveMappings.stream()
+                .filter(mapping -> !logicalGraph.nodes().contains(mapping.getLogicalOperation()))
+                .collect(Collectors.toList());
     }
 
-    private Multimap<String, Mapping> getMappingByTag(List<Mapping> mappings) {
+    private Multimap<String, Mapping> getMappingByTag(final List<Mapping> mappings) {
         return mappings.stream()
                 .filter(mapping -> (mapping.getDeserializedOperation().getInputTag() != null))
                 .collect(ArrayListMultimap::create,
@@ -84,7 +85,7 @@ public class DeserializedToLogicalOperationsConverter {
                         Multimap::putAll);
     }
 
-    private List<LogicalLoad> getLogicalLoads(List<Mapping> loadMappings) {
+    private List<LogicalLoad> getLogicalLoads(final List<Mapping> loadMappings) {
         return loadMappings.stream()
                 .map(loadMapping -> (LogicalLoad) loadMapping.getLogicalOperation())
                 .collect(Collectors.toList());

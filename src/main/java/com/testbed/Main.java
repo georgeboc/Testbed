@@ -13,10 +13,8 @@ public class Main {
     private static final String DEFAULT_PIPELINE_PATH = "parameters/pipeline.json";
     private static final String DEFAULT_OPERATION_INSTRUMENTATIONS_PATH = "output/operation_instrumentations.csv";
 
-    public static void main(String[] args) throws Exception {
-        System.out.println("Calling Read Json And Print Content Interactor");
+    public static void main(final String[] args) throws Exception {
         InteractorFactory interactorFactory = getReadJsonAndPrintContentFactory();
-
         System.out.printf("Introduce JSON pipeline file path (default: %s):%n", DEFAULT_PIPELINE_PATH);
         String pipelinePath = readLineOrDefault(DEFAULT_PIPELINE_PATH);
         System.out.printf("Introduce CSV operation instrumentations output file path (default: %s):%n", DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
@@ -25,7 +23,7 @@ public class Main {
         interactor.execute();
     }
 
-    private static String readLineOrDefault(String defaultValue) throws IOException {
+    private static String readLineOrDefault(final String defaultValue) throws IOException {
         String lineRead = getBufferedReader().readLine();
         if (lineRead.isBlank()) {
             return defaultValue;

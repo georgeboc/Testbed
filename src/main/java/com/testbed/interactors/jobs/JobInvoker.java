@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class JobInvoker {
     private final Map<String, Invokable> physicalOperationToInstrumentedInvocationMapper;
 
-    public void invokeJob(Job job) {
+    public void invokeJob(final Job job) {
         Stream<Invokable> invokableStream = getInvokablesStream(job.getJobOperations());
         Stream<JobOperation> jobOperationStream = job.getJobOperations().stream();
         Stream<JobOperationInvocation> jobOperationInvocationStream = Streams.zip(invokableStream,
@@ -32,13 +32,14 @@ public class JobInvoker {
                 resultStack));
     }
 
-    private Stream<Invokable> getInvokablesStream(List<JobOperation> jobOperations) {
+    private Stream<Invokable> getInvokablesStream(final List<JobOperation> jobOperations) {
         return jobOperations.stream()
                 .map(jobOperation -> jobOperation.getPhysicalOperation().getClass().getSimpleName())
                 .map(physicalOperationToInstrumentedInvocationMapper::get);
     }
 
-    private void invokeJobOperation(JobOperationInvocation jobOperationInvocation, Stack<Result> resultStack) {
+    private void invokeJobOperation(final JobOperationInvocation jobOperationInvocation,
+                                    final Stack<Result> resultStack) {
         JobOperation jobOperation = jobOperationInvocation.getJobOperation();
         InvocationParameters invocationParameters = createInvocationParameters(jobOperation, resultStack);
         Result result = jobOperationInvocation.getInvokable().invoke(invocationParameters);
@@ -46,14 +47,16 @@ public class JobInvoker {
                 .forEach(unusedParam -> resultStack.push(result));
     }
 
-    private InvocationParameters createInvocationParameters(JobOperation jobOperation, Stack<Result> resultStack) {
+    private InvocationParameters createInvocationParameters(final JobOperation jobOperation,
+                                                            final Stack<Result> resultStack) {
         return InvocationParameters.builder()
                 .physicalOperation(jobOperation.getPhysicalOperation())
                 .inputResults(getInputResults(jobOperation.getPrecedingPhysicalOperationsCount(), resultStack))
                 .build();
     }
 
-    private List<Result> getInputResults(int successivePhysicalOperationsCount, Stack<Result> resultStack) {
+    private List<Result> getInputResults(final int successivePhysicalOperationsCount,
+                                         final Stack<Result> resultStack) {
         List<Result> results = Lists.newArrayList();
         IntStream.range(0, successivePhysicalOperationsCount).forEach(unusedParam -> results.add(resultStack.pop()));
         return results;

@@ -21,7 +21,7 @@ public class AvroColumnReader implements ColumnReader {
     private static final String VALUE = "Value";
 
     @Override
-    public String getValueFromRowId(long rowId, String columnName, String directory) {
+    public String getValueFromRowId(final long rowId, final String columnName, final String directory) {
         Pattern columnPartsPattern = Pattern.compile("count_value_stats_" + columnName + ".avro/part-.*\\.avro$");
         List<String> columnPartsPaths = tryGetFilesInDirectoryByPattern(directory, columnPartsPattern);
         return columnPartsPaths.stream()
@@ -33,7 +33,7 @@ public class AvroColumnReader implements ColumnReader {
                 .get();
     }
 
-    private List<String> tryGetFilesInDirectoryByPattern(String directory, Pattern pattern) {
+    private List<String> tryGetFilesInDirectoryByPattern(final String directory, final Pattern pattern) {
         try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
             return paths.map(Path::toString)
                     .filter(pattern.asPredicate())
@@ -44,8 +44,8 @@ public class AvroColumnReader implements ColumnReader {
         }
     }
 
-    private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(String filename) {
-        DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
+    private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
+        final DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
         try {
             return new DataFileReader<>(new File(filename), datumReader);
         } catch (IOException exception) {

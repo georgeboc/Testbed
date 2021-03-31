@@ -5,5 +5,5 @@ import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.profiles.ProfileEstimation;
 
 public interface LogicalToPhysicalOperationConverter {
-    PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException;
+    PhysicalOperation convert(final ProfileEstimation profileEstimation) throws ColumnNotFoundException;
 }

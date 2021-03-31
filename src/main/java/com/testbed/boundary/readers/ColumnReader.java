@@ -1,5 +1,5 @@
 package com.testbed.boundary.readers;
 
 public interface ColumnReader {
-    String getValueFromRowId(long rowId, String columnName, String filePath);
+    String getValueFromRowId(final long rowId, final String columnName, final String filePath);
 }

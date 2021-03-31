@@ -27,12 +27,12 @@ public class AvroProfileDeserializer implements Deserializer<Profile> {
     private static final String METADATA_FILENAME = "metadata.avro";
 
     @Override
-    public Profile deserialize(String path) throws RuntimeException {
+    public Profile deserialize(final String path) throws RuntimeException {
         Map<String, ColumnProfile> columns = getColumnProfiles(path);
         return new Profile(columns);
     }
 
-    private Map<String, ColumnProfile> getColumnProfiles(String path) {
+    private Map<String, ColumnProfile> getColumnProfiles(final String path) {
         Pattern columnFileNamePattern = Pattern.compile("count_value_stats_([^/])*\\.avro$");
         List<String> columnFilePaths = tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
         Stream<String> columnNamesStream = getColumnNamesStream(columnFilePaths);
@@ -41,7 +41,7 @@ public class AvroProfileDeserializer implements Deserializer<Profile> {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private List<String> tryGetFilesInDirectoryByPattern(String directory, Pattern pattern) {
+    private List<String> tryGetFilesInDirectoryByPattern(final String directory, final Pattern pattern) {
         try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
             return paths.map(Path::toString)
                     .filter(pattern.asPredicate())
@@ -51,7 +51,7 @@ public class AvroProfileDeserializer implements Deserializer<Profile> {
         }
     }
 
-    private Stream<String> getColumnNamesStream(List<String> columnProfileFileNames) {
+    private Stream<String> getColumnNamesStream(final List<String> columnProfileFileNames) {
         Pattern columnFileNamePattern = Pattern.compile("count_value_stats_(.*)\\.avro");
         return columnProfileFileNames.stream()
                 .map(columnFileNamePattern::matcher)
@@ -60,14 +60,14 @@ public class AvroProfileDeserializer implements Deserializer<Profile> {
                 .distinct();
     }
 
-    private Stream<ColumnProfile> getColumnProfileStream(List<String> columnFilePaths) {
+    private Stream<ColumnProfile> getColumnProfileStream(final List<String> columnFilePaths) {
         return columnFilePaths.stream()
                 .map(columnFilePath -> columnFilePath + '/' + METADATA_FILENAME)
                 .map(this::tryGetDataFileReaderFromFileName)
                 .map(this::getColumnProfileFromDataFileReader);
     }
 
-    private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(String filename) {
+    private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
         DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
         try {
             return new DataFileReader<>(new File(filename), datumReader);
@@ -76,7 +76,7 @@ public class AvroProfileDeserializer implements Deserializer<Profile> {
         }
     }
 
-    private ColumnProfile getColumnProfileFromDataFileReader(DataFileReader<GenericRecord> dataFileReader) {
+    private ColumnProfile getColumnProfileFromDataFileReader(final DataFileReader<GenericRecord> dataFileReader) {
         GenericRecord genericRecord = dataFileReader.next();
         return ColumnProfile.builder()
             .isUnique(Boolean.parseBoolean(genericRecord.get(IS_UNIQUE).toString()))

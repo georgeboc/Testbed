@@ -31,7 +31,7 @@ public class LogicalToPhysicalOperationsConverter {
     private final Deserializer<Profile> profileDeserializer;
     private final Map<String, LogicalToPhysicalOperationConverter> logicalOperationConverterMapping;
 
-    public PhysicalPlan convert(LogicalPlan logicalPlan) {
+    public PhysicalPlan convert(final LogicalPlan logicalPlan) {
         List<LogicalLoad> logicalLoads = logicalPlan.getLogicalLoads();
         List<ProfileEstimation> loadProfileEstimations = getLoadProfileEstimations(logicalLoads);
         Graph<PhysicalOperation> graph = createPhysicalGraph(loadProfileEstimations, logicalPlan);
@@ -42,7 +42,7 @@ public class LogicalToPhysicalOperationsConverter {
                 .build();
     }
 
-    private List<ProfileEstimation> getLoadProfileEstimations(List<LogicalLoad> logicalLoads) {
+    private List<ProfileEstimation> getLoadProfileEstimations(final List<LogicalLoad> logicalLoads) {
         return logicalLoads.stream()
                 .map(logicalLoad -> ProfileEstimation.builder()
                         .logicalOperation(logicalLoad)
@@ -52,8 +52,8 @@ public class LogicalToPhysicalOperationsConverter {
                 .collect(Collectors.toList());
     }
 
-    private Graph<PhysicalOperation> createPhysicalGraph(List<ProfileEstimation> loadProfileEstimations,
-                                                         LogicalPlan logicalPlan) {
+    private Graph<PhysicalOperation> createPhysicalGraph(final List<ProfileEstimation> loadProfileEstimations,
+                                                         final LogicalPlan logicalPlan) {
         MutableGraph<PhysicalOperation> physicalGraph = GraphBuilder.directed().build();
 
         Stack<ProfileEstimation> operationsStack = new Stack<>();
@@ -76,20 +76,20 @@ public class LogicalToPhysicalOperationsConverter {
         return physicalGraph;
     }
 
-    private Collection<ProfileEstimation> getUnvisitedSuccessiveProfileEstimations(List<ProfileEstimation> successiveProfileEstimations,
-                                                                                   Set<ProfileEstimation> visitedProfileEstimations) {
+    private Collection<ProfileEstimation> getUnvisitedSuccessiveProfileEstimations(final List<ProfileEstimation> successiveProfileEstimations,
+                                                                                   final Set<ProfileEstimation> visitedProfileEstimations) {
         return successiveProfileEstimations.stream()
                 .filter(successiveProfileEstimation -> !visitedProfileEstimations.contains(successiveProfileEstimation))
                 .collect(Collectors.toList());
     }
 
-    private PhysicalOperation getPhysicalOperation(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
+    private PhysicalOperation getPhysicalOperation(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         String logicalOperationName = profileEstimation.getLogicalOperation().getClass().getSimpleName();
         return logicalOperationConverterMapping.get(logicalOperationName).convert(profileEstimation);
     }
 
-    private List<ProfileEstimation> getSuccessiveProfileEstimations(ProfileEstimation currentProfileEstimation,
-                                                                    Collection<LogicalOperation> successiveLogicalOperations) {
+    private List<ProfileEstimation> getSuccessiveProfileEstimations(final ProfileEstimation currentProfileEstimation,
+                                                                    final Collection<LogicalOperation> successiveLogicalOperations) {
         return successiveLogicalOperations.stream()
                 .map(logicalOperation -> ProfileEstimation.builder()
                         .logicalOperation(logicalOperation)
@@ -99,7 +99,7 @@ public class LogicalToPhysicalOperationsConverter {
                 .collect(Collectors.toList());
     }
 
-    private List<PhysicalLoad> getPhysicalLoads(Graph<PhysicalOperation> graph) {
+    private List<PhysicalLoad> getPhysicalLoads(final Graph<PhysicalOperation> graph) {
         return graph.nodes().stream()
                 .filter(physicalOperation -> physicalOperation.getClass().getSimpleName().equals(PHYSICAL_LOAD))
                 .map(physicalOperation -> (PhysicalLoad) physicalOperation)

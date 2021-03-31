@@ -2,23 +2,24 @@ package com.testbed.boundary.deserializers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+@RequiredArgsConstructor
 public class JsonOperationsDeserializer implements Deserializer<DeserializedOperations> {
+    private final ObjectMapper objectMapper;
+
     @Override
-    public DeserializedOperations deserialize(String path) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.addMixIn(DeserializedOperation.class, DeserializedOperationMixin.class);
+    public DeserializedOperations deserialize(final String path) {
         String fileContents = tryReadFileContents(path);
-        return tryReadValueFromMapper(mapper, fileContents);
+        return tryReadValueFromMapper(objectMapper, fileContents);
     }
 
-    private DeserializedOperations tryReadValueFromMapper(ObjectMapper mapper, String fileContents) {
+    private DeserializedOperations tryReadValueFromMapper(final ObjectMapper mapper, final String fileContents) {
         try {
             return mapper.readValue(fileContents, DeserializedOperations.class);
         } catch (JsonProcessingException exception) {
@@ -26,7 +27,7 @@ public class JsonOperationsDeserializer implements Deserializer<DeserializedOper
         }
     }
 
-    private String tryReadFileContents(String path) {
+    private String tryReadFileContents(final String path) {
         try {
             return Files.readString(Paths.get(path));
         } catch (IOException exception) {

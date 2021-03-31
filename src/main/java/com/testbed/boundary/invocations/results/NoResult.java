@@ -7,7 +7,7 @@ import java.util.List;
 public class NoResult implements Result {
     @Override
     public Object getValues() {
-        return null;
+        return new Object();
     }
 
     @Override
