@@ -1,21 +1,22 @@
 package com.testbed.configuration;
 
 import com.clearspring.analytics.util.Lists;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.testbed.boundary.deserializers.AvroProfileDeserializer;
 import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
-import com.testbed.boundary.executors.Executable;
-import com.testbed.boundary.executors.InstrumentedExecutable;
-import com.testbed.boundary.executors.spark.LoadExecutable;
-import com.testbed.boundary.executors.spark.SelectExecutable;
-import com.testbed.boundary.executors.spark.SinkExecutable;
+import com.testbed.boundary.invocations.InstrumentInvokable;
+import com.testbed.boundary.invocations.Invokable;
+import com.testbed.boundary.invocations.OperationInstrumentation;
+import com.testbed.boundary.invocations.spark.LoadInvokable;
+import com.testbed.boundary.invocations.spark.SelectInvokable;
+import com.testbed.boundary.invocations.spark.SinkInvokable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
-import com.testbed.boundary.serializers.CSVOperationInstrumentationsSerializer;
-import com.testbed.boundary.serializers.Serializer;
-import com.testbed.entities.instrumentation.OperationInstrumentation;
+import com.testbed.boundary.serializers.CSVSerializer;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.factories.InteractorFactory;
@@ -27,8 +28,10 @@ import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalLoa
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalSelectConverter;
-import com.testbed.interactors.executors.Executor;
-import com.testbed.interactors.executors.TopologicalSorter;
+import com.testbed.interactors.jobs.JobCreator;
+import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
+import com.testbed.views.InvocationInstrumentationView;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.SparkSession;
@@ -40,17 +43,16 @@ import java.util.Map;
 
 @Configuration
 public class SpringConfiguration {
-    private static final String DESERIALIZED_SELECT_CONVERTER = "deserializedSelectConverter";
-    private static final String DESERIALIZED_LOAD_CONVERTER = "deserializedLoadConverter";
+    private static final String DESERIALIZED_TO_LOGICAL_SELECT_CONVERTER = "deserializedSelectConverter";
+    private static final String DESERIALIZED_TO_LOGICAL_LOAD_CONVERTER = "deserializedLoadConverter";
 
     private static final String LOGICAL_SELECT_CONVERTER = "logicalSelectConverter";
     private static final String LOGICAL_LOAD_CONVERTER = "logicalLoadConverter";
 
-    private static final String DESERIALIZED_CONVERTERS_MAPPING = "deserializedConvertersMapping";
+    private static final String DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING = "deserializedConvertersMapping";
     private static final String LOGICAL_CONVERTERS_MAPPING = "logicalConvertersMapping";
-    private static final String SPARK_PHYSICAL_OPERATION_TO_EXECUTABLE_MAPPING = "sparkPhysicalOperationToExecutableMapper";
-    private static final String SPARK_PHYSICAL_OPERATION_TO_INSTRUMENTED_EXECUTABLE_MAPPING = "sparkPhysicalOperationToInstrumentedExecutableMapper";
-
+    private static final String SPARK_PHYSICAL_OPERATION_TO_INVOKABLE_MAPPING = "sparkPhysicalOperationToInvocationMapper";
+    private static final String SPARK_PHYSICAL_OPERATION_TO_INSTRUMENT_INVOKABLE_MAPPING = "sparkPhysicalOperationToInstrumentedInvocationMapper";
 
     private static final String DESERIALIZED_SELECT = "DeserializedSelect";
     private static final String DESERIALIZED_LOAD = "DeserializedLoad";
@@ -62,27 +64,14 @@ public class SpringConfiguration {
     private static final String PHYSICAL_SELECT = "PhysicalSelect";
     private static final String PHYSICAL_SINK = "PhysicalSink";
 
-    private static final String SPARK_LOAD_EXECUTABLE = "sparkLoadExecutable";
-    private static final String SPARK_SELECT_EXECUTABLE = "sparkSelectExecutable";
-    private static final String SPARK_SINK_EXECUTABLE = "sparkSinkExecutable";
+    private static final String SPARK_LOAD_INVOKABLE = "sparkLoadInvoker";
+    private static final String SPARK_SELECT_INVOKABLE = "sparkSelectInvoker";
+    private static final String SPARK_SINK_INVOKABLE = "sparkSinkInvoker";
 
+    private static final String SPARK_INVOKER = "sparkInvoker";
+    
     private static final String APP_NAME = "Testbed";
     private static final String LOCAL = "local[*]";
-
-    @Bean
-    public Serializer<List<OperationInstrumentation>> getOperationInstrumentationsSerializer() {
-        return new CSVOperationInstrumentationsSerializer();
-    }
-
-    @Bean
-    public Deserializer<DeserializedOperations> getOperationsDeserializer() {
-        return new JsonOperationsDeserializer();
-    }
-
-    @Bean
-    public Deserializer<Profile> getProfileDeserializer() {
-        return new AvroProfileDeserializer();
-    }
 
     @Bean
     public ColumnReader getColumnReader() {
@@ -92,34 +81,58 @@ public class SpringConfiguration {
     @Bean
     public InteractorFactory getReadJsonAndPrintContentFactory() {
         return new InteractorFactory(getOperationsDeserializer(),
-                getDeserializedOperationsConverter(),
+                getDeserializedToLogicalOperationsConverter(),
                 getLogicalOperationsConverter(),
-                getSparkExecutor(),
+                getJobCreator(),
+                getSparkInvoker(),
                 getOperationInstrumentations(),
-                getOperationInstrumentationsSerializer());
-    }
-
-    @Bean(name=DESERIALIZED_LOAD_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedLoadConverter() {
-        return new DeserializedToLogicalLoadConverter();
-    }
-
-    @Bean(name=DESERIALIZED_SELECT_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedSelectConverter() {
-        return new DeserializedToLogicalSelectConverter();
-    }
-
-    @Bean(name=DESERIALIZED_CONVERTERS_MAPPING)
-    public Map<String, DeserializedToLogicalOperationConverter> getDeserializedConvertersMapping() {
-        return Maps.newHashMap(ImmutableMap.of(
-                DESERIALIZED_LOAD, getDeserializedLoadConverter(),
-                DESERIALIZED_SELECT, getDeserializedSelectConverter()
-        ));
+                getInvocationInstrumentationViewer());
     }
 
     @Bean
-    public DeserializedToLogicalOperationsConverter getDeserializedOperationsConverter() {
-        return new DeserializedToLogicalOperationsConverter(getDeserializedConvertersMapping());
+    public Deserializer<DeserializedOperations> getOperationsDeserializer() {
+        return new JsonOperationsDeserializer();
+    }
+
+    @Bean
+    public DeserializedToLogicalOperationsConverter getDeserializedToLogicalOperationsConverter() {
+        return new DeserializedToLogicalOperationsConverter(getDeserializedToLogicalConvertersMapping());
+    }
+
+    @Bean(name= DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING)
+    public Map<String, DeserializedToLogicalOperationConverter> getDeserializedToLogicalConvertersMapping() {
+        return Maps.newHashMap(ImmutableMap.of(
+                DESERIALIZED_LOAD, getDeserializedToLogicalLoadConverter(),
+                DESERIALIZED_SELECT, getDeserializedToLogicalSelectConverter()
+        ));
+    }
+
+    @Bean(name= DESERIALIZED_TO_LOGICAL_LOAD_CONVERTER)
+    public DeserializedToLogicalOperationConverter getDeserializedToLogicalLoadConverter() {
+        return new DeserializedToLogicalLoadConverter();
+    }
+
+    @Bean(name= DESERIALIZED_TO_LOGICAL_SELECT_CONVERTER)
+    public DeserializedToLogicalOperationConverter getDeserializedToLogicalSelectConverter() {
+        return new DeserializedToLogicalSelectConverter();
+    }
+
+    @Bean
+    public LogicalToPhysicalOperationsConverter getLogicalOperationsConverter() {
+        return new LogicalToPhysicalOperationsConverter(getProfileDeserializer(), getLogicalConvertersMapping());
+    }
+
+    @Bean
+    public Deserializer<Profile> getProfileDeserializer() {
+        return new AvroProfileDeserializer();
+    }
+
+    @Bean(name=LOGICAL_CONVERTERS_MAPPING)
+    public Map<String, LogicalToPhysicalOperationConverter> getLogicalConvertersMapping() {
+        return Maps.newHashMap(ImmutableMap.of(
+                LOGICAL_LOAD, getLogicalLoadConverter(),
+                LOGICAL_SELECT, getLogicalSelectConverter()
+        ));
     }
 
     @Bean(name=LOGICAL_LOAD_CONVERTER)
@@ -132,31 +145,47 @@ public class SpringConfiguration {
         return new LogicalToPhysicalSelectConverter(getColumnReader());
     }
 
-    @Bean(name=LOGICAL_CONVERTERS_MAPPING)
-    public Map<String, LogicalToPhysicalOperationConverter> getLogicalConvertersMapping() {
+    @Bean
+    public JobCreator getJobCreator() {
+        return new JobCreator();
+    }
+    
+    @Bean(name= SPARK_INVOKER)
+    public JobInvoker getSparkInvoker() {
+        return new JobInvoker(getSparkPhysicalOperationToInstrumentInvokableMapper());
+    }
+
+    @Bean(name= SPARK_PHYSICAL_OPERATION_TO_INSTRUMENT_INVOKABLE_MAPPING)
+    public Map<String, Invokable> getSparkPhysicalOperationToInstrumentInvokableMapper() {
         return Maps.newHashMap(ImmutableMap.of(
-                LOGICAL_LOAD, getLogicalLoadConverter(),
-                LOGICAL_SELECT, getLogicalSelectConverter()
+                PHYSICAL_LOAD, getInstrumentInvokable(getSparkLoadInvokable()),
+                PHYSICAL_SELECT, getInstrumentInvokable(getSparkSelectInvokable()),
+                PHYSICAL_SINK, getInstrumentInvokable(getSparkSinkInvokable())
         ));
     }
 
-    @Bean
-    public LogicalToPhysicalOperationsConverter getLogicalOperationsConverter() {
-         return new LogicalToPhysicalOperationsConverter(getProfileDeserializer(), getLogicalConvertersMapping());
+    public Invokable getInstrumentInvokable(Invokable wrappedInvokable) {
+        return new InstrumentInvokable(wrappedInvokable, getOperationInstrumentations());
     }
 
-    @Bean
-    public TopologicalSorter getTopologicalSorter() {
-        return new TopologicalSorter();
+    @Bean(name= SPARK_LOAD_INVOKABLE)
+    public Invokable getSparkLoadInvokable() {
+        return new LoadInvokable(getSparkSession());
+    }
+
+    @Bean(name= SPARK_SELECT_INVOKABLE)
+    public Invokable getSparkSelectInvokable() {
+        return new SelectInvokable();
+    }
+
+    @Bean(name= SPARK_SINK_INVOKABLE)
+    public Invokable getSparkSinkInvokable() {
+        return new SinkInvokable();
     }
 
     @Bean
     public List<OperationInstrumentation> getOperationInstrumentations() {
         return Lists.newArrayList();
-    }
-
-    public Executable getInstrumentedExecutable(Executable wrappedExecutable) {
-        return new InstrumentedExecutable(wrappedExecutable, getOperationInstrumentations());
     }
 
     @Bean
@@ -166,41 +195,29 @@ public class SpringConfiguration {
         return new SparkSession(sparkContext);
     }
 
-    @Bean(name=SPARK_LOAD_EXECUTABLE)
-    public Executable getSparkLoadExecutable() {
-        return new LoadExecutable(getSparkSession());
-    }
-
-    @Bean(name=SPARK_SELECT_EXECUTABLE)
-    public Executable getSparkSelectExecutable() {
-        return new SelectExecutable();
-    }
-
-    @Bean(name=SPARK_SINK_EXECUTABLE)
-    public Executable getSparkSinkExecutable() {
-        return new SinkExecutable();
-    }
-
-    @Bean(name=SPARK_PHYSICAL_OPERATION_TO_EXECUTABLE_MAPPING)
-    public Map<String, Executable> getSparkPhysicalOperationToExecutableMapper() {
+    @Bean(name= SPARK_PHYSICAL_OPERATION_TO_INVOKABLE_MAPPING)
+    public Map<String, Invokable> getSparkPhysicalOperationToInvokableMapper() {
         return Maps.newHashMap(ImmutableMap.of(
-                PHYSICAL_LOAD, getSparkLoadExecutable(),
-                PHYSICAL_SELECT, getSparkSelectExecutable(),
-                PHYSICAL_SINK, getSparkSinkExecutable()
-        ));
-    }
-
-    @Bean(name=SPARK_PHYSICAL_OPERATION_TO_INSTRUMENTED_EXECUTABLE_MAPPING)
-    public Map<String, Executable> getSparkPhysicalOperationToInstrumentedExecutableMapper() {
-        return Maps.newHashMap(ImmutableMap.of(
-                PHYSICAL_LOAD, getInstrumentedExecutable(getSparkLoadExecutable()),
-                PHYSICAL_SELECT, getInstrumentedExecutable(getSparkSelectExecutable()),
-                PHYSICAL_SINK, getInstrumentedExecutable(getSparkSinkExecutable())
+                PHYSICAL_LOAD, getSparkLoadInvokable(),
+                PHYSICAL_SELECT, getSparkSelectInvokable(),
+                PHYSICAL_SINK, getSparkSinkInvokable()
         ));
     }
 
     @Bean
-    public Executor getSparkExecutor() {
-        return new Executor(getTopologicalSorter(), getSparkPhysicalOperationToInstrumentedExecutableMapper());
+    public InvocationInstrumentationViewer getInvocationInstrumentationViewer() {
+        return new InvocationInstrumentationViewer(getInvocationInstrumentationViewCSVSerializer(), getObjectMapper());
+    }
+
+    @Bean
+    public ObjectMapper getObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        return objectMapper;
+    }
+
+    @Bean
+    public CSVSerializer<InvocationInstrumentationView> getInvocationInstrumentationViewCSVSerializer() {
+        return new CSVSerializer<>(InvocationInstrumentationView.class);
     }
 }

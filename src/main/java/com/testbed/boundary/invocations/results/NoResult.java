@@ -1,7 +1,6 @@
-package com.testbed.boundary.executors.spark;
+package com.testbed.boundary.invocations.results;
 
 import com.clearspring.analytics.util.Lists;
-import com.testbed.boundary.executors.Result;
 
 import java.util.List;
 

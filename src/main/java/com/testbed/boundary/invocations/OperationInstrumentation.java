@@ -1,4 +1,4 @@
-package com.testbed.entities.instrumentation;
+package com.testbed.boundary.invocations;
 
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class OperationInstrumentation {
     private final long outputRowsCount;
     private final List<List<String>> inputsColumnNames;
     private final List<String> outputColumnNames;
-    private final Instant instantBeforeExecution;
-    private final Instant instantAfterExecution;
-    private final Duration executionDuration;
+    private final Instant instantBeforeInvocation;
+    private final Instant instantAfterInvocation;
+    private final Duration invocationDuration;
 }

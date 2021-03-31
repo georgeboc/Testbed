@@ -1,8 +1,10 @@
-package com.testbed.interactors.executors;
+package com.testbed.interactors.jobs;
 
 import com.clearspring.analytics.util.Lists;
 import com.google.common.base.Functions;
 import com.google.common.graph.Graph;
+import com.testbed.entities.jobs.Job;
+import com.testbed.entities.jobs.JobOperation;
 import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.operations.physical.PhysicalPlan;
 
@@ -13,20 +15,26 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("UnstableApiUsage")
-public class TopologicalSorter {
-    public List<PhysicalOperation> sortTopologically(PhysicalPlan physicalPlan) {
+public class JobCreator {
+    public Job createJob(PhysicalPlan physicalPlan) {
         Stack<PhysicalOperation> physicalOperationStack = new Stack<>();
-        List<PhysicalOperation> topologicallySortedPhysicalOperations = Lists.newArrayList();
+        List<JobOperation> jobOperations = Lists.newArrayList();
         Map<PhysicalOperation, Integer> inputDependencyCounter = countInputDependencies(physicalPlan);
         physicalOperationStack.addAll(getPhysicalOperationsWithoutDependencies(inputDependencyCounter));
         while (!physicalOperationStack.empty()) {
             PhysicalOperation currentPhysicalOperation = physicalOperationStack.pop();
             inputDependencyCounter.remove(currentPhysicalOperation);
-            topologicallySortedPhysicalOperations.add(currentPhysicalOperation);
+            jobOperations.add(createJobOperation(currentPhysicalOperation, physicalPlan.getGraph()));
             decreaseInputDependencyCounterForAllSuccessors(physicalPlan, inputDependencyCounter, currentPhysicalOperation);
             physicalOperationStack.addAll(getPhysicalOperationsWithoutDependencies(inputDependencyCounter));
         }
-        return topologicallySortedPhysicalOperations;
+        return new Job(jobOperations);
+    }
+
+    private JobOperation createJobOperation(PhysicalOperation currentPhysicalOperation, Graph<PhysicalOperation> graph) {
+        return new JobOperation(currentPhysicalOperation,
+                graph.inDegree(currentPhysicalOperation),
+                graph.outDegree(currentPhysicalOperation));
     }
 
     private void decreaseInputDependencyCounterForAllSuccessors(PhysicalPlan physicalPlan,

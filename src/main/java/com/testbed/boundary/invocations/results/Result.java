@@ -1,4 +1,4 @@
-package com.testbed.boundary.executors;
+package com.testbed.boundary.invocations.results;
 
 import java.util.List;
 

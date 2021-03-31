@@ -1,6 +1,5 @@
-package com.testbed.boundary.executors.spark;
+package com.testbed.boundary.invocations.results;
 
-import com.testbed.boundary.executors.Result;
 import lombok.Data;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
