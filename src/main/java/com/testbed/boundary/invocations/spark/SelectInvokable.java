@@ -18,8 +18,8 @@ public class SelectInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,
-                "Select operation receives %d inputs from previous node, when it is expected to receive one",
-                invocationParameters.getInputResults().size());
+                "Select operation is expected to receive one input from a previous node, although it " +
+                        "receives %d inputs", invocationParameters.getInputResults().size());
 
         PhysicalSelect physicalSelect = (PhysicalSelect) invocationParameters.getPhysicalOperation();
         Dataset<Row> outputDataset = getOutputDataset(invocationParameters, physicalSelect);
