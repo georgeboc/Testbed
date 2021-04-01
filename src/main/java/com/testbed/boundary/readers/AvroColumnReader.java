@@ -28,7 +28,7 @@ public class AvroColumnReader implements ColumnReader {
                                                 final String directory) {
         List<String> columnPartsPaths = tryGetFilesInDirectoryByPattern(directory, columnName);
         int columnPartsCount = columnPartsPaths.size();
-        int columnPartId = getColumnPartId(selectivityFactor, columnPartsCount);
+        int columnPartId = (int) (columnPartsCount*selectivityFactor);
         String columnPartPath = columnPartsPaths.get(columnPartId);
         DataFileReader<GenericRecord> dataFileReader = tryGetDataFileReaderFromFileName(columnPartPath);
         long rowId = getRowId(selectivityFactor, columnProfile, columnPartsCount, columnPartId);
@@ -47,10 +47,6 @@ public class AvroColumnReader implements ColumnReader {
         }
     }
 
-    private int getColumnPartId(final double selectivityFactor, final double columnPartsCount) {
-        return (int) (columnPartsCount * selectivityFactor);
-    }
-
     private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
         final DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
         try {
@@ -65,8 +61,8 @@ public class AvroColumnReader implements ColumnReader {
                           final int columnPartsCount,
                           final double columnPartId) {
         long rowsPerColumnPart = columnProfile.getRowsCount()/columnPartsCount;
-        double deltaSelectivityFactor = selectivityFactor - columnPartId /((double) columnPartsCount);
-        long rowId = (long) (((double) rowsPerColumnPart) * deltaSelectivityFactor);
+        double deltaSelectivityFactor = selectivityFactor - columnPartId/columnPartsCount;
+        long rowId = (long) (rowsPerColumnPart * deltaSelectivityFactor);
         if (rowId == rowsPerColumnPart) {
             return rowId - 1;
         }

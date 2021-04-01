@@ -26,9 +26,11 @@ public class LogicalToPhysicalSelectConverter implements LogicalToPhysicalOperat
                 columnProfile,
                 logicalSelect.getColumnName(),
                 profileEstimation.getColumnStatsPath());
+        long expectedOutputRowsCount = (long) (columnProfile.getRowsCount()*logicalSelect.getSelectivityFactor());
         return PhysicalSelect.builder()
                 .columnName(logicalSelect.getColumnName())
                 .lessThanValue(value)
+                .expectedOutputRowsCount(expectedOutputRowsCount)
                 .build();
     }
 }

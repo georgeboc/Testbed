@@ -25,9 +25,11 @@ public class InteractorFactory {
     private final InvocationInstrumentationViewer invocationInstrumentationViewer;
 
     public Interactor getReadJsonAndPrintContent(final String pipelineFileName,
-                                                 final String operationInstrumentationsOutputPath) {
+                                                 final String operationInstrumentationsOutputPath,
+                                                 final double tolerableErrorPercentage) {
         return new SparkRunnerInteractor(pipelineFileName,
                 operationInstrumentationsOutputPath,
+                tolerableErrorPercentage,
                 operationsDeserializer,
                 deserializedToLogicalOperationsConverter,
                 logicalToPhysicalOperationsConverter,

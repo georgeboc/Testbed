@@ -8,4 +8,5 @@ import lombok.Data;
 public class PhysicalSelect implements PhysicalOperation {
     private final String lessThanValue;
     private final String columnName;
+    private final long expectedOutputRowsCount;
 }

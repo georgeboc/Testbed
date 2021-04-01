@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 public class Main {
     private static final String DEFAULT_PIPELINE_PATH = "parameters/pipeline.json";
     private static final String DEFAULT_OPERATION_INSTRUMENTATIONS_PATH = "output/operation_instrumentations.csv";
+    private static final String DEFAULT_TOLERABLE_ERROR_PERCENTAGE = "5.0";
 
     public static void main(final String[] args) throws Exception {
         InteractorFactory interactorFactory = getReadJsonAndPrintContentFactory();
@@ -19,7 +20,11 @@ public class Main {
         String pipelinePath = readLineOrDefault(DEFAULT_PIPELINE_PATH);
         System.out.printf("Introduce CSV operation instrumentations output file path (default: %s):%n", DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
         String operationInstrumentationsPath = readLineOrDefault(DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
-        Interactor interactor = interactorFactory.getReadJsonAndPrintContent(pipelinePath, operationInstrumentationsPath);
+        System.out.printf("Introduce the tolerable error percentage (default: %s):%n", DEFAULT_TOLERABLE_ERROR_PERCENTAGE);
+        double tolerableErrorPercentage = Double.parseDouble(readLineOrDefault(DEFAULT_TOLERABLE_ERROR_PERCENTAGE));
+        Interactor interactor = interactorFactory.getReadJsonAndPrintContent(pipelinePath,
+                operationInstrumentationsPath,
+                tolerableErrorPercentage);
         interactor.execute();
     }
 

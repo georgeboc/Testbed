@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public class JobInvoker {
     private final Map<String, Invokable> physicalOperationToInstrumentedInvocationMapper;
 
-    public void invokeJob(final Job job) {
+    public void invokeJob(final Job job, final double tolerableErrorPercentage) {
         Stream<Invokable> invokableStream = getInvokablesStream(job.getJobOperations());
         Stream<JobOperation> jobOperationStream = job.getJobOperations().stream();
         Stream<JobOperationInvocation> jobOperationInvocationStream = Streams.zip(invokableStream,
@@ -29,7 +29,7 @@ public class JobInvoker {
                 JobOperationInvocation::new);
         Stack<Result> resultStack = new Stack<>();
         jobOperationInvocationStream.forEach(jobOperationInvocation -> invokeJobOperation(jobOperationInvocation,
-                resultStack));
+                resultStack, tolerableErrorPercentage));
     }
 
     private Stream<Invokable> getInvokablesStream(final List<JobOperation> jobOperations) {
@@ -39,19 +39,24 @@ public class JobInvoker {
     }
 
     private void invokeJobOperation(final JobOperationInvocation jobOperationInvocation,
-                                    final Stack<Result> resultStack) {
+                                    final Stack<Result> resultStack,
+                                    final double tolerableErrorPercentage) {
         JobOperation jobOperation = jobOperationInvocation.getJobOperation();
-        InvocationParameters invocationParameters = createInvocationParameters(jobOperation, resultStack);
+        InvocationParameters invocationParameters = createInvocationParameters(jobOperation,
+                resultStack,
+                tolerableErrorPercentage);
         Result result = jobOperationInvocation.getInvokable().invoke(invocationParameters);
         IntStream.range(0, jobOperation.getSucceedingPhysicalOperationsCount())
                 .forEach(unusedParam -> resultStack.push(result));
     }
 
     private InvocationParameters createInvocationParameters(final JobOperation jobOperation,
-                                                            final Stack<Result> resultStack) {
+                                                            final Stack<Result> resultStack,
+                                                            final double tolerableErrorPercentage) {
         return InvocationParameters.builder()
                 .physicalOperation(jobOperation.getPhysicalOperation())
                 .inputResults(getInputResults(jobOperation.getPrecedingPhysicalOperationsCount(), resultStack))
+                .tolerableErrorPercentage(tolerableErrorPercentage)
                 .build();
     }
 

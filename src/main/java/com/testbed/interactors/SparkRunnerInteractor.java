@@ -22,6 +22,7 @@ public class SparkRunnerInteractor implements Interactor {
 
     private final String pipelineFileName;
     private final String operationInstrumentationsOutputPath;
+    private final double tolerableErrorPercentage;
 
     private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
@@ -49,7 +50,7 @@ public class SparkRunnerInteractor implements Interactor {
         Job job = jobCreator.createJob(physicalPlan);
         LOG.info("Created job: " + job);
         LOG.info("Invoking job");
-        jobInvoker.invokeJob(job);
+        jobInvoker.invokeJob(job, tolerableErrorPercentage);
         LOG.info("Operation Instrumentations after job invocation: " + operationInstrumentations);
         LOG.info("Viewing Operation Instrumentations to " + operationInstrumentationsOutputPath);
         invocationInstrumentationViewer.view(operationInstrumentationsOutputPath, operationInstrumentations);

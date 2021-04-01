@@ -12,5 +12,6 @@ import java.util.List;
 public class InvocationParameters {
     private final List<Result> inputResults;
     private final PhysicalOperation physicalOperation;
+    private final double tolerableErrorPercentage;
 }
 
