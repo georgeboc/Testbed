@@ -10,6 +10,11 @@ import com.testbed.entities.operations.physical.PhysicalProject;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
 
@@ -21,26 +26,35 @@ public class ProjectInvokable implements Invokable {
                 invocationParameters.getInputResults().size());
 
         PhysicalProject physicalProject = (PhysicalProject) invocationParameters.getPhysicalOperation();
-        Dataset<Row> outputDataset = getOutputDataset(invocationParameters, physicalProject);
-        checkIfErrorIsTolerable(outputDataset.columns().length,
-                physicalProject.getExpectedOutputColumnsCount(),
+        Dataset<Row> inputDataset = getInputDataset(invocationParameters);
+        Dataset<Row> outputDataset = getOutputDataset(inputDataset, physicalProject);
+        checkIfErrorIsTolerable(inputDataset.columns().length,
+                outputDataset.columns().length,
+                physicalProject.getExpectedColumnsSelectionFactor(),
                 invocationParameters.getTolerableErrorPercentage());
         return new SparkResult(outputDataset);
     }
 
-    private Dataset<Row> getOutputDataset(InvocationParameters invocationParameters, PhysicalProject physicalProject) {
+    private Dataset<Row> getInputDataset(InvocationParameters invocationParameters) {
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
-        Dataset<Row> inputDataset = (Dataset<Row>) inputResult.getValues();
-        Column[] projectedColumns = (Column[]) physicalProject.getProjectedColumnNames().stream()
-                .map(Column::new)
-                .toArray();
-        return inputDataset.select(projectedColumns);
+        return (Dataset<Row>) inputResult.getValues();
     }
 
-    private void checkIfErrorIsTolerable(final long columnsCount,
-                                         final long expectedOutputColumnsCount,
+    private Dataset<Row> getOutputDataset(Dataset<Row> inputDataset, PhysicalProject physicalProject) {
+        List<Column> projectedColumns = physicalProject.getProjectedColumnNames().stream()
+                .map(Column::new)
+                .collect(Collectors.toList());
+        Seq<Column> projectedColumnsSeq = JavaConverters.asScalaIteratorConverter(projectedColumns.iterator())
+                .asScala()
+                .toSeq();
+        return inputDataset.select(projectedColumnsSeq);
+    }
+
+    private void checkIfErrorIsTolerable(final long inputColumnsCount,
+                                         final long outputColumnsCount,
+                                         final double expectedColumnsSelectionFactor,
                                          final double tolerableErrorPercentage) {
-        double errorPercentage = abs(columnsCount - expectedOutputColumnsCount)*100/(double)expectedOutputColumnsCount;
+        double errorPercentage = abs((double)outputColumnsCount/inputColumnsCount - expectedColumnsSelectionFactor)*100;
         if (errorPercentage > tolerableErrorPercentage) {
             throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
         }

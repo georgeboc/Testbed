@@ -17,8 +17,9 @@ public class LogicalToPhysicalProjectConverter implements LogicalToPhysicalOpera
         LogicalProject logicalProject = (LogicalProject) profileEstimation.getLogicalOperation();
         long expectedOutputColumnsCount = (long) (logicalProject.getColumnsSelectionFactor() * columnNames.size());
         List<String> projectedColumnNames = columnNames.stream()
+                .sorted()
                 .limit(expectedOutputColumnsCount)
                 .collect(Collectors.toList());
-        return new PhysicalProject(projectedColumnNames, expectedOutputColumnsCount);
+        return new PhysicalProject(projectedColumnNames, logicalProject.getColumnsSelectionFactor());
     }
 }
