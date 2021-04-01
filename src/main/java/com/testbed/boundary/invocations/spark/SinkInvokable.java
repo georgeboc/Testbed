@@ -12,8 +12,8 @@ public class SinkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,
-                "Sink operation is expected to receive one input from a previous node, although it " +
-                        "is receiving %d inputs", invocationParameters.getInputResults().size());
+                "Sink operation is receiving %d inputs, although it is expected to receive one",
+                invocationParameters.getInputResults().size());
 
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
         inputResult.count();
