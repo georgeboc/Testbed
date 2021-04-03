@@ -4,4 +4,5 @@ import lombok.Data;
 
 @Data
 public class PhysicalSink implements PhysicalOperation {
+    private final String _id;
 }

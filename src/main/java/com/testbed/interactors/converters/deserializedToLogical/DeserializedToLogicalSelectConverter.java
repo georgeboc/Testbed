@@ -9,6 +9,14 @@ public class DeserializedToLogicalSelectConverter implements DeserializedToLogic
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedSelect deserializedSelect = (DeserializedSelect) deserializedOperation;
-        return new LogicalSelect(deserializedSelect.getSelectivityFactor(), deserializedSelect.getColumnName());
+        return LogicalSelect.builder()
+                ._id(getId(deserializedSelect))
+                .selectivityFactor(deserializedSelect.getSelectivityFactor())
+                .columnName(deserializedSelect.getColumnName())
+                .build();
+    }
+
+    private String getId(DeserializedSelect deserializedSelect) {
+        return deserializedSelect.getInputTag() + "_" + deserializedSelect.getOutputTag();
     }
 }

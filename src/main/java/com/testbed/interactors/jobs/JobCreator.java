@@ -20,15 +20,34 @@ public class JobCreator {
         Stack<PhysicalOperation> physicalOperationStack = new Stack<>();
         List<JobOperation> jobOperations = Lists.newArrayList();
         Map<PhysicalOperation, Integer> inputDependencyCounter = countInputDependencies(physicalPlan);
-        physicalOperationStack.addAll(getPhysicalOperationsWithoutDependencies(inputDependencyCounter));
+        movePhysicalOperationsWithoutDependenciesFromMapToStack(physicalOperationStack, inputDependencyCounter);
         while (!physicalOperationStack.empty()) {
             PhysicalOperation currentPhysicalOperation = physicalOperationStack.pop();
-            inputDependencyCounter.remove(currentPhysicalOperation);
             jobOperations.add(createJobOperation(currentPhysicalOperation, physicalPlan.getGraph()));
             decreaseInputDependencyCounterForAllSuccessors(physicalPlan, inputDependencyCounter, currentPhysicalOperation);
-            physicalOperationStack.addAll(getPhysicalOperationsWithoutDependencies(inputDependencyCounter));
+            movePhysicalOperationsWithoutDependenciesFromMapToStack(physicalOperationStack, inputDependencyCounter);
         }
         return new Job(jobOperations);
+    }
+
+    private Map<PhysicalOperation, Integer> countInputDependencies(final PhysicalPlan physicalPlan) {
+        Graph<PhysicalOperation> physicalOperationGraph = physicalPlan.getGraph();
+        return physicalOperationGraph.nodes().stream()
+                .collect(Collectors.toMap(Functions.identity(), physicalOperationGraph::inDegree));
+    }
+
+    private void movePhysicalOperationsWithoutDependenciesFromMapToStack(Stack<PhysicalOperation> physicalOperationStack,
+                                                                         Map<PhysicalOperation, Integer> inputDependencyCounter) {
+        List<PhysicalOperation> physicalOperationsWithoutDependencies = getPhysicalOperationsWithoutDependencies(inputDependencyCounter);
+        physicalOperationStack.addAll(physicalOperationsWithoutDependencies);
+        physicalOperationsWithoutDependencies.forEach(inputDependencyCounter::remove);
+    }
+
+    private List<PhysicalOperation> getPhysicalOperationsWithoutDependencies(final Map<PhysicalOperation, Integer> inputDependencyCounter) {
+        return inputDependencyCounter.entrySet().stream()
+                .filter(physicalOperationLongEntry -> physicalOperationLongEntry.getValue() == 0)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     private JobOperation createJobOperation(final PhysicalOperation currentPhysicalOperation,
@@ -43,18 +62,5 @@ public class JobCreator {
                                                                 final PhysicalOperation currentPhysicalOperation) {
         Collection<PhysicalOperation> successors = physicalPlan.getGraph().successors(currentPhysicalOperation);
         successors.forEach(successor -> inputDependencyCounter.put(successor, inputDependencyCounter.get(successor) - 1));
-    }
-
-    private List<PhysicalOperation> getPhysicalOperationsWithoutDependencies(final Map<PhysicalOperation, Integer> inputDependencyCounter) {
-        return inputDependencyCounter.entrySet().stream()
-                .filter(physicalOperationLongEntry -> physicalOperationLongEntry.getValue() == 0)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-    }
-
-    private Map<PhysicalOperation, Integer> countInputDependencies(final PhysicalPlan physicalPlan) {
-        Graph<PhysicalOperation> physicalOperationGraph = physicalPlan.getGraph();
-        return physicalOperationGraph.nodes().stream()
-                .collect(Collectors.toMap(Functions.identity(), physicalOperationGraph::inDegree));
     }
 }

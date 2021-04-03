@@ -8,6 +8,6 @@ public class JoinInputTagStreamDispatcher implements Dispatcher<DeserializedJoin
     @Override
     public Stream<String> dispatch(Object object) {
         DeserializedJoin deserializedJoin = (DeserializedJoin) object;
-        return Stream.of(deserializedJoin.getFirstInputTag(), deserializedJoin.getSecondInputTag());
+        return Stream.of(deserializedJoin.getLeftInputTag(), deserializedJoin.getRightInputTag());
     }
 }

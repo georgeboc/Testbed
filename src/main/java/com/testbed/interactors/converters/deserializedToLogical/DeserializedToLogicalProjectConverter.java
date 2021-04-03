@@ -9,6 +9,13 @@ public class DeserializedToLogicalProjectConverter implements DeserializedToLogi
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedProject deserializedProject = (DeserializedProject) deserializedOperation;
-        return new LogicalProject(deserializedProject.getColumnsSelectionFactor());
+        return LogicalProject.builder()
+                ._id(getId(deserializedProject))
+                .columnsSelectionFactor(deserializedProject.getColumnsSelectionFactor())
+                .build();
+    }
+
+    private String getId(DeserializedProject deserializedProject) {
+        return deserializedProject.getInputTag() + "_" + deserializedProject.getOutputTag();
     }
 }

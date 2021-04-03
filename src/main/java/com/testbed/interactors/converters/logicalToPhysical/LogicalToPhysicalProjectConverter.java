@@ -20,6 +20,10 @@ public class LogicalToPhysicalProjectConverter implements LogicalToPhysicalOpera
                 .sorted()
                 .limit(expectedOutputColumnsCount)
                 .collect(Collectors.toList());
-        return new PhysicalProject(projectedColumnNames, logicalProject.getColumnsSelectionFactor());
+        return PhysicalProject.builder()
+                ._id(logicalProject.get_id())
+                .projectedColumnNames(projectedColumnNames)
+                .expectedColumnsSelectionFactor(logicalProject.getColumnsSelectionFactor())
+                .build();
     }
 }

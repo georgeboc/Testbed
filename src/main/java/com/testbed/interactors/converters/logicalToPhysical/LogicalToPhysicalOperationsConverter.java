@@ -68,7 +68,7 @@ public class LogicalToPhysicalOperationsConverter {
                     .map(this::getPhysicalOperation)
                     .forEach(successivePhysicalOperation -> physicalGraph.putEdge(currentPhysicalOperation, successivePhysicalOperation));
             if (successiveProfileEstimations.isEmpty()) {
-                physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink());
+                physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink(String.valueOf(currentPhysicalOperation.hashCode())));
             }
             visitedProfileEstimations.add(currentProfileEstimation);
         }

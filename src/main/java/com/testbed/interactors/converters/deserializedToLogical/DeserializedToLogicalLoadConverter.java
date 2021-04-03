@@ -9,6 +9,13 @@ public class DeserializedToLogicalLoadConverter implements DeserializedToLogical
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedLoad deserializedLoad = (DeserializedLoad) deserializedOperation;
-        return new LogicalLoad(deserializedLoad.getDatasetDirectoryPath());
+        return LogicalLoad.builder()
+                ._id(getId(deserializedLoad))
+                .datasetDirectoryPath(deserializedLoad.getDatasetDirectoryPath())
+                .build();
+    }
+
+    private String getId(DeserializedLoad deserializedLoad) {
+        return deserializedLoad.getOutputTag();
     }
 }
