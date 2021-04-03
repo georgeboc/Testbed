@@ -8,7 +8,6 @@ import lombok.Data;
 public class DeserializedGroupBy implements DeserializedOperation, Dispatchable {
     private String inputTag;
     private String outputTag;
-    private String operation;
     private String columnName;
 
     @Override

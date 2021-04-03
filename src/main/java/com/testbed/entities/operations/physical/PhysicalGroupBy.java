@@ -7,6 +7,5 @@ import lombok.Data;
 @Builder
 public class PhysicalGroupBy implements PhysicalOperation {
     private final String _id;
-    private final String operation;
     private final String columnName;
 }

@@ -12,7 +12,6 @@ public class DeserializedToLogicalGroupByConverter implements DeserializedToLogi
         return LogicalGroupBy.builder()
                 ._id(getId(deserializedGroupBy))
                 .columnName(deserializedGroupBy.getColumnName())
-                .operation(deserializedGroupBy.getOperation())
                 .build();
     }
 

@@ -14,7 +14,6 @@ public class LogicalToPhysicalGroupByConverter implements LogicalToPhysicalOpera
         return PhysicalGroupBy.builder()
                 ._id(logicalOperation.get_id())
                 .columnName(logicalOperation.getColumnName())
-                .operation(logicalOperation.getOperation())
                 .build();
     }
 }
