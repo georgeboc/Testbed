@@ -5,19 +5,28 @@ import com.testbed.entities.operations.deserialized.DeserializedJoin;
 import com.testbed.entities.operations.deserialized.DeserializedLoad;
 import com.testbed.entities.operations.deserialized.DeserializedProject;
 import com.testbed.entities.operations.deserialized.DeserializedSelect;
+import lombok.RequiredArgsConstructor;
 
+import java.util.stream.Stream;
+
+@RequiredArgsConstructor
 public class DispatchersFactory {
+    private final Dispatcher<DeserializedLoad, DeserializedLoad> filterInDeserializedLoadDispatcher;
+    private final Dispatcher<DeserializedSelect, Stream<String>> selectInputTagStreamDispatcher;
+    private final Dispatcher<DeserializedProject, Stream<String>> projectStreamDispatcher;
+    private final Dispatcher<DeserializedJoin, Stream<String>> joinStreamDispatcher;
+
     public DispatcherHandler getDispatcherHandlerForDeserializedLoadFilter() {
         DispatcherHandler dispatcherHandler = new GenericDispatcherHandler(Maps.newHashMap());
-        dispatcherHandler.assignDispatcherToClass(new FilterInDeserializedLoadDispatcher(), DeserializedLoad.class);
+        dispatcherHandler.assignDispatcherToClass(filterInDeserializedLoadDispatcher, DeserializedLoad.class);
         return dispatcherHandler;
     }
 
     public DispatcherHandler getDispatcherHandlerForInputTagStreamWithoutLoadOperation() {
         DispatcherHandler dispatcherHandler = new GenericDispatcherHandler(Maps.newHashMap());
-        dispatcherHandler.assignDispatcherToClass(new SelectInputTagStreamDispatcher(), DeserializedSelect.class);
-        dispatcherHandler.assignDispatcherToClass(new ProjectInputTagStreamDispatcher(), DeserializedProject.class);
-        dispatcherHandler.assignDispatcherToClass(new JoinInputTagStreamDispatcher(), DeserializedJoin.class);
+        dispatcherHandler.assignDispatcherToClass(selectInputTagStreamDispatcher, DeserializedSelect.class);
+        dispatcherHandler.assignDispatcherToClass(projectStreamDispatcher, DeserializedProject.class);
+        dispatcherHandler.assignDispatcherToClass(joinStreamDispatcher, DeserializedJoin.class);
         return dispatcherHandler;
     }
 }
