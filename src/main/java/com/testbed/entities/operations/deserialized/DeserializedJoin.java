@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class DeserializedSelect implements DeserializedOperation, Dispatchable {
-    private String inputTag;
+public class DeserializedJoin implements DeserializedOperation, Dispatchable {
+    private String firstInputTag;
+    private String secondInputTag;
     private String outputTag;
-    private double selectivityFactor;
-    private String columnName;
+    private String joinColumnName;
 
     @Override
     public Object accept(DispatcherHandler dispatcherHandler) {

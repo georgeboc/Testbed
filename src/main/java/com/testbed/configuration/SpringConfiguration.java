@@ -28,6 +28,7 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationsConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalProjectConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalSelectConverter;
+import com.testbed.interactors.converters.dispatchers.DispatchersFactory;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalLoadConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConverter;
@@ -116,7 +117,8 @@ public class SpringConfiguration {
 
     @Bean
     public DeserializedToLogicalOperationsConverter getDeserializedToLogicalOperationsConverter() {
-        return new DeserializedToLogicalOperationsConverter(getDeserializedToLogicalConvertersMapping());
+        return new DeserializedToLogicalOperationsConverter(getDeserializedToLogicalConvertersMapping(),
+                getDispatchersFactory());
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING)
@@ -141,6 +143,11 @@ public class SpringConfiguration {
     @Bean(name = DESERIALIZED_TO_LOGICAL_PROJECT_CONVERTER)
     public DeserializedToLogicalProjectConverter getDeserializedToLogicalProjectConverter() {
         return new DeserializedToLogicalProjectConverter();
+    }
+
+    @Bean
+    public DispatchersFactory getDispatchersFactory() {
+        return new DispatchersFactory();
     }
 
     @Bean
