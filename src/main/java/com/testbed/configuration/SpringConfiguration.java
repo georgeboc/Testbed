@@ -17,6 +17,7 @@ import com.testbed.boundary.invocations.spark.LoadInvokable;
 import com.testbed.boundary.invocations.spark.ProjectInvokable;
 import com.testbed.boundary.invocations.spark.SelectInvokable;
 import com.testbed.boundary.invocations.spark.SinkInvokable;
+import com.testbed.boundary.invocations.spark.UnionInvokable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
 import com.testbed.boundary.serializers.CSVSerializer;
@@ -28,6 +29,7 @@ import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.deserialized.DeserializedProject;
 import com.testbed.entities.operations.deserialized.DeserializedSelect;
+import com.testbed.entities.operations.deserialized.DeserializedUnion;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.factories.InteractorFactory;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalAggregateConverter;
@@ -38,6 +40,7 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationsConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalProjectConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalSelectConverter;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalUnionConverter;
 import com.testbed.interactors.converters.dispatchers.AggregateInputTagStreamDispatcher;
 import com.testbed.interactors.converters.dispatchers.Dispatcher;
 import com.testbed.interactors.converters.dispatchers.DispatchersFactory;
@@ -46,6 +49,7 @@ import com.testbed.interactors.converters.dispatchers.GroupByInputTagStreamDispa
 import com.testbed.interactors.converters.dispatchers.JoinInputTagStreamDispatcher;
 import com.testbed.interactors.converters.dispatchers.ProjectInputTagStreamDispatcher;
 import com.testbed.interactors.converters.dispatchers.SelectInputTagStreamDispatcher;
+import com.testbed.interactors.converters.dispatchers.UnionInputTagStreamDispatcher;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalAggregateConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalGroupByConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalJoinConverter;
@@ -54,6 +58,7 @@ import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOpe
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalProjectConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalSelectConverter;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalUnionConverter;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -88,6 +93,7 @@ public class SpringConfiguration {
     private static final String DESERIALIZED_TO_LOGICAL_JOIN_CONVERTER = "deserializedToLogicalJoinConverter";
     private static final String DESERIALIZED_TO_LOGICAL_GROUP_BY_CONVERTER = "deserializedToLogicalGroupByConverter";
     private static final String DESERIALIZED_TO_LOGICAL_AGGREGATE_CONVERTER = "deserializedToLogicalAggregateConverter";
+    private static final String DESERIALIZED_TO_LOGICAL_UNION_CONVERTER = "deserializedToLogicalUnionConverter";
 
     private static final String LOGICAL_TO_PHYSICAL_LOAD_CONVERTER = "logicalToPhysicalLoadConverter";
     private static final String LOGICAL_TO_PHYSICAL_SELECT_CONVERTER = "logicalToPhysicalSelectConverter";
@@ -95,6 +101,7 @@ public class SpringConfiguration {
     private static final String LOGICAL_TO_PHYSICAL_JOIN_CONVERTER = "logicalToPhysicalJoinConverter";
     private static final String LOGICAL_TO_PHYSICAL_GROUP_BY_CONVERTER = "logicalToPhysicalGroupByConverter";
     private static final String LOGICAL_TO_PHYSICAL_AGGREGATE_CONVERTER = "logicalToPhysicalAggregateConverter";
+    private static final String LOGICAL_TO_PHYSICAL_UNION_CONVERTER = "logicalToPhysicalUnionConverter";
 
     private static final String DESERIALIZED_LOAD = "DeserializedLoad";
     private static final String DESERIALIZED_SELECT = "DeserializedSelect";
@@ -102,6 +109,7 @@ public class SpringConfiguration {
     private static final String DESERIALIZED_JOIN = "DeserializedJoin";
     private static final String DESERIALIZED_GROUP_BY = "DeserializedGroupBy";
     private static final String DESERIALIZED_AGGREGATE = "DeserializedAggregate";
+    private static final String DESERIALIZED_UNION = "DeserializedUnion";
 
     private static final String LOGICAL_LOAD = "LogicalLoad";
     private static final String LOGICAL_SELECT = "LogicalSelect";
@@ -109,6 +117,7 @@ public class SpringConfiguration {
     private static final String LOGICAL_JOIN = "LogicalJoin";
     private static final String LOGICAL_GROUP_BY = "LogicalGroupBy";
     private static final String LOGICAL_AGGREGATE = "LogicalAggregate";
+    private static final String LOGICAL_UNION = "LogicalUnion";
 
     private static final String PHYSICAL_LOAD = "PhysicalLoad";
     private static final String PHYSICAL_SELECT = "PhysicalSelect";
@@ -116,6 +125,7 @@ public class SpringConfiguration {
     private static final String PHYSICAL_JOIN = "PhysicalJoin";
     private static final String PHYSICAL_GROUP_BY = "PhysicalGroupBy";
     private static final String PHYSICAL_AGGREGATE = "PhysicalAggregate";
+    private static final String PHYSICAL_UNION = "PhysicalUnion";
     private static final String PHYSICAL_SINK = "PhysicalSink";
 
     private static final String SPARK_LOAD_INVOKABLE = "sparkLoadInvokable";
@@ -124,6 +134,7 @@ public class SpringConfiguration {
     private static final String SPARK_JOIN_INVOKABLE = "sparkJoinInvokable";
     private static final String SPARK_GROUP_BY_INVOKABLE = "sparkGroupByInvokable";
     private static final String SPARK_AGGREGATE_INVOKABLE = "sparkAggregateInvokable";
+    private static final String SPARK_UNION_INVOKABLE = "sparkUnionInvokable";
     private static final String SPARK_SINK_INVOKABLE = "sparkSinkInvokable";
 
     @Bean
@@ -168,7 +179,8 @@ public class SpringConfiguration {
                 DESERIALIZED_PROJECT, getDeserializedToLogicalProjectConverter(),
                 DESERIALIZED_JOIN, getDeserializedToLogicalJoinConverter(),
                 DESERIALIZED_GROUP_BY, getDeserializedToLogicalGroupByConverter(),
-                DESERIALIZED_AGGREGATE, getDeserializedToLogicalAggregateConverter()
+                DESERIALIZED_AGGREGATE, getDeserializedToLogicalAggregateConverter(),
+                DESERIALIZED_UNION, getDeserializedToLogicalUnionConverter()
         );
     }
 
@@ -202,6 +214,11 @@ public class SpringConfiguration {
         return new DeserializedToLogicalAggregateConverter();
     }
 
+    @Bean(name = DESERIALIZED_TO_LOGICAL_UNION_CONVERTER)
+    public DeserializedToLogicalOperationConverter getDeserializedToLogicalUnionConverter() {
+        return new DeserializedToLogicalUnionConverter();
+    }
+
     @Bean
     public DispatchersFactory getDispatchersFactory() {
         return new DispatchersFactory(getFilterInDeserializedLoadDispatcher(),
@@ -209,7 +226,8 @@ public class SpringConfiguration {
                 getProjectStreamDispatcher(),
                 getJoinStreamDispatcher(),
                 getGroupByStreamDispatcher(),
-                getAggregateStreamDispatcher());
+                getAggregateStreamDispatcher(),
+                getUnionStreamDispatcher());
     }
 
     @Bean
@@ -243,6 +261,11 @@ public class SpringConfiguration {
     }
 
     @Bean
+    public Dispatcher<DeserializedUnion, Stream<String>> getUnionStreamDispatcher() {
+        return new UnionInputTagStreamDispatcher();
+    }
+
+    @Bean
     public LogicalToPhysicalOperationsConverter getLogicalOperationsConverter() {
         return new LogicalToPhysicalOperationsConverter(getProfileDeserializer(), getLogicalConvertersMapping());
     }
@@ -260,7 +283,8 @@ public class SpringConfiguration {
                 LOGICAL_PROJECT, getLogicalToPhysicalProjectConverter(),
                 LOGICAL_JOIN, getLogicalToPhysicalJoinConverter(),
                 LOGICAL_GROUP_BY, getLogicalToPhysicalGroupByConverter(),
-                LOGICAL_AGGREGATE, getLogicalToPhysicalAggregateConverter()
+                LOGICAL_AGGREGATE, getLogicalToPhysicalAggregateConverter(),
+                LOGICAL_UNION, getLogicalToPhysicalUnionConverter()
         );
     }
 
@@ -294,6 +318,11 @@ public class SpringConfiguration {
         return new LogicalToPhysicalAggregateConverter();
     }
 
+    @Bean(name = LOGICAL_TO_PHYSICAL_UNION_CONVERTER)
+    public LogicalToPhysicalOperationConverter getLogicalToPhysicalUnionConverter() {
+        return new LogicalToPhysicalUnionConverter();
+    }
+
     @Bean
     public JobCreator getJobCreator() {
         return new JobCreator();
@@ -313,6 +342,7 @@ public class SpringConfiguration {
                 PHYSICAL_JOIN, getInstrumentInvokable(getSparkJoinInvokable()),
                 PHYSICAL_GROUP_BY, getInstrumentInvokable(getSparkGroupByInvokable()),
                 PHYSICAL_AGGREGATE, getInstrumentInvokable(getSparkAggregateInvokable()),
+                PHYSICAL_UNION, getInstrumentInvokable(getSparkUnionInvokable()),
                 PHYSICAL_SINK, getInstrumentInvokable(getSparkSinkInvokable())
         );
     }
@@ -351,11 +381,15 @@ public class SpringConfiguration {
         return new AggregateInvokable();
     }
 
+    @Bean(name = SPARK_UNION_INVOKABLE)
+    public Invokable getSparkUnionInvokable() {
+        return new UnionInvokable();
+    }
+
     @Bean(name = SPARK_SINK_INVOKABLE)
     public Invokable getSparkSinkInvokable() {
         return new SinkInvokable();
     }
-
     @Bean
     public List<OperationInstrumentation> getOperationInstrumentations() {
         return Lists.newArrayList();
@@ -377,6 +411,7 @@ public class SpringConfiguration {
                 PHYSICAL_JOIN, getSparkJoinInvokable(),
                 PHYSICAL_GROUP_BY, getSparkGroupByInvokable(),
                 PHYSICAL_AGGREGATE, getSparkAggregateInvokable(),
+                PHYSICAL_UNION, getSparkUnionInvokable(),
                 PHYSICAL_SINK, getSparkSinkInvokable()
         );
     }
