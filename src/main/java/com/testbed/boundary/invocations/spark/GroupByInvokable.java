@@ -8,8 +8,15 @@ import com.testbed.boundary.invocations.results.Result;
 import com.testbed.boundary.invocations.results.SparkResult;
 import com.testbed.entities.operations.physical.PhysicalGroupBy;
 import lombok.RequiredArgsConstructor;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class GroupByInvokable implements Invokable {
@@ -27,6 +34,12 @@ public class GroupByInvokable implements Invokable {
     private Dataset<Row> getOutputDataset(InvocationParameters invocationParameters, PhysicalGroupBy physicalGroupBy) {
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputResult.getValues();
-        return inputDataset.groupBy(physicalGroupBy.getColumnName()).agg(Maps.newHashMap());
+        List<Column> groupByColumns = Arrays.stream(inputDataset.columns())
+                .map(Column::new)
+                .collect(Collectors.toList());
+        Seq<Column> groupByColumnsSeq = JavaConverters.asScalaIteratorConverter(groupByColumns.iterator())
+                .asScala()
+                .toSeq();
+        return inputDataset.groupBy(groupByColumnsSeq).agg(Maps.newHashMap());
     }
 }
