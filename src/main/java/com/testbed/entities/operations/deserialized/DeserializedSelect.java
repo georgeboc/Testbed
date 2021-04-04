@@ -5,7 +5,7 @@ import com.testbed.interactors.converters.dispatchers.DispatcherHandler;
 import lombok.Data;
 
 @Data
-public class DeserializedSelect implements DeserializedOperation, Dispatchable {
+public class DeserializedSelect implements DeserializedOperation, Dispatchable, UnaryDeserializedOperation {
     private String inputTag;
     private String outputTag;
     private double selectivityFactor;

@@ -5,7 +5,7 @@ import com.testbed.interactors.converters.dispatchers.DispatcherHandler;
 import lombok.Data;
 
 @Data
-public class DeserializedGroupBy implements DeserializedOperation, Dispatchable {
+public class DeserializedGroupBy implements DeserializedOperation, Dispatchable, UnaryDeserializedOperation {
     private String inputTag;
     private String outputTag;
 

@@ -5,7 +5,7 @@ import com.testbed.interactors.converters.dispatchers.DispatcherHandler;
 import lombok.Data;
 
 @Data
-public class DeserializedJoin implements DeserializedOperation, Dispatchable {
+public class DeserializedJoin implements DeserializedOperation, Dispatchable, BinaryDeserializedOperation {
     private String leftInputTag;
     private String rightInputTag;
     private String outputTag;

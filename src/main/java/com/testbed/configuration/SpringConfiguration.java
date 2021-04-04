@@ -21,15 +21,11 @@ import com.testbed.boundary.invocations.spark.UnionInvokable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
 import com.testbed.boundary.serializers.CSVSerializer;
-import com.testbed.entities.operations.deserialized.DeserializedAggregate;
-import com.testbed.entities.operations.deserialized.DeserializedGroupBy;
-import com.testbed.entities.operations.deserialized.DeserializedJoin;
+import com.testbed.entities.operations.deserialized.BinaryDeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedLoad;
 import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
-import com.testbed.entities.operations.deserialized.DeserializedProject;
-import com.testbed.entities.operations.deserialized.DeserializedSelect;
-import com.testbed.entities.operations.deserialized.DeserializedUnion;
+import com.testbed.entities.operations.deserialized.UnaryDeserializedOperation;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.factories.InteractorFactory;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalAggregateConverter;
@@ -41,15 +37,11 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalProjectConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalSelectConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalUnionConverter;
-import com.testbed.interactors.converters.dispatchers.AggregateInputTagStreamDispatcher;
+import com.testbed.interactors.converters.dispatchers.BinaryInputTagStreamDispatcher;
 import com.testbed.interactors.converters.dispatchers.Dispatcher;
 import com.testbed.interactors.converters.dispatchers.DispatchersFactory;
 import com.testbed.interactors.converters.dispatchers.FilterInDeserializedLoadDispatcher;
-import com.testbed.interactors.converters.dispatchers.GroupByInputTagStreamDispatcher;
-import com.testbed.interactors.converters.dispatchers.JoinInputTagStreamDispatcher;
-import com.testbed.interactors.converters.dispatchers.ProjectInputTagStreamDispatcher;
-import com.testbed.interactors.converters.dispatchers.SelectInputTagStreamDispatcher;
-import com.testbed.interactors.converters.dispatchers.UnionInputTagStreamDispatcher;
+import com.testbed.interactors.converters.dispatchers.UnaryInputTagStreamDispatcher;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalAggregateConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalGroupByConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalJoinConverter;
@@ -222,12 +214,8 @@ public class SpringConfiguration {
     @Bean
     public DispatchersFactory getDispatchersFactory() {
         return new DispatchersFactory(getFilterInDeserializedLoadDispatcher(),
-                getSelectInputTagStreamDispatcher(),
-                getProjectStreamDispatcher(),
-                getJoinStreamDispatcher(),
-                getGroupByStreamDispatcher(),
-                getAggregateStreamDispatcher(),
-                getUnionStreamDispatcher());
+                getUnaryInputTagStreamDispatcher(),
+                getBinaryStreamDispatcher());
     }
 
     @Bean
@@ -236,33 +224,13 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public Dispatcher<DeserializedSelect, Stream<String>> getSelectInputTagStreamDispatcher() {
-        return new SelectInputTagStreamDispatcher();
+    public Dispatcher<UnaryDeserializedOperation, Stream<String>> getUnaryInputTagStreamDispatcher() {
+        return new UnaryInputTagStreamDispatcher();
     }
 
     @Bean
-    public Dispatcher<DeserializedProject, Stream<String>> getProjectStreamDispatcher() {
-        return new ProjectInputTagStreamDispatcher();
-    }
-
-    @Bean
-    public Dispatcher<DeserializedJoin, Stream<String>> getJoinStreamDispatcher() {
-        return new JoinInputTagStreamDispatcher();
-    }
-
-    @Bean
-    public Dispatcher<DeserializedGroupBy, Stream<String>> getGroupByStreamDispatcher() {
-        return new GroupByInputTagStreamDispatcher();
-    }
-
-    @Bean
-    public Dispatcher<DeserializedAggregate, Stream<String>> getAggregateStreamDispatcher() {
-        return new AggregateInputTagStreamDispatcher();
-    }
-
-    @Bean
-    public Dispatcher<DeserializedUnion, Stream<String>> getUnionStreamDispatcher() {
-        return new UnionInputTagStreamDispatcher();
+    public Dispatcher<BinaryDeserializedOperation, Stream<String>> getBinaryStreamDispatcher() {
+        return new BinaryInputTagStreamDispatcher();
     }
 
     @Bean

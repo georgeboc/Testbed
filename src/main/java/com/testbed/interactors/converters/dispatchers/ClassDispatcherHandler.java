@@ -3,9 +3,10 @@ package com.testbed.interactors.converters.dispatchers;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
-public class GenericDispatcherHandler implements DispatcherHandler {
+public class ClassDispatcherHandler implements DispatcherHandler {
     private final Map<Class<?>, Dispatcher<?, ?>> classToVisitorMap;
 
     @Override
@@ -15,10 +16,8 @@ public class GenericDispatcherHandler implements DispatcherHandler {
 
     @Override
     public Object visit(Object objectToVisit) {
-        Dispatcher<?, ?> dispatcher = classToVisitorMap.get(objectToVisit.getClass());
-        if (dispatcher != null) {
-            return dispatcher.dispatch(objectToVisit);
-        }
-        return null;
+        Optional<? extends Dispatcher<?, ?>> optionalDispatcher = Optional.ofNullable(classToVisitorMap
+                .get(objectToVisit.getClass()));
+        return optionalDispatcher.map(dispatcher -> dispatcher.dispatch(objectToVisit)).orElse(null);
     }
 }
