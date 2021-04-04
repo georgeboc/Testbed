@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LogicalAggregation implements LogicalOperation {
+public class LogicalAggregate implements LogicalOperation {
     private final String _id;
     private String aggregationColumnName;
-    private String operation;
+    private String aggregationOperation;
 }

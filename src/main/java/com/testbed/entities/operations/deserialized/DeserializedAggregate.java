@@ -5,11 +5,11 @@ import com.testbed.interactors.converters.dispatchers.DispatcherHandler;
 import lombok.Data;
 
 @Data
-public class DeserializedAggregation implements DeserializedOperation, Dispatchable {
+public class DeserializedAggregate implements DeserializedOperation, Dispatchable {
     private String inputTag;
     private String outputTag;
     private String aggregationColumnName;
-    private String operation;
+    private String aggregationOperation;
 
     @Override
     public Object accept(DispatcherHandler dispatcherHandler) {

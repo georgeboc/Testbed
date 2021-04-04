@@ -1,6 +1,7 @@
 package com.testbed.interactors.converters.dispatchers;
 
 import com.google.common.collect.Maps;
+import com.testbed.entities.operations.deserialized.DeserializedAggregate;
 import com.testbed.entities.operations.deserialized.DeserializedGroupBy;
 import com.testbed.entities.operations.deserialized.DeserializedJoin;
 import com.testbed.entities.operations.deserialized.DeserializedLoad;
@@ -17,6 +18,7 @@ public class DispatchersFactory {
     private final Dispatcher<DeserializedProject, Stream<String>> projectStreamDispatcher;
     private final Dispatcher<DeserializedJoin, Stream<String>> joinStreamDispatcher;
     private final Dispatcher<DeserializedGroupBy, Stream<String>> groupByStreamDispatcher;
+    private final Dispatcher<DeserializedAggregate, Stream<String>> aggregateStreamDispatcher;
 
     public DispatcherHandler getDispatcherHandlerForDeserializedLoadFilter() {
         DispatcherHandler dispatcherHandler = new GenericDispatcherHandler(Maps.newHashMap());
@@ -30,6 +32,7 @@ public class DispatchersFactory {
         dispatcherHandler.assignDispatcherToClass(projectStreamDispatcher, DeserializedProject.class);
         dispatcherHandler.assignDispatcherToClass(joinStreamDispatcher, DeserializedJoin.class);
         dispatcherHandler.assignDispatcherToClass(groupByStreamDispatcher, DeserializedGroupBy.class);
+        dispatcherHandler.assignDispatcherToClass(aggregateStreamDispatcher, DeserializedAggregate.class);
         return dispatcherHandler;
     }
 }

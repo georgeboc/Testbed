@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PhysicalAggregation implements PhysicalOperation {
+public class PhysicalAggregate implements PhysicalOperation {
     private final String _id;
     private String aggregationColumnName;
-    private String operation;
+    private String aggregationOperation;
 }
