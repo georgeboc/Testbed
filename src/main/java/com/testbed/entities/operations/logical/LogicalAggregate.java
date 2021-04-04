@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LogicalAggregate implements LogicalOperation {
+public class LogicalAggregate implements UnaryLogicalOperation {
     private final String _id;
     private String aggregationColumnName;
     private String aggregationOperation;

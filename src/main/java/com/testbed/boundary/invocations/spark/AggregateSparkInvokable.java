@@ -1,6 +1,5 @@
 package com.testbed.boundary.invocations.spark;
 
-import com.clearspring.analytics.util.Preconditions;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.results.Result;
@@ -16,10 +15,6 @@ import static org.apache.spark.sql.functions.expr;
 public class AggregateSparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
-        Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,
-                "Aggregation operation is receiving %d inputs, although it is expected to receive one",
-                invocationParameters.getInputResults().size());
-
         PhysicalAggregate physicalAggregate = (PhysicalAggregate) invocationParameters.getPhysicalOperation();
         Dataset<Row> outputDataset = getOutputDataset(invocationParameters, physicalAggregate);
         return new SparkResult(outputDataset);

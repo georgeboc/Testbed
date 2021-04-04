@@ -1,4 +1,4 @@
-package com.testbed.interactors.converters.dispatchers;
+package com.testbed.interactors.dispatchers;
 
 public interface Dispatcher<T, S> {
     S dispatch(Object object);

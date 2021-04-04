@@ -1,6 +1,5 @@
 package com.testbed.boundary.invocations.spark;
 
-import com.clearspring.analytics.util.Preconditions;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.results.Result;
@@ -21,10 +20,6 @@ import static java.lang.Math.abs;
 public class ProjectSparkInvokable implements Invokable {
     @Override
     public Result invoke(InvocationParameters invocationParameters) {
-        Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,
-                "Project operation is receiving %d inputs, although it is expected to receive one",
-                invocationParameters.getInputResults().size());
-
         PhysicalProject physicalProject = (PhysicalProject) invocationParameters.getPhysicalOperation();
         Dataset<Row> inputDataset = getInputDataset(invocationParameters);
         Dataset<Row> outputDataset = getOutputDataset(inputDataset, physicalProject);

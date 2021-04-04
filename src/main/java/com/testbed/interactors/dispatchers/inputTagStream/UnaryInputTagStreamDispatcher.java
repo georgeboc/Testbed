@@ -1,6 +1,7 @@
-package com.testbed.interactors.converters.dispatchers;
+package com.testbed.interactors.dispatchers.inputTagStream;
 
 import com.testbed.entities.operations.deserialized.UnaryDeserializedOperation;
+import com.testbed.interactors.dispatchers.Dispatcher;
 
 import java.util.stream.Stream;
 

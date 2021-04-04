@@ -10,6 +10,7 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.validators.InputsCountValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ public class SparkRunnerInteractor implements Interactor {
 
     private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final DeserializedToLogicalManager deserializedToLogicalManager;
+    private final InputsCountValidatorManager inputsCountValidatorManager;
     private final LogicalToPhysicalManager logicalToPhysicalManager;
 
     private final JobCreator jobCreator;
@@ -43,6 +45,9 @@ public class SparkRunnerInteractor implements Interactor {
         LOG.info("Converting deserialized operations to logical operations");
         LogicalPlan logicalPlan = deserializedToLogicalManager.convert(deserializedOperations);
         LOG.info("Logical Plan: " + logicalPlan);
+        LOG.info("Validating Logical Plan");
+        inputsCountValidatorManager.validate(logicalPlan.getGraph());
+        LOG.info("Logical Plan is valid");
         LOG.info("Converting logical operations to physical operations");
         PhysicalPlan physicalPlan = logicalToPhysicalManager.convert(logicalPlan);
         LOG.info("Physical Plan: " + physicalPlan);

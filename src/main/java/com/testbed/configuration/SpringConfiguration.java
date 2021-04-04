@@ -29,19 +29,14 @@ import com.testbed.entities.operations.deserialized.UnaryDeserializedOperation;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.interactors.InteractorFactory;
 import com.testbed.interactors.converters.deserializedToLogical.AggregateDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
 import com.testbed.interactors.converters.deserializedToLogical.GroupByDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.JoinDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.LoadDeserializedToLogicalConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
 import com.testbed.interactors.converters.deserializedToLogical.ProjectDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.SelectDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.UnionDeserializedToLogicalConverter;
-import com.testbed.interactors.converters.dispatchers.BinaryInputTagStreamDispatcher;
-import com.testbed.interactors.converters.dispatchers.Dispatcher;
-import com.testbed.interactors.converters.dispatchers.DispatchersFactory;
-import com.testbed.interactors.converters.dispatchers.FilterInDeserializedLoadDispatcher;
-import com.testbed.interactors.converters.dispatchers.UnaryInputTagStreamDispatcher;
 import com.testbed.interactors.converters.logicalToPhysical.AggregateLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.GroupByLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.JoinLogicalToPhysicalConverter;
@@ -51,8 +46,14 @@ import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalMan
 import com.testbed.interactors.converters.logicalToPhysical.ProjectLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.SelectLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.UnionLogicalToPhysicalConverter;
+import com.testbed.interactors.dispatchers.Dispatcher;
+import com.testbed.interactors.dispatchers.DispatchersFactory;
+import com.testbed.interactors.dispatchers.filterIn.FilterInDeserializedLoadDispatcher;
+import com.testbed.interactors.dispatchers.inputTagStream.BinaryInputTagStreamDispatcher;
+import com.testbed.interactors.dispatchers.inputTagStream.UnaryInputTagStreamDispatcher;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.validators.InputsCountValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
 import com.testbed.views.InvocationInstrumentationView;
 import org.apache.spark.SparkConf;
@@ -138,6 +139,7 @@ public class SpringConfiguration {
     public InteractorFactory getReadJsonAndPrintContentFactory() {
         return new InteractorFactory(getOperationsDeserializer(),
                 getDeserializedToLogicalOperationsConverter(),
+                getInputsCountValidatorManager(),
                 getLogicalOperationsConverter(),
                 getJobCreator(),
                 getSparkInvoker(),
@@ -209,6 +211,11 @@ public class SpringConfiguration {
     @Bean(name = DESERIALIZED_TO_LOGICAL_UNION_CONVERTER)
     public DeserializedToLogicalConverter getDeserializedToLogicalUnionConverter() {
         return new UnionDeserializedToLogicalConverter();
+    }
+
+    @Bean
+    public InputsCountValidatorManager getInputsCountValidatorManager() {
+        return new InputsCountValidatorManager();
     }
 
     @Bean

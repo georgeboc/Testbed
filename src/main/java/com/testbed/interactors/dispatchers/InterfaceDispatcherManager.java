@@ -1,4 +1,4 @@
-package com.testbed.interactors.converters.dispatchers;
+package com.testbed.interactors.dispatchers;
 
 import lombok.RequiredArgsConstructor;
 
@@ -8,7 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public class InterfaceDispatcherHandler implements DispatcherHandler {
+public class InterfaceDispatcherManager implements DispatcherManager {
     private final Map<Class<?>, Dispatcher<?, ?>> classToVisitorMap;
 
     @Override

@@ -1,6 +1,5 @@
 package com.testbed.boundary.invocations.spark;
 
-import com.clearspring.analytics.util.Preconditions;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.results.Result;
@@ -15,10 +14,6 @@ import java.util.stream.Collectors;
 public class JoinSparkInvokable implements Invokable {
     @Override
     public Result invoke(InvocationParameters invocationParameters) {
-        Preconditions.checkArgument(invocationParameters.getInputResults().size() == 2,
-                "Join operation is receiving %d inputs, although it is expected to receive two",
-                invocationParameters.getInputResults().size());
-
         PhysicalJoin physicalJoin = (PhysicalJoin) invocationParameters.getPhysicalOperation();
         List<Dataset<Row>> inputDatasets = getInputDatasets(invocationParameters);
         Dataset<Row> outputDataset = getOutputDataset(inputDatasets, physicalJoin);

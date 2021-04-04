@@ -1,16 +1,16 @@
 package com.testbed.entities.operations.deserialized;
 
-import com.testbed.interactors.converters.dispatchers.Dispatchable;
-import com.testbed.interactors.converters.dispatchers.DispatcherHandler;
+import com.testbed.interactors.dispatchers.Dispatchable;
+import com.testbed.interactors.dispatchers.DispatcherManager;
 import lombok.Data;
 
 @Data
-public class DeserializedLoad implements DeserializedOperation, Dispatchable {
+public class DeserializedLoad implements Dispatchable, ZeroaryDeserializedOperation {
     private String datasetDirectoryPath;
     private String outputTag;
 
     @Override
-    public Object accept(DispatcherHandler dispatcherHandler) {
-        return dispatcherHandler.visit(this);
+    public Object accept(DispatcherManager dispatcherManager) {
+        return dispatcherManager.visit(this);
     }
 }

@@ -11,10 +11,6 @@ import lombok.RequiredArgsConstructor;
 public class SinkSparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
-        Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,
-                "Sink operation is receiving %d inputs, although it is expected to receive one",
-                invocationParameters.getInputResults().size());
-
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
         inputResult.count();
         return new NoResult();

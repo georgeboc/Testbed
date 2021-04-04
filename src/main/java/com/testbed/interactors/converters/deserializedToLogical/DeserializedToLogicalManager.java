@@ -13,8 +13,8 @@ import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalLoad;
 import com.testbed.entities.operations.logical.LogicalOperation;
 import com.testbed.entities.operations.logical.LogicalPlan;
-import com.testbed.interactors.converters.dispatchers.DispatcherHandler;
-import com.testbed.interactors.converters.dispatchers.DispatchersFactory;
+import com.testbed.interactors.dispatchers.DispatcherManager;
+import com.testbed.interactors.dispatchers.DispatchersFactory;
 import lombok.RequiredArgsConstructor;
 
 import java.util.AbstractMap;
@@ -54,9 +54,9 @@ public class DeserializedToLogicalManager {
     }
 
     private List<DeserializedLoad> getDeserializedLoads(final DeserializedOperations deserializedOperations) {
-        DispatcherHandler dispatcherHandler = dispatchersFactory.getDispatcherHandlerForDeserializedLoadFilter();
+        DispatcherManager dispatcherManager = dispatchersFactory.getDispatcherManagerForDeserializedLoadFilter();
         return deserializedOperations.stream()
-                .map(dispatcherHandler::visit)
+                .map(dispatcherManager::visit)
                 .filter(Objects::nonNull)
                 .map(object -> (DeserializedLoad) object)
                 .collect(Collectors.toList());
@@ -102,9 +102,9 @@ public class DeserializedToLogicalManager {
     }
 
     private Multimap<String, DeserializedOperation> getMappingByInputTag(final List<DeserializedOperation> deserializedOperations) {
-        DispatcherHandler dispatcherHandler = dispatchersFactory.getDispatcherHandlerForInputTagStreamWithoutLoadOperation();
+        DispatcherManager dispatcherManager = dispatchersFactory.getDispatcherManagerForInputTagStreamWithoutLoadOperation();
         Stream<Optional<Stream<String>>> inputTagStreamOfStreams = deserializedOperations.stream()
-                .map(dispatcherHandler::visit)
+                .map(dispatcherManager::visit)
                 .map(object -> (Stream<String>) object)
                 .map(Optional::ofNullable);
         return Streams.zip(inputTagStreamOfStreams, deserializedOperations.stream(), AbstractMap.SimpleEntry::new)

@@ -7,6 +7,7 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.validators.InputsCountValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class InteractorFactory {
     private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final DeserializedToLogicalManager deserializedToLogicalManager;
+    private final InputsCountValidatorManager inputsCountValidatorManager;
     private final LogicalToPhysicalManager logicalToPhysicalManager;
     private final JobCreator jobCreator;
     private final JobInvoker jobInvoker;
@@ -30,6 +32,7 @@ public class InteractorFactory {
                 tolerableErrorPercentage,
                 operationsDeserializer,
                 deserializedToLogicalManager,
+                inputsCountValidatorManager,
                 logicalToPhysicalManager,
                 jobCreator,
                 jobInvoker,
