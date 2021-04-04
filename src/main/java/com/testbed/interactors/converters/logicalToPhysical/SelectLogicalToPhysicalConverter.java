@@ -11,7 +11,7 @@ import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class LogicalToPhysicalSelectConverter implements LogicalToPhysicalOperationConverter {
+public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     private final ColumnReader columnReader;
 
     @Override

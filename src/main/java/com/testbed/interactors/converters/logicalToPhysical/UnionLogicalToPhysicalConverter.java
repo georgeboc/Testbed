@@ -6,7 +6,7 @@ import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.operations.physical.PhysicalUnion;
 import com.testbed.entities.profiles.ProfileEstimation;
 
-public class LogicalToPhysicalUnionConverter implements LogicalToPhysicalOperationConverter {
+public class UnionLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
     public PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         LogicalUnion logicalUnion = (LogicalUnion) profileEstimation.getLogicalOperation();

@@ -5,7 +5,7 @@ import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.logical.LogicalJoin;
 import com.testbed.entities.operations.logical.LogicalOperation;
 
-public class DeserializedToLogicalJoinConverter implements DeserializedToLogicalOperationConverter {
+public class JoinDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
     public LogicalOperation convert(DeserializedOperation deserializedOperation) {
         DeserializedJoin deserializedJoin = (DeserializedJoin) deserializedOperation;

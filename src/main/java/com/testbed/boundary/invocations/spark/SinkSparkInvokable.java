@@ -8,7 +8,7 @@ import com.testbed.boundary.invocations.results.Result;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class SinkInvokable implements Invokable {
+public class SinkSparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,

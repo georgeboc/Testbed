@@ -5,7 +5,7 @@ import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.logical.LogicalGroupBy;
 import com.testbed.entities.operations.logical.LogicalOperation;
 
-public class DeserializedToLogicalGroupByConverter implements DeserializedToLogicalOperationConverter {
+public class GroupByDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedGroupBy deserializedGroupBy = (DeserializedGroupBy) deserializedOperation;

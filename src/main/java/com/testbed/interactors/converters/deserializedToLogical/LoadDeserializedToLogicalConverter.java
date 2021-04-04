@@ -5,7 +5,7 @@ import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.logical.LogicalLoad;
 import com.testbed.entities.operations.logical.LogicalOperation;
 
-public class DeserializedToLogicalLoadConverter implements DeserializedToLogicalOperationConverter {
+public class LoadDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedLoad deserializedLoad = (DeserializedLoad) deserializedOperation;

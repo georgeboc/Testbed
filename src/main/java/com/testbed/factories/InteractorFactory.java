@@ -5,8 +5,8 @@ import com.testbed.boundary.invocations.OperationInstrumentation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.interactors.Interactor;
 import com.testbed.interactors.SparkRunnerInteractor;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationsConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConverter;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -17,8 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InteractorFactory {
     private final Deserializer<DeserializedOperations> operationsDeserializer;
-    private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
-    private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
+    private final DeserializedToLogicalManager deserializedToLogicalManager;
+    private final LogicalToPhysicalManager logicalToPhysicalManager;
     private final JobCreator jobCreator;
     private final JobInvoker jobInvoker;
     private final List<OperationInstrumentation> operationInstrumentations;
@@ -31,8 +31,8 @@ public class InteractorFactory {
                 operationInstrumentationsOutputPath,
                 tolerableErrorPercentage,
                 operationsDeserializer,
-                deserializedToLogicalOperationsConverter,
-                logicalToPhysicalOperationsConverter,
+                deserializedToLogicalManager,
+                logicalToPhysicalManager,
                 jobCreator,
                 jobInvoker,
                 operationInstrumentations,

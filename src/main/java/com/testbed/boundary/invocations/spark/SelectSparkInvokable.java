@@ -14,7 +14,7 @@ import org.apache.spark.sql.Row;
 import static java.lang.Math.abs;
 
 @RequiredArgsConstructor
-public class SelectInvokable implements Invokable {
+public class SelectSparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,

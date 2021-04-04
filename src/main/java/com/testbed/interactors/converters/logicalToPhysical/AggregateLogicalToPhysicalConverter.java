@@ -7,7 +7,7 @@ import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class LogicalToPhysicalAggregateConverter implements LogicalToPhysicalOperationConverter {
+public class AggregateLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
         LogicalAggregate logicalAggregate = (LogicalAggregate) profileEstimation.getLogicalOperation();

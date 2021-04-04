@@ -5,7 +5,7 @@ import com.testbed.entities.operations.deserialized.DeserializedUnion;
 import com.testbed.entities.operations.logical.LogicalOperation;
 import com.testbed.entities.operations.logical.LogicalUnion;
 
-public class DeserializedToLogicalUnionConverter implements DeserializedToLogicalOperationConverter {
+public class UnionDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
     public LogicalOperation convert(DeserializedOperation deserializedOperation) {
         DeserializedUnion deserializedUnion = (DeserializedUnion) deserializedOperation;

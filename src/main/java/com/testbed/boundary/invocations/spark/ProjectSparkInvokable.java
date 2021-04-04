@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
 
-public class ProjectInvokable implements Invokable {
+public class ProjectSparkInvokable implements Invokable {
     @Override
     public Result invoke(InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,

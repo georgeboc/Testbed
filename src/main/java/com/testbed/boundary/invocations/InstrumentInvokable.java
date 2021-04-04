@@ -1,10 +1,13 @@
 package com.testbed.boundary.invocations;
 
+import com.google.common.base.CaseFormat;
 import com.testbed.boundary.invocations.results.Result;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +26,9 @@ public class InstrumentInvokable implements Invokable {
         Result result = wrappedInvokable.invoke(invocationParameters);
         Instant instantAfterInvocation = Instant.now();
         Duration invocationDuration = Duration.between(instantBeforeInvocation, instantAfterInvocation);
-        String operationName = wrappedInvokable.getClass().getSimpleName().replace(INVOKABLE, EMPTY);
+        String className = wrappedInvokable.getClass().getSimpleName();
+        String[] classNameParts = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, className).split("_");
+        String operationName = StringUtils.capitalize(Arrays.stream(classNameParts).findFirst().get());
         List<Long> inputsRowsCounts = getRowsCounts(invocationParameters.getInputResults());
         long outputRowsCount = result.count();
         List<List<String>> inputsColumnNames = getColumnNames(invocationParameters.getInputResults());

@@ -10,14 +10,14 @@ import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
 import com.testbed.boundary.invocations.InstrumentInvokable;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.OperationInstrumentation;
-import com.testbed.boundary.invocations.spark.AggregateInvokable;
-import com.testbed.boundary.invocations.spark.GroupByInvokable;
-import com.testbed.boundary.invocations.spark.JoinInvokable;
-import com.testbed.boundary.invocations.spark.LoadInvokable;
-import com.testbed.boundary.invocations.spark.ProjectInvokable;
-import com.testbed.boundary.invocations.spark.SelectInvokable;
-import com.testbed.boundary.invocations.spark.SinkInvokable;
-import com.testbed.boundary.invocations.spark.UnionInvokable;
+import com.testbed.boundary.invocations.spark.AggregateSparkInvokable;
+import com.testbed.boundary.invocations.spark.GroupBySparkInvokable;
+import com.testbed.boundary.invocations.spark.JoinSparkInvokable;
+import com.testbed.boundary.invocations.spark.LoadSparkInvokable;
+import com.testbed.boundary.invocations.spark.ProjectSparkInvokable;
+import com.testbed.boundary.invocations.spark.SelectSparkInvokable;
+import com.testbed.boundary.invocations.spark.SinkSparkInvokable;
+import com.testbed.boundary.invocations.spark.UnionSparkInvokable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
 import com.testbed.boundary.serializers.CSVSerializer;
@@ -28,29 +28,29 @@ import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.deserialized.UnaryDeserializedOperation;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.factories.InteractorFactory;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalAggregateConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalGroupByConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalJoinConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalLoadConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationsConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalProjectConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalSelectConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalUnionConverter;
+import com.testbed.interactors.converters.deserializedToLogical.AggregateDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.GroupByDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.JoinDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.LoadDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
+import com.testbed.interactors.converters.deserializedToLogical.ProjectDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.SelectDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.UnionDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.dispatchers.BinaryInputTagStreamDispatcher;
 import com.testbed.interactors.converters.dispatchers.Dispatcher;
 import com.testbed.interactors.converters.dispatchers.DispatchersFactory;
 import com.testbed.interactors.converters.dispatchers.FilterInDeserializedLoadDispatcher;
 import com.testbed.interactors.converters.dispatchers.UnaryInputTagStreamDispatcher;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalAggregateConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalGroupByConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalJoinConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalLoadConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalProjectConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalSelectConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalUnionConverter;
+import com.testbed.interactors.converters.logicalToPhysical.AggregateLogicalToPhysicalConverter;
+import com.testbed.interactors.converters.logicalToPhysical.GroupByLogicalToPhysicalConverter;
+import com.testbed.interactors.converters.logicalToPhysical.JoinLogicalToPhysicalConverter;
+import com.testbed.interactors.converters.logicalToPhysical.LoadLogicalToPhysicalConverter;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverter;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
+import com.testbed.interactors.converters.logicalToPhysical.ProjectLogicalToPhysicalConverter;
+import com.testbed.interactors.converters.logicalToPhysical.SelectLogicalToPhysicalConverter;
+import com.testbed.interactors.converters.logicalToPhysical.UnionLogicalToPhysicalConverter;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -158,13 +158,13 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public DeserializedToLogicalOperationsConverter getDeserializedToLogicalOperationsConverter() {
-        return new DeserializedToLogicalOperationsConverter(getDeserializedToLogicalConvertersMapping(),
+    public DeserializedToLogicalManager getDeserializedToLogicalOperationsConverter() {
+        return new DeserializedToLogicalManager(getDeserializedToLogicalConvertersMapping(),
                 getDispatchersFactory());
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING)
-    public Map<String, DeserializedToLogicalOperationConverter> getDeserializedToLogicalConvertersMapping() {
+    public Map<String, DeserializedToLogicalConverter> getDeserializedToLogicalConvertersMapping() {
         return Map.of(
                 DESERIALIZED_LOAD, getDeserializedToLogicalLoadConverter(),
                 DESERIALIZED_SELECT, getDeserializedToLogicalSelectConverter(),
@@ -177,38 +177,38 @@ public class SpringConfiguration {
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_LOAD_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedToLogicalLoadConverter() {
-        return new DeserializedToLogicalLoadConverter();
+    public DeserializedToLogicalConverter getDeserializedToLogicalLoadConverter() {
+        return new LoadDeserializedToLogicalConverter();
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_SELECT_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedToLogicalSelectConverter() {
-        return new DeserializedToLogicalSelectConverter();
+    public DeserializedToLogicalConverter getDeserializedToLogicalSelectConverter() {
+        return new SelectDeserializedToLogicalConverter();
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_PROJECT_CONVERTER)
-    public DeserializedToLogicalProjectConverter getDeserializedToLogicalProjectConverter() {
-        return new DeserializedToLogicalProjectConverter();
+    public ProjectDeserializedToLogicalConverter getDeserializedToLogicalProjectConverter() {
+        return new ProjectDeserializedToLogicalConverter();
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_JOIN_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedToLogicalJoinConverter() {
-        return new DeserializedToLogicalJoinConverter();
+    public DeserializedToLogicalConverter getDeserializedToLogicalJoinConverter() {
+        return new JoinDeserializedToLogicalConverter();
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_GROUP_BY_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedToLogicalGroupByConverter() {
-        return new DeserializedToLogicalGroupByConverter();
+    public DeserializedToLogicalConverter getDeserializedToLogicalGroupByConverter() {
+        return new GroupByDeserializedToLogicalConverter();
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_AGGREGATE_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedToLogicalAggregateConverter() {
-        return new DeserializedToLogicalAggregateConverter();
+    public DeserializedToLogicalConverter getDeserializedToLogicalAggregateConverter() {
+        return new AggregateDeserializedToLogicalConverter();
     }
 
     @Bean(name = DESERIALIZED_TO_LOGICAL_UNION_CONVERTER)
-    public DeserializedToLogicalOperationConverter getDeserializedToLogicalUnionConverter() {
-        return new DeserializedToLogicalUnionConverter();
+    public DeserializedToLogicalConverter getDeserializedToLogicalUnionConverter() {
+        return new UnionDeserializedToLogicalConverter();
     }
 
     @Bean
@@ -234,8 +234,8 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public LogicalToPhysicalOperationsConverter getLogicalOperationsConverter() {
-        return new LogicalToPhysicalOperationsConverter(getProfileDeserializer(), getLogicalConvertersMapping());
+    public LogicalToPhysicalManager getLogicalOperationsConverter() {
+        return new LogicalToPhysicalManager(getProfileDeserializer(), getLogicalConvertersMapping());
     }
 
     @Bean
@@ -244,7 +244,7 @@ public class SpringConfiguration {
     }
 
     @Bean(name = LOGICAL_CONVERTERS_MAPPING)
-    public Map<String, LogicalToPhysicalOperationConverter> getLogicalConvertersMapping() {
+    public Map<String, LogicalToPhysicalConverter> getLogicalConvertersMapping() {
         return Map.of(
                 LOGICAL_LOAD, getLogicalToPhysicalLoadConverter(),
                 LOGICAL_SELECT, getLogicalToPhysicalSelectConverter(),
@@ -257,38 +257,38 @@ public class SpringConfiguration {
     }
 
     @Bean(name = LOGICAL_TO_PHYSICAL_LOAD_CONVERTER)
-    public LogicalToPhysicalOperationConverter getLogicalToPhysicalLoadConverter() {
-        return new LogicalToPhysicalLoadConverter();
+    public LogicalToPhysicalConverter getLogicalToPhysicalLoadConverter() {
+        return new LoadLogicalToPhysicalConverter();
     }
 
     @Bean(name = LOGICAL_TO_PHYSICAL_SELECT_CONVERTER)
-    public LogicalToPhysicalOperationConverter getLogicalToPhysicalSelectConverter() {
-        return new LogicalToPhysicalSelectConverter(getColumnReader());
+    public LogicalToPhysicalConverter getLogicalToPhysicalSelectConverter() {
+        return new SelectLogicalToPhysicalConverter(getColumnReader());
     }
 
     @Bean(name = LOGICAL_TO_PHYSICAL_PROJECT_CONVERTER)
-    public LogicalToPhysicalProjectConverter getLogicalToPhysicalProjectConverter() {
-        return new LogicalToPhysicalProjectConverter();
+    public ProjectLogicalToPhysicalConverter getLogicalToPhysicalProjectConverter() {
+        return new ProjectLogicalToPhysicalConverter();
     }
 
     @Bean(name = LOGICAL_TO_PHYSICAL_JOIN_CONVERTER)
-    public LogicalToPhysicalOperationConverter getLogicalToPhysicalJoinConverter() {
-        return new LogicalToPhysicalJoinConverter();
+    public LogicalToPhysicalConverter getLogicalToPhysicalJoinConverter() {
+        return new JoinLogicalToPhysicalConverter();
     }
 
     @Bean(name = LOGICAL_TO_PHYSICAL_GROUP_BY_CONVERTER)
-    public LogicalToPhysicalOperationConverter getLogicalToPhysicalGroupByConverter() {
-        return new LogicalToPhysicalGroupByConverter();
+    public LogicalToPhysicalConverter getLogicalToPhysicalGroupByConverter() {
+        return new GroupByLogicalToPhysicalConverter();
     }
 
     @Bean(name = LOGICAL_TO_PHYSICAL_AGGREGATE_CONVERTER)
-    public LogicalToPhysicalOperationConverter getLogicalToPhysicalAggregateConverter() {
-        return new LogicalToPhysicalAggregateConverter();
+    public LogicalToPhysicalConverter getLogicalToPhysicalAggregateConverter() {
+        return new AggregateLogicalToPhysicalConverter();
     }
 
     @Bean(name = LOGICAL_TO_PHYSICAL_UNION_CONVERTER)
-    public LogicalToPhysicalOperationConverter getLogicalToPhysicalUnionConverter() {
-        return new LogicalToPhysicalUnionConverter();
+    public LogicalToPhysicalConverter getLogicalToPhysicalUnionConverter() {
+        return new UnionLogicalToPhysicalConverter();
     }
 
     @Bean
@@ -321,42 +321,42 @@ public class SpringConfiguration {
 
     @Bean(name = SPARK_LOAD_INVOKABLE)
     public Invokable getSparkLoadInvokable() {
-        return new LoadInvokable(getSparkSession());
+        return new LoadSparkInvokable(getSparkSession());
     }
 
     @Bean(name = SPARK_SELECT_INVOKABLE)
     public Invokable getSparkSelectInvokable() {
-        return new SelectInvokable();
+        return new SelectSparkInvokable();
     }
 
     @Bean(name = SPARK_PROJECT_INVOKABLE)
     public Invokable getSparkProjectInvokable() {
-        return new ProjectInvokable();
+        return new ProjectSparkInvokable();
     }
 
     @Bean(name = SPARK_JOIN_INVOKABLE)
     public Invokable getSparkJoinInvokable() {
-        return new JoinInvokable();
+        return new JoinSparkInvokable();
     }
 
     @Bean(name = SPARK_GROUP_BY_INVOKABLE)
     public Invokable getSparkGroupByInvokable() {
-        return new GroupByInvokable();
+        return new GroupBySparkInvokable();
     }
 
     @Bean(name = SPARK_AGGREGATE_INVOKABLE)
     public Invokable getSparkAggregateInvokable() {
-        return new AggregateInvokable();
+        return new AggregateSparkInvokable();
     }
 
     @Bean(name = SPARK_UNION_INVOKABLE)
     public Invokable getSparkUnionInvokable() {
-        return new UnionInvokable();
+        return new UnionSparkInvokable();
     }
 
     @Bean(name = SPARK_SINK_INVOKABLE)
     public Invokable getSparkSinkInvokable() {
-        return new SinkInvokable();
+        return new SinkSparkInvokable();
     }
     @Bean
     public List<OperationInstrumentation> getOperationInstrumentations() {

@@ -7,7 +7,7 @@ import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class LogicalToPhysicalGroupByConverter implements LogicalToPhysicalOperationConverter {
+public class GroupByLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
         LogicalGroupBy logicalOperation = (LogicalGroupBy) profileEstimation.getLogicalOperation();

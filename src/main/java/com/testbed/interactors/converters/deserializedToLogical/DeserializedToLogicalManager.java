@@ -29,8 +29,8 @@ import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
-public class DeserializedToLogicalOperationsConverter {
-    private final Map<String, DeserializedToLogicalOperationConverter> deserializedOperationConverterMapping;
+public class DeserializedToLogicalManager {
+    private final Map<String, DeserializedToLogicalConverter> deserializedOperationConverterMapping;
     private final DispatchersFactory dispatchersFactory;
 
     public LogicalPlan convert(final DeserializedOperations deserializedOperations) {

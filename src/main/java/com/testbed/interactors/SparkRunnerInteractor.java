@@ -6,8 +6,8 @@ import com.testbed.entities.jobs.Job;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalPlan;
 import com.testbed.entities.operations.physical.PhysicalPlan;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalOperationsConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalOperationsConverter;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -25,8 +25,8 @@ public class SparkRunnerInteractor implements Interactor {
     private final double tolerableErrorPercentage;
 
     private final Deserializer<DeserializedOperations> operationsDeserializer;
-    private final DeserializedToLogicalOperationsConverter deserializedToLogicalOperationsConverter;
-    private final LogicalToPhysicalOperationsConverter logicalToPhysicalOperationsConverter;
+    private final DeserializedToLogicalManager deserializedToLogicalManager;
+    private final LogicalToPhysicalManager logicalToPhysicalManager;
 
     private final JobCreator jobCreator;
     private final JobInvoker jobInvoker;
@@ -41,10 +41,10 @@ public class SparkRunnerInteractor implements Interactor {
         DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(pipelineFileName);
         LOG.info("Deserialized pipeline: " + deserializedOperations);
         LOG.info("Converting deserialized operations to logical operations");
-        LogicalPlan logicalPlan = deserializedToLogicalOperationsConverter.convert(deserializedOperations);
+        LogicalPlan logicalPlan = deserializedToLogicalManager.convert(deserializedOperations);
         LOG.info("Logical Plan: " + logicalPlan);
         LOG.info("Converting logical operations to physical operations");
-        PhysicalPlan physicalPlan = logicalToPhysicalOperationsConverter.convert(logicalPlan);
+        PhysicalPlan physicalPlan = logicalToPhysicalManager.convert(logicalPlan);
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Creating job");
         Job job = jobCreator.createJob(physicalPlan);

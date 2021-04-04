@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class LogicalToPhysicalProjectConverter implements LogicalToPhysicalOperationConverter {
+public class ProjectLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
     public PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         Set<String> columnNames = profileEstimation.getProfile().getColumns().keySet();

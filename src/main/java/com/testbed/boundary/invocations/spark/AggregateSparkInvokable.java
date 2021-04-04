@@ -13,7 +13,7 @@ import org.apache.spark.sql.Row;
 import static org.apache.spark.sql.functions.expr;
 
 @RequiredArgsConstructor
-public class AggregateInvokable implements Invokable {
+public class AggregateSparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,

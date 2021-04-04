@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class GroupByInvokable implements Invokable {
+public class GroupBySparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 1,

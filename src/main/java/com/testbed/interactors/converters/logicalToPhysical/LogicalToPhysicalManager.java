@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
-public class LogicalToPhysicalOperationsConverter {
+public class LogicalToPhysicalManager {
     private final Deserializer<Profile> profileDeserializer;
-    private final Map<String, LogicalToPhysicalOperationConverter> logicalOperationConverterMapping;
+    private final Map<String, LogicalToPhysicalConverter> logicalOperationConverterMapping;
 
     public PhysicalPlan convert(final LogicalPlan logicalPlan) {
         List<LogicalLoad> logicalLoads = logicalPlan.getLogicalLoads();

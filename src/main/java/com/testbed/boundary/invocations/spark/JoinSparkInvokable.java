@@ -12,7 +12,7 @@ import org.apache.spark.sql.Row;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JoinInvokable implements Invokable {
+public class JoinSparkInvokable implements Invokable {
     @Override
     public Result invoke(InvocationParameters invocationParameters) {
         Preconditions.checkArgument(invocationParameters.getInputResults().size() == 2,
