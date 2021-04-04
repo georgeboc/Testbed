@@ -27,7 +27,7 @@ import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.deserialized.UnaryDeserializedOperation;
 import com.testbed.entities.profiles.Profile;
-import com.testbed.factories.InteractorFactory;
+import com.testbed.interactors.InteractorFactory;
 import com.testbed.interactors.converters.deserializedToLogical.AggregateDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.GroupByDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.JoinDeserializedToLogicalConverter;

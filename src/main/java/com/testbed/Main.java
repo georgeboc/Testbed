@@ -1,8 +1,9 @@
 package com.testbed;
 
 import com.testbed.configuration.SpringConfiguration;
-import com.testbed.factories.InteractorFactory;
 import com.testbed.interactors.Interactor;
+import com.testbed.interactors.InteractorFactory;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.BufferedReader;
@@ -17,28 +18,21 @@ public class Main {
     public static void main(final String[] args) throws Exception {
         InteractorFactory interactorFactory = getReadJsonAndPrintContentFactory();
         System.out.printf("Introduce JSON pipeline file path (default: %s):%n", DEFAULT_PIPELINE_PATH);
-        String pipelinePath = readLineOrDefault(DEFAULT_PIPELINE_PATH);
+        String pipelinePath = StringUtils.defaultIfBlank(readLine(), DEFAULT_PIPELINE_PATH);
         System.out.printf("Introduce CSV operation instrumentations output file path (default: %s):%n", DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
-        String operationInstrumentationsPath = readLineOrDefault(DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
+        String operationInstrumentationsPath = StringUtils.defaultIfBlank(readLine(), DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
         System.out.printf("Introduce the tolerable error percentage (default: %s):%n", DEFAULT_TOLERABLE_ERROR_PERCENTAGE);
-        double tolerableErrorPercentage = Double.parseDouble(readLineOrDefault(DEFAULT_TOLERABLE_ERROR_PERCENTAGE));
+        double tolerableErrorPercentage = Double.parseDouble(StringUtils.defaultIfBlank(readLine(), DEFAULT_TOLERABLE_ERROR_PERCENTAGE));
         Interactor interactor = interactorFactory.getReadJsonAndPrintContent(pipelinePath,
                 operationInstrumentationsPath,
                 tolerableErrorPercentage);
         interactor.execute();
     }
 
-    private static String readLineOrDefault(final String defaultValue) throws IOException {
-        String lineRead = getBufferedReader().readLine();
-        if (lineRead.isBlank()) {
-            return defaultValue;
-        }
-        return lineRead;
-    }
-
-    private static BufferedReader getBufferedReader() {
+    private static String readLine() throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
-        return new BufferedReader(inputStreamReader);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        return bufferedReader.readLine();
     }
 
     private static InteractorFactory getReadJsonAndPrintContentFactory() {
