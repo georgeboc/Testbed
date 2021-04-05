@@ -11,7 +11,7 @@ public class JoinLogicalToPhysicalConverter implements LogicalToPhysicalConverte
     public PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         LogicalJoin logicalJoin = (LogicalJoin) profileEstimation.getLogicalOperation();
         return PhysicalJoin.builder()
-                ._id(logicalJoin.get_id())
+                .id(logicalJoin.getId())
                 .joinColumnName(logicalJoin.getJoinColumnName())
                 .build();
     }

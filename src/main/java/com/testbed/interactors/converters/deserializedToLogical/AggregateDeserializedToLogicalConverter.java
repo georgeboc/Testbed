@@ -10,7 +10,7 @@ public class AggregateDeserializedToLogicalConverter implements DeserializedToLo
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedAggregate deserializedAggregate = (DeserializedAggregate) deserializedOperation;
         return LogicalAggregate.builder()
-                ._id(getId(deserializedAggregate))
+                .id(getId(deserializedAggregate))
                 .aggregationColumnName(deserializedAggregate.getAggregationColumnName())
                 .aggregationOperation(deserializedAggregate.getAggregationOperation())
                 .build();

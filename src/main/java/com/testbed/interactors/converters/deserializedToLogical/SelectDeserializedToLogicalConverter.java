@@ -10,7 +10,7 @@ public class SelectDeserializedToLogicalConverter implements DeserializedToLogic
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedSelect deserializedSelect = (DeserializedSelect) deserializedOperation;
         return LogicalSelect.builder()
-                ._id(getId(deserializedSelect))
+                .id(getId(deserializedSelect))
                 .selectivityFactor(deserializedSelect.getSelectivityFactor())
                 .columnName(deserializedSelect.getColumnName())
                 .build();

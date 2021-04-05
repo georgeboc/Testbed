@@ -10,7 +10,7 @@ public class LoadLogicalToPhysicalConverter implements LogicalToPhysicalConverte
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
         LogicalLoad logicalLoad = (LogicalLoad) profileEstimation.getLogicalOperation();
         return PhysicalLoad.builder()
-                ._id(logicalLoad.get_id())
+                .id(logicalLoad.getId())
                 .datasetDirectoryPath(logicalLoad.getDatasetDirectoryPath())
                 .build();
     }

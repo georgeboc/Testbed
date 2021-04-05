@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class PhysicalUnion implements PhysicalOperation {
-    private final String _id;
+    private final String id;
 }

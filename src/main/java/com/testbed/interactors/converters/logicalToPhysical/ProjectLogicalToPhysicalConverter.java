@@ -21,7 +21,7 @@ public class ProjectLogicalToPhysicalConverter implements LogicalToPhysicalConve
                 .limit(expectedOutputColumnsCount)
                 .collect(Collectors.toList());
         return PhysicalProject.builder()
-                ._id(logicalProject.get_id())
+                .id(logicalProject.getId())
                 .projectedColumnNames(projectedColumnNames)
                 .expectedColumnsSelectionFactor(logicalProject.getColumnsSelectionFactor())
                 .build();

@@ -10,6 +10,6 @@ public class UnionLogicalToPhysicalConverter implements LogicalToPhysicalConvert
     @Override
     public PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         LogicalUnion logicalUnion = (LogicalUnion) profileEstimation.getLogicalOperation();
-        return new PhysicalUnion(logicalUnion.get_id());
+        return new PhysicalUnion(logicalUnion.getId());
     }
 }

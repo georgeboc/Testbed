@@ -10,7 +10,7 @@ public class JoinDeserializedToLogicalConverter implements DeserializedToLogical
     public LogicalOperation convert(DeserializedOperation deserializedOperation) {
         DeserializedJoin deserializedJoin = (DeserializedJoin) deserializedOperation;
         return LogicalJoin.builder()
-                ._id(getId(deserializedJoin))
+                .id(getId(deserializedJoin))
                 .joinColumnName(deserializedJoin.getJoinColumnName())
                 .build();
     }

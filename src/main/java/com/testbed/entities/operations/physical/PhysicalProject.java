@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class PhysicalProject implements PhysicalOperation {
-    private final String _id;
+    private final String id;
     private final List<String> projectedColumnNames;
     private final double expectedColumnsSelectionFactor;
 }

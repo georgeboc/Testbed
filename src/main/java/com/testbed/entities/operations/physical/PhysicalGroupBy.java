@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class PhysicalGroupBy implements PhysicalOperation {
-    private final String _id;
+    private final String id;
 }

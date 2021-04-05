@@ -11,6 +11,6 @@ public class GroupByLogicalToPhysicalConverter implements LogicalToPhysicalConve
     @Override
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
         LogicalGroupBy logicalOperation = (LogicalGroupBy) profileEstimation.getLogicalOperation();
-        return new PhysicalGroupBy(logicalOperation.get_id());
+        return new PhysicalGroupBy(logicalOperation.getId());
     }
 }

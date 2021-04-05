@@ -12,7 +12,7 @@ public class AggregateLogicalToPhysicalConverter implements LogicalToPhysicalCon
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
         LogicalAggregate logicalAggregate = (LogicalAggregate) profileEstimation.getLogicalOperation();
         return PhysicalAggregate.builder()
-                ._id(logicalAggregate.get_id())
+                .id(logicalAggregate.getId())
                 .aggregationColumnName(logicalAggregate.getAggregationColumnName())
                 .aggregationOperation(logicalAggregate.getAggregationOperation())
                 .build();

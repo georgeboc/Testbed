@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class PhysicalAggregate implements PhysicalOperation {
-    private final String _id;
+    private final String id;
     private String aggregationColumnName;
     private String aggregationOperation;
 }

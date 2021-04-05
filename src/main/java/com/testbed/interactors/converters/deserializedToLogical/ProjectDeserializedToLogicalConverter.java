@@ -10,7 +10,7 @@ public class ProjectDeserializedToLogicalConverter implements DeserializedToLogi
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedProject deserializedProject = (DeserializedProject) deserializedOperation;
         return LogicalProject.builder()
-                ._id(getId(deserializedProject))
+                .id(getId(deserializedProject))
                 .columnsSelectionFactor(deserializedProject.getColumnsSelectionFactor())
                 .build();
     }

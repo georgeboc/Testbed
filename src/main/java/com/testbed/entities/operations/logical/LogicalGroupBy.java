@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class LogicalGroupBy implements UnaryLogicalOperation {
-    private final String _id;
+    private final String id;
 }

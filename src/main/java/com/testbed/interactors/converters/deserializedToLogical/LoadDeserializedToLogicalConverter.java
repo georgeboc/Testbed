@@ -10,7 +10,7 @@ public class LoadDeserializedToLogicalConverter implements DeserializedToLogical
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedLoad deserializedLoad = (DeserializedLoad) deserializedOperation;
         return LogicalLoad.builder()
-                ._id(getId(deserializedLoad))
+                .id(getId(deserializedLoad))
                 .datasetDirectoryPath(deserializedLoad.getDatasetDirectoryPath())
                 .build();
     }

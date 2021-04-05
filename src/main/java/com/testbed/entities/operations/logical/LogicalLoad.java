@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class LogicalLoad implements ZeroaryLogicalOperation {
-    private final String _id;
+    private final String id;
     private final String datasetDirectoryPath;
 }
