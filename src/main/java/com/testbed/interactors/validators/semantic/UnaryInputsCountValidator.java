@@ -1,4 +1,4 @@
-package com.testbed.interactors.validators;
+package com.testbed.interactors.validators.semantic;
 
 import com.clearspring.analytics.util.Preconditions;
 import com.google.common.graph.Graph;

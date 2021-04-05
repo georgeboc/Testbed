@@ -53,7 +53,9 @@ import com.testbed.interactors.dispatchers.inputTagStream.BinaryInputTagStreamDi
 import com.testbed.interactors.dispatchers.inputTagStream.UnaryInputTagStreamDispatcher;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
-import com.testbed.interactors.validators.InputsCountValidatorManager;
+import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
+import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidator;
+import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
 import com.testbed.views.InvocationInstrumentationView;
 import org.apache.spark.SparkConf;
@@ -138,6 +140,7 @@ public class SpringConfiguration {
     @Bean
     public InteractorFactory getReadJsonAndPrintContentFactory() {
         return new InteractorFactory(getOperationsDeserializer(),
+                getNotNullOnAllFieldsValidatorManager(),
                 getDeserializedToLogicalOperationsConverter(),
                 getInputsCountValidatorManager(),
                 getLogicalOperationsConverter(),
@@ -150,6 +153,16 @@ public class SpringConfiguration {
     @Bean
     public Deserializer<DeserializedOperations> getOperationsDeserializer() {
         return new JsonOperationsDeserializer(getObjectMapperWithDeserializedOperationMixin());
+    }
+
+    @Bean
+    public NotNullOnAllFieldsValidatorManager getNotNullOnAllFieldsValidatorManager() {
+        return new NotNullOnAllFieldsValidatorManager(getNotNullOnAllFieldsValidator());
+    }
+
+    @Bean
+    public NotNullOnAllFieldsValidator getNotNullOnAllFieldsValidator() {
+        return new NotNullOnAllFieldsValidator();
     }
 
     @Bean(name = OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN)

@@ -10,7 +10,8 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
-import com.testbed.interactors.validators.InputsCountValidatorManager;
+import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
+import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ public class SparkRunnerInteractor implements Interactor {
     private final double tolerableErrorPercentage;
 
     private final Deserializer<DeserializedOperations> operationsDeserializer;
+    private final NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager;
     private final DeserializedToLogicalManager deserializedToLogicalManager;
     private final InputsCountValidatorManager inputsCountValidatorManager;
     private final LogicalToPhysicalManager logicalToPhysicalManager;
@@ -42,10 +44,13 @@ public class SparkRunnerInteractor implements Interactor {
         LOG.info("Deserializing operations from pipeline whose filename is: " + pipelineFileName);
         DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(pipelineFileName);
         LOG.info("Deserialized pipeline: " + deserializedOperations);
+        LOG.info("Validating if deserialized operations have values for all fields");
+        notNullOnAllFieldsValidatorManager.validate(deserializedOperations);
+        LOG.info("Deserialized operations are valid");
         LOG.info("Converting deserialized operations to logical operations");
         LogicalPlan logicalPlan = deserializedToLogicalManager.convert(deserializedOperations);
         LOG.info("Logical Plan: " + logicalPlan);
-        LOG.info("Validating Logical Plan");
+        LOG.info("Validating if all operations have corresponding number of inputs in Logical Plan");
         inputsCountValidatorManager.validate(logicalPlan.getGraph());
         LOG.info("Logical Plan is valid");
         LOG.info("Converting logical operations to physical operations");

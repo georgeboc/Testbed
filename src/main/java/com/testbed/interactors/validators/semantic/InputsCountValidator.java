@@ -1,4 +1,4 @@
-package com.testbed.interactors.validators;
+package com.testbed.interactors.validators.semantic;
 
 import com.google.common.graph.Graph;
 import com.testbed.entities.operations.logical.LogicalOperation;

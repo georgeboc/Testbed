@@ -1,4 +1,4 @@
-package com.testbed.interactors.validators;
+package com.testbed.interactors.validators.semantic;
 
 import com.testbed.entities.operations.logical.LogicalOperation;
 import lombok.Getter;
