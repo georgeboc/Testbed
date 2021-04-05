@@ -6,9 +6,9 @@ import lombok.Data;
 
 import java.util.List;
 
+@SuppressWarnings("UnstableApiUsage")
 @Data
 @Builder
-@SuppressWarnings("UnstableApiUsage")
 public class LogicalPlan {
     private final Graph<LogicalOperation> graph;
     private final List<LogicalLoad> logicalLoads;

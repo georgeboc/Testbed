@@ -6,9 +6,9 @@ import lombok.Data;
 
 import java.util.List;
 
+@SuppressWarnings("UnstableApiUsage")
 @Data
 @Builder
-@SuppressWarnings("UnstableApiUsage")
 public class PhysicalPlan {
     private final Graph<PhysicalOperation> graph;
     private final List<PhysicalLoad> loadOperations;

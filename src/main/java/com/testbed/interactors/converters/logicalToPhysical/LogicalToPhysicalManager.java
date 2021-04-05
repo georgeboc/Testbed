@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
+@RequiredArgsConstructor
 public class LogicalToPhysicalManager {
     private final Deserializer<Profile> profileDeserializer;
     private final Map<String, LogicalToPhysicalConverter> logicalOperationConverterMapping;

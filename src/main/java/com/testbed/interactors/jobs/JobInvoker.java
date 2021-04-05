@@ -24,11 +24,11 @@ public class JobInvoker {
     public void invokeJob(final Job job, final double tolerableErrorPercentage) {
         Stream<Invokable> invokableStream = getInvokablesStream(job.getJobOperations());
         Stream<JobOperation> jobOperationStream = job.getJobOperations().stream();
-        Stream<JobOperationInvocation> jobOperationInvocationStream = Streams.zip(invokableStream,
-                jobOperationStream,
-                JobOperationInvocation::new);
         Stack<Result> resultStack = new Stack<>();
-        jobOperationInvocationStream.forEach(jobOperationInvocation -> invokeJobOperation(jobOperationInvocation,
+        Streams.zip(invokableStream,
+                jobOperationStream,
+                JobOperationInvocation::new)
+                .forEach(jobOperationInvocation -> invokeJobOperation(jobOperationInvocation,
                 resultStack, tolerableErrorPercentage));
     }
 

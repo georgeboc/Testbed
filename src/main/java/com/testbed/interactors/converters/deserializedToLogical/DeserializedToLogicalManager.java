@@ -15,6 +15,7 @@ import com.testbed.entities.operations.logical.LogicalOperation;
 import com.testbed.entities.operations.logical.LogicalPlan;
 import com.testbed.interactors.dispatchers.DispatcherManager;
 import com.testbed.interactors.dispatchers.DispatchersFactory;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.util.AbstractMap;
@@ -22,13 +23,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
+@RequiredArgsConstructor
 public class DeserializedToLogicalManager {
     private final Map<String, DeserializedToLogicalConverter> deserializedOperationConverterMapping;
     private final DispatchersFactory dispatchersFactory;
@@ -103,14 +103,14 @@ public class DeserializedToLogicalManager {
 
     private Multimap<String, DeserializedOperation> getMappingByInputTag(final List<DeserializedOperation> deserializedOperations) {
         DispatcherManager dispatcherManager = dispatchersFactory.getDispatcherManagerForInputTagStreamWithoutLoadOperation();
-        Stream<Optional<Stream<String>>> inputTagStreamOfStreams = deserializedOperations.stream()
+        Stream<Stream<String>> inputTagStreamOfStreams = deserializedOperations.stream()
                 .map(dispatcherManager::visit)
-                .map(object -> (Stream<String>) object)
-                .map(Optional::ofNullable);
-        return Streams.zip(inputTagStreamOfStreams, deserializedOperations.stream(), AbstractMap.SimpleEntry::new)
-                .filter(simpleEntry -> simpleEntry.getKey().isPresent())
-                .map(simpleEntry -> new AbstractMap.SimpleEntry<>(simpleEntry.getKey().get(), simpleEntry.getValue()))
-                .flatMap(simpleEntry -> simpleEntry.getKey().map(inputTag -> new AbstractMap.SimpleEntry<>(inputTag, simpleEntry.getValue())))
+                .map(object -> (Stream<String>) object);
+        return Streams.zip(inputTagStreamOfStreams, deserializedOperations.stream(), InputTagsStreamAndOperation::new)
+                .filter(inputTagsStreamAndOperation -> Objects.nonNull(inputTagsStreamAndOperation.getInputTagsStream()))
+                .flatMap(inputTagsStreamAndOperation -> inputTagsStreamAndOperation.getInputTagsStream()
+                        .map(inputTag -> new AbstractMap.SimpleEntry<>(inputTag,
+                                inputTagsStreamAndOperation.getDeserializedOperation())))
                 .collect(ArrayListMultimap::create,
                         (multimap, simpleEntry) -> multimap.put(simpleEntry.getKey(), simpleEntry.getValue()),
                         Multimap::putAll);
@@ -122,5 +122,11 @@ public class DeserializedToLogicalManager {
                 .map(operationsMapping::get)
                 .map(logicalOperation -> (LogicalLoad) logicalOperation)
                 .collect(Collectors.toList());
+    }
+
+    @Data
+    private static class InputTagsStreamAndOperation {
+        private final Stream<String> inputTagsStream;
+        private final DeserializedOperation deserializedOperation;
     }
 }
