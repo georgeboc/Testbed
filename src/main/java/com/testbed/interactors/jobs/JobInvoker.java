@@ -9,17 +9,19 @@ import com.testbed.boundary.invocations.results.Result;
 import com.testbed.entities.jobs.Job;
 import com.testbed.entities.jobs.JobOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 
+import javax.inject.Inject;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-@RequiredArgsConstructor
 @SuppressWarnings("UnstableApiUsage")
+@RequiredArgsConstructor
 public class JobInvoker {
-    private final Map<String, Invokable> physicalOperationToInstrumentedInvocationMapper;
+    @Inject
+    private ApplicationContext applicationContext;
 
     public void invokeJob(final Job job, final double tolerableErrorPercentage) {
         Stream<Invokable> invokableStream = getInvokablesStream(job.getJobOperations());
@@ -34,8 +36,10 @@ public class JobInvoker {
 
     private Stream<Invokable> getInvokablesStream(final List<JobOperation> jobOperations) {
         return jobOperations.stream()
-                .map(jobOperation -> jobOperation.getPhysicalOperation().getClass().getSimpleName())
-                .map(physicalOperationToInstrumentedInvocationMapper::get);
+                .map(JobOperation::getPhysicalOperation)
+                .map(Object::getClass)
+                .map(Class::getSimpleName)
+                .map(operationClassName -> applicationContext.getBean(operationClassName, Invokable.class));
     }
 
     private void invokeJobOperation(final JobOperationInvocation jobOperationInvocation,

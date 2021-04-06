@@ -5,6 +5,9 @@ import com.testbed.entities.operations.deserialized.DeserializedUnion;
 import com.testbed.entities.operations.logical.LogicalOperation;
 import com.testbed.entities.operations.logical.LogicalUnion;
 
+import javax.inject.Named;
+
+@Named
 public class UnionDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
     public LogicalOperation convert(DeserializedOperation deserializedOperation) {

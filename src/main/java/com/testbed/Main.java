@@ -1,10 +1,10 @@
 package com.testbed;
 
-import com.testbed.configuration.SpringConfiguration;
 import com.testbed.interactors.Interactor;
 import com.testbed.interactors.InteractorFactory;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,7 +16,8 @@ public class Main {
     private static final String DEFAULT_TOLERABLE_ERROR_PERCENTAGE = "5.0";
 
     public static void main(final String[] args) throws Exception {
-        InteractorFactory interactorFactory = getReadJsonAndPrintContentFactory();
+        ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {"Sprint-AutoScan.xml"});
+        InteractorFactory interactorFactory = context.getBean(InteractorFactory.class);
         System.out.printf("Introduce JSON pipeline file path (default: %s):%n", DEFAULT_PIPELINE_PATH);
         String pipelinePath = StringUtils.defaultIfBlank(readLine(), DEFAULT_PIPELINE_PATH);
         System.out.printf("Introduce CSV operation instrumentations output file path (default: %s):%n", DEFAULT_OPERATION_INSTRUMENTATIONS_PATH);
@@ -33,10 +34,5 @@ public class Main {
         InputStreamReader inputStreamReader = new InputStreamReader(System.in);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         return bufferedReader.readLine();
-    }
-
-    private static InteractorFactory getReadJsonAndPrintContentFactory() {
-        AnnotationConfigApplicationContext configuration = new AnnotationConfigApplicationContext(SpringConfiguration.class);
-        return configuration.getBean(InteractorFactory.class);
     }
 }

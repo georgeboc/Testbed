@@ -17,7 +17,9 @@ import com.testbed.interactors.dispatchers.DispatcherManager;
 import com.testbed.interactors.dispatchers.DispatchersFactory;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 
+import javax.inject.Inject;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
@@ -30,8 +32,9 @@ import java.util.stream.Stream;
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
 public class DeserializedToLogicalManager {
-    private final Map<String, DeserializedToLogicalConverter> deserializedOperationConverterMapping;
     private final DispatchersFactory dispatchersFactory;
+    @Inject
+    private ApplicationContext applicationContext;
 
     public LogicalPlan convert(final DeserializedOperations deserializedOperations) {
         Map<DeserializedOperation, LogicalOperation> operationsMapping = getOperationsMapping(deserializedOperations);
@@ -47,8 +50,8 @@ public class DeserializedToLogicalManager {
 
     private Map<DeserializedOperation, LogicalOperation> getOperationsMapping(final DeserializedOperations deserializedOperations) {
         Stream<LogicalOperation> logicalOperationsStream = deserializedOperations.stream()
-                .map(deserializedOperation -> deserializedOperationConverterMapping
-                        .get(deserializedOperation.getClass().getSimpleName()).convert(deserializedOperation));
+                .map(deserializedOperation -> applicationContext.getBean(deserializedOperation.getClass().getSimpleName(),
+                        DeserializedToLogicalConverter.class).convert(deserializedOperation));
         return Streams.zip(deserializedOperations.stream(), logicalOperationsStream, AbstractMap.SimpleEntry::new)
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }

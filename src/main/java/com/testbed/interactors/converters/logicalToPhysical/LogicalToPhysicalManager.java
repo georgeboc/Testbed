@@ -16,10 +16,11 @@ import com.testbed.entities.profiles.Profile;
 import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 import org.glassfish.jersey.internal.guava.Sets;
+import org.springframework.context.ApplicationContext;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
@@ -28,7 +29,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LogicalToPhysicalManager {
     private final Deserializer<Profile> profileDeserializer;
-    private final Map<String, LogicalToPhysicalConverter> logicalOperationConverterMapping;
+    @Inject
+    private ApplicationContext applicationContext;
+
 
     public PhysicalPlan convert(final LogicalPlan logicalPlan) {
         List<LogicalLoad> logicalLoads = logicalPlan.getLogicalLoads();
@@ -84,7 +87,7 @@ public class LogicalToPhysicalManager {
 
     private PhysicalOperation getPhysicalOperation(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         String logicalOperationName = profileEstimation.getLogicalOperation().getClass().getSimpleName();
-        return logicalOperationConverterMapping.get(logicalOperationName).convert(profileEstimation);
+        return applicationContext.getBean(logicalOperationName, LogicalToPhysicalConverter.class).convert(profileEstimation);
     }
 
     private List<ProfileEstimation> getSuccessiveProfileEstimations(final ProfileEstimation currentProfileEstimation,
@@ -100,8 +103,8 @@ public class LogicalToPhysicalManager {
 
     private List<PhysicalLoad> getPhysicalLoads(final List<ProfileEstimation> loadProfileEstimations) {
         return loadProfileEstimations.stream()
-                .map(loadProfileEstimation -> logicalOperationConverterMapping
-                        .get(loadProfileEstimation.getLogicalOperation().getClass().getSimpleName()).convert(loadProfileEstimation))
+                .map(loadProfileEstimation -> applicationContext.getBean(loadProfileEstimation.getLogicalOperation().getClass().getSimpleName(),
+                        LogicalToPhysicalConverter.class).convert(loadProfileEstimation))
                 .map(physicalOperation -> (PhysicalLoad) physicalOperation)
                 .collect(Collectors.toList());
     }

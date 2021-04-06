@@ -65,38 +65,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 @Configuration
 public class SpringConfiguration {
-    private static final String DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING = "deserializedToLogicalConvertersMapping";
-    private static final String LOGICAL_CONVERTERS_MAPPING = "logicalConvertersMapping";
-    private static final String SPARK_PHYSICAL_OPERATION_TO_INVOKABLE_MAPPING = "sparkPhysicalOperationToInvokableMapping";
-    private static final String SPARK_PHYSICAL_OPERATION_TO_INSTRUMENT_INVOKABLE_MAPPING = "sparkPhysicalOperationToInstrumentInvokableMapping";
-
-    private static final String SPARK_INVOKER = "sparkInvoker";
-
     private static final String APP_NAME = "Testbed";
     private static final String LOCAL = "local[*]";
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
-
-    private static final String DESERIALIZED_TO_LOGICAL_LOAD_CONVERTER = "deserializedToLogicalLoadConverter";
-    private static final String DESERIALIZED_TO_LOGICAL_SELECT_CONVERTER = "deserializedToLogicalSelectConverter";
-    private static final String DESERIALIZED_TO_LOGICAL_PROJECT_CONVERTER = "deserializedToLogicalProjectConverter";
-    private static final String DESERIALIZED_TO_LOGICAL_JOIN_CONVERTER = "deserializedToLogicalJoinConverter";
-    private static final String DESERIALIZED_TO_LOGICAL_GROUP_BY_CONVERTER = "deserializedToLogicalGroupByConverter";
-    private static final String DESERIALIZED_TO_LOGICAL_AGGREGATE_CONVERTER = "deserializedToLogicalAggregateConverter";
-    private static final String DESERIALIZED_TO_LOGICAL_UNION_CONVERTER = "deserializedToLogicalUnionConverter";
-
-    private static final String LOGICAL_TO_PHYSICAL_LOAD_CONVERTER = "logicalToPhysicalLoadConverter";
-    private static final String LOGICAL_TO_PHYSICAL_SELECT_CONVERTER = "logicalToPhysicalSelectConverter";
-    private static final String LOGICAL_TO_PHYSICAL_PROJECT_CONVERTER = "logicalToPhysicalProjectConverter";
-    private static final String LOGICAL_TO_PHYSICAL_JOIN_CONVERTER = "logicalToPhysicalJoinConverter";
-    private static final String LOGICAL_TO_PHYSICAL_GROUP_BY_CONVERTER = "logicalToPhysicalGroupByConverter";
-    private static final String LOGICAL_TO_PHYSICAL_AGGREGATE_CONVERTER = "logicalToPhysicalAggregateConverter";
-    private static final String LOGICAL_TO_PHYSICAL_UNION_CONVERTER = "logicalToPhysicalUnionConverter";
 
     private static final String DESERIALIZED_LOAD = "DeserializedLoad";
     private static final String DESERIALIZED_SELECT = "DeserializedSelect";
@@ -123,301 +99,238 @@ public class SpringConfiguration {
     private static final String PHYSICAL_UNION = "PhysicalUnion";
     private static final String PHYSICAL_SINK = "PhysicalSink";
 
-    private static final String SPARK_LOAD_INVOKABLE = "sparkLoadInvokable";
-    private static final String SPARK_SELECT_INVOKABLE = "sparkSelectInvokable";
-    private static final String SPARK_PROJECT_INVOKABLE = "sparkProjectInvokable";
-    private static final String SPARK_JOIN_INVOKABLE = "sparkJoinInvokable";
-    private static final String SPARK_GROUP_BY_INVOKABLE = "sparkGroupByInvokable";
-    private static final String SPARK_AGGREGATE_INVOKABLE = "sparkAggregateInvokable";
-    private static final String SPARK_UNION_INVOKABLE = "sparkUnionInvokable";
-    private static final String SPARK_SINK_INVOKABLE = "sparkSinkInvokable";
-
     @Bean
     public ColumnReader getColumnReader() {
         return new AvroColumnReader();
     }
 
     @Bean
-    public InteractorFactory getReadJsonAndPrintContentFactory() {
-        return new InteractorFactory(getOperationsDeserializer(),
-                getNotNullOnAllFieldsValidatorManager(),
-                getDeserializedToLogicalOperationsConverter(),
-                getInputsCountValidatorManager(),
-                getLogicalOperationsConverter(),
-                getJobCreator(),
-                getSparkInvoker(),
-                getOperationInstrumentations(),
-                getInvocationInstrumentationViewer());
+    public InteractorFactory interactorFactory() {
+        return new InteractorFactory(operationsDeserializer(),
+                notNullOnAllFieldsValidatorManager(),
+                deserializedToLogicalOperationsConverter(),
+                inputsCountValidatorManager(),
+                logicalOperationsConverter(),
+                jobCreator(),
+                jobInvoker(),
+                operationInstrumentations(),
+                invocationInstrumentationViewer());
     }
 
     @Bean
-    public Deserializer<DeserializedOperations> getOperationsDeserializer() {
-        return new JsonOperationsDeserializer(getObjectMapperWithDeserializedOperationMixin());
+    public Deserializer<DeserializedOperations> operationsDeserializer() {
+        return new JsonOperationsDeserializer(objectMapperWithDeserializedOperationMixin());
     }
 
     @Bean
-    public NotNullOnAllFieldsValidatorManager getNotNullOnAllFieldsValidatorManager() {
-        return new NotNullOnAllFieldsValidatorManager(getNotNullOnAllFieldsValidator());
+    public NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager() {
+        return new NotNullOnAllFieldsValidatorManager(notNullOnAllFieldsValidator());
     }
 
     @Bean
-    public NotNullOnAllFieldsValidator getNotNullOnAllFieldsValidator() {
+    public NotNullOnAllFieldsValidator notNullOnAllFieldsValidator() {
         return new NotNullOnAllFieldsValidator();
     }
 
     @Bean(name = OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN)
-    public ObjectMapper getObjectMapperWithDeserializedOperationMixin() {
+    public ObjectMapper objectMapperWithDeserializedOperationMixin() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.addMixIn(DeserializedOperation.class, DeserializedOperationMixin.class);
         return objectMapper;
     }
 
     @Bean
-    public DeserializedToLogicalManager getDeserializedToLogicalOperationsConverter() {
-        return new DeserializedToLogicalManager(getDeserializedToLogicalConvertersMapping(),
-                getDispatchersFactory());
+    public DeserializedToLogicalManager deserializedToLogicalOperationsConverter() {
+        return new DeserializedToLogicalManager(dispatchersFactory());
     }
 
-    @Bean(name = DESERIALIZED_TO_LOGICAL_CONVERTERS_MAPPING)
-    public Map<String, DeserializedToLogicalConverter> getDeserializedToLogicalConvertersMapping() {
-        return Map.of(
-                DESERIALIZED_LOAD, getDeserializedToLogicalLoadConverter(),
-                DESERIALIZED_SELECT, getDeserializedToLogicalSelectConverter(),
-                DESERIALIZED_PROJECT, getDeserializedToLogicalProjectConverter(),
-                DESERIALIZED_JOIN, getDeserializedToLogicalJoinConverter(),
-                DESERIALIZED_GROUP_BY, getDeserializedToLogicalGroupByConverter(),
-                DESERIALIZED_AGGREGATE, getDeserializedToLogicalAggregateConverter(),
-                DESERIALIZED_UNION, getDeserializedToLogicalUnionConverter()
-        );
-    }
-
-    @Bean(name = DESERIALIZED_TO_LOGICAL_LOAD_CONVERTER)
-    public DeserializedToLogicalConverter getDeserializedToLogicalLoadConverter() {
+    @Bean(name = DESERIALIZED_LOAD)
+    public DeserializedToLogicalConverter loadDeserializedToLogicalConverter() {
         return new LoadDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_TO_LOGICAL_SELECT_CONVERTER)
-    public DeserializedToLogicalConverter getDeserializedToLogicalSelectConverter() {
+    @Bean(name = DESERIALIZED_SELECT)
+    public DeserializedToLogicalConverter selectDeserializedToLogicalConverter() {
         return new SelectDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_TO_LOGICAL_PROJECT_CONVERTER)
-    public ProjectDeserializedToLogicalConverter getDeserializedToLogicalProjectConverter() {
+    @Bean(name = DESERIALIZED_PROJECT)
+    public ProjectDeserializedToLogicalConverter projectDeserializedToLogicalConverter() {
         return new ProjectDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_TO_LOGICAL_JOIN_CONVERTER)
-    public DeserializedToLogicalConverter getDeserializedToLogicalJoinConverter() {
+    @Bean(name = DESERIALIZED_JOIN)
+    public DeserializedToLogicalConverter joinDeserializedToLogicalConverter() {
         return new JoinDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_TO_LOGICAL_GROUP_BY_CONVERTER)
-    public DeserializedToLogicalConverter getDeserializedToLogicalGroupByConverter() {
+    @Bean(name = DESERIALIZED_GROUP_BY)
+    public DeserializedToLogicalConverter groupByDeserializedToLogicalConverter() {
         return new GroupByDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_TO_LOGICAL_AGGREGATE_CONVERTER)
-    public DeserializedToLogicalConverter getDeserializedToLogicalAggregateConverter() {
+    @Bean(name = DESERIALIZED_AGGREGATE)
+    public DeserializedToLogicalConverter aggregateDeserializedToLogicalConverter() {
         return new AggregateDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_TO_LOGICAL_UNION_CONVERTER)
-    public DeserializedToLogicalConverter getDeserializedToLogicalUnionConverter() {
+    @Bean(name = DESERIALIZED_UNION)
+    public DeserializedToLogicalConverter unionDeserializedToLogicalConverter() {
         return new UnionDeserializedToLogicalConverter();
     }
 
     @Bean
-    public InputsCountValidatorManager getInputsCountValidatorManager() {
+    public InputsCountValidatorManager inputsCountValidatorManager() {
         return new InputsCountValidatorManager();
     }
 
     @Bean
-    public DispatchersFactory getDispatchersFactory() {
-        return new DispatchersFactory(getFilterInDeserializedLoadDispatcher(),
-                getUnaryInputTagStreamDispatcher(),
-                getBinaryStreamDispatcher());
+    public DispatchersFactory dispatchersFactory() {
+        return new DispatchersFactory(filterInDeserializedLoadDispatcher(),
+                unaryInputTagStreamDispatcher(),
+                binaryStreamDispatcher());
     }
 
     @Bean
-    public Dispatcher<DeserializedLoad, DeserializedLoad> getFilterInDeserializedLoadDispatcher() {
+    public Dispatcher<DeserializedLoad, DeserializedLoad> filterInDeserializedLoadDispatcher() {
         return new FilterInDeserializedLoadDispatcher();
     }
 
     @Bean
-    public Dispatcher<UnaryDeserializedOperation, Stream<String>> getUnaryInputTagStreamDispatcher() {
+    public Dispatcher<UnaryDeserializedOperation, Stream<String>> unaryInputTagStreamDispatcher() {
         return new UnaryInputTagStreamDispatcher();
     }
 
     @Bean
-    public Dispatcher<BinaryDeserializedOperation, Stream<String>> getBinaryStreamDispatcher() {
+    public Dispatcher<BinaryDeserializedOperation, Stream<String>> binaryStreamDispatcher() {
         return new BinaryInputTagStreamDispatcher();
     }
 
     @Bean
-    public LogicalToPhysicalManager getLogicalOperationsConverter() {
-        return new LogicalToPhysicalManager(getProfileDeserializer(), getLogicalConvertersMapping());
+    public LogicalToPhysicalManager logicalOperationsConverter() {
+        return new LogicalToPhysicalManager(profileDeserializer());
     }
 
     @Bean
-    public Deserializer<Profile> getProfileDeserializer() {
+    public Deserializer<Profile> profileDeserializer() {
         return new AvroProfileDeserializer();
     }
 
-    @Bean(name = LOGICAL_CONVERTERS_MAPPING)
-    public Map<String, LogicalToPhysicalConverter> getLogicalConvertersMapping() {
-        return Map.of(
-                LOGICAL_LOAD, getLogicalToPhysicalLoadConverter(),
-                LOGICAL_SELECT, getLogicalToPhysicalSelectConverter(),
-                LOGICAL_PROJECT, getLogicalToPhysicalProjectConverter(),
-                LOGICAL_JOIN, getLogicalToPhysicalJoinConverter(),
-                LOGICAL_GROUP_BY, getLogicalToPhysicalGroupByConverter(),
-                LOGICAL_AGGREGATE, getLogicalToPhysicalAggregateConverter(),
-                LOGICAL_UNION, getLogicalToPhysicalUnionConverter()
-        );
-    }
-
-    @Bean(name = LOGICAL_TO_PHYSICAL_LOAD_CONVERTER)
-    public LogicalToPhysicalConverter getLogicalToPhysicalLoadConverter() {
+    @Bean(name = LOGICAL_LOAD)
+    public LogicalToPhysicalConverter loadLogicalToPhysicalConverter() {
         return new LoadLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_TO_PHYSICAL_SELECT_CONVERTER)
-    public LogicalToPhysicalConverter getLogicalToPhysicalSelectConverter() {
+    @Bean(name = LOGICAL_SELECT)
+    public LogicalToPhysicalConverter selectLogicalToPhysicalConverter() {
         return new SelectLogicalToPhysicalConverter(getColumnReader());
     }
 
-    @Bean(name = LOGICAL_TO_PHYSICAL_PROJECT_CONVERTER)
-    public ProjectLogicalToPhysicalConverter getLogicalToPhysicalProjectConverter() {
+    @Bean(name = LOGICAL_PROJECT)
+    public ProjectLogicalToPhysicalConverter projectLogicalToPhysicalConverter() {
         return new ProjectLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_TO_PHYSICAL_JOIN_CONVERTER)
-    public LogicalToPhysicalConverter getLogicalToPhysicalJoinConverter() {
+    @Bean(name = LOGICAL_JOIN)
+    public LogicalToPhysicalConverter joinLogicalToPhysicalConverter() {
         return new JoinLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_TO_PHYSICAL_GROUP_BY_CONVERTER)
-    public LogicalToPhysicalConverter getLogicalToPhysicalGroupByConverter() {
+    @Bean(name = LOGICAL_GROUP_BY)
+    public LogicalToPhysicalConverter groupByLogicalToPhysicalConverter() {
         return new GroupByLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_TO_PHYSICAL_AGGREGATE_CONVERTER)
-    public LogicalToPhysicalConverter getLogicalToPhysicalAggregateConverter() {
+    @Bean(name = LOGICAL_AGGREGATE)
+    public LogicalToPhysicalConverter aggregateLogicalToPhysicalConverter() {
         return new AggregateLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_TO_PHYSICAL_UNION_CONVERTER)
-    public LogicalToPhysicalConverter getLogicalToPhysicalUnionConverter() {
+    @Bean(name = LOGICAL_UNION)
+    public LogicalToPhysicalConverter unionLogicalToPhysicalConverter() {
         return new UnionLogicalToPhysicalConverter();
     }
 
     @Bean
-    public JobCreator getJobCreator() {
+    public JobCreator jobCreator() {
         return new JobCreator();
     }
 
-    @Bean(name = SPARK_INVOKER)
-    public JobInvoker getSparkInvoker() {
-        return new JobInvoker(getSparkPhysicalOperationToInstrumentInvokableMapper());
-    }
-
-    @Bean(name = SPARK_PHYSICAL_OPERATION_TO_INSTRUMENT_INVOKABLE_MAPPING)
-    public Map<String, Invokable> getSparkPhysicalOperationToInstrumentInvokableMapper() {
-        return Map.of(
-                PHYSICAL_LOAD, getInstrumentInvokable(getSparkLoadInvokable()),
-                PHYSICAL_SELECT, getInstrumentInvokable(getSparkSelectInvokable()),
-                PHYSICAL_PROJECT, getInstrumentInvokable(getSparkProjectInvokable()),
-                PHYSICAL_JOIN, getInstrumentInvokable(getSparkJoinInvokable()),
-                PHYSICAL_GROUP_BY, getInstrumentInvokable(getSparkGroupByInvokable()),
-                PHYSICAL_AGGREGATE, getInstrumentInvokable(getSparkAggregateInvokable()),
-                PHYSICAL_UNION, getInstrumentInvokable(getSparkUnionInvokable()),
-                PHYSICAL_SINK, getInstrumentInvokable(getSparkSinkInvokable())
-        );
-    }
-
-    public Invokable getInstrumentInvokable(Invokable wrappedInvokable) {
-        return new InstrumentInvokable(wrappedInvokable, getOperationInstrumentations());
-    }
-
-    @Bean(name = SPARK_LOAD_INVOKABLE)
-    public Invokable getSparkLoadInvokable() {
-        return new LoadSparkInvokable(getSparkSession());
-    }
-
-    @Bean(name = SPARK_SELECT_INVOKABLE)
-    public Invokable getSparkSelectInvokable() {
-        return new SelectSparkInvokable();
-    }
-
-    @Bean(name = SPARK_PROJECT_INVOKABLE)
-    public Invokable getSparkProjectInvokable() {
-        return new ProjectSparkInvokable();
-    }
-
-    @Bean(name = SPARK_JOIN_INVOKABLE)
-    public Invokable getSparkJoinInvokable() {
-        return new JoinSparkInvokable();
-    }
-
-    @Bean(name = SPARK_GROUP_BY_INVOKABLE)
-    public Invokable getSparkGroupByInvokable() {
-        return new GroupBySparkInvokable();
-    }
-
-    @Bean(name = SPARK_AGGREGATE_INVOKABLE)
-    public Invokable getSparkAggregateInvokable() {
-        return new AggregateSparkInvokable();
-    }
-
-    @Bean(name = SPARK_UNION_INVOKABLE)
-    public Invokable getSparkUnionInvokable() {
-        return new UnionSparkInvokable();
-    }
-
-    @Bean(name = SPARK_SINK_INVOKABLE)
-    public Invokable getSparkSinkInvokable() {
-        return new SinkSparkInvokable();
-    }
     @Bean
-    public List<OperationInstrumentation> getOperationInstrumentations() {
+    public JobInvoker jobInvoker() {
+        return new JobInvoker();
+    }
+
+    @Bean(name = PHYSICAL_LOAD)
+    public Invokable sparkLoadInvokable() {
+        return instrumentInvokable(new LoadSparkInvokable(sparkSession()));
+    }
+
+    @Bean(name = PHYSICAL_SELECT)
+    public Invokable sparkSelectInvokable() {
+        return instrumentInvokable(new SelectSparkInvokable());
+    }
+
+    @Bean(name = PHYSICAL_PROJECT)
+    public Invokable sparkProjectInvokable() {
+        return instrumentInvokable(new ProjectSparkInvokable());
+    }
+
+    @Bean(name = PHYSICAL_JOIN)
+    public Invokable sparkJoinInvokable() {
+        return instrumentInvokable(new JoinSparkInvokable());
+    }
+
+    @Bean(name = PHYSICAL_GROUP_BY)
+    public Invokable sparkGroupByInvokable() {
+        return instrumentInvokable(new GroupBySparkInvokable());
+    }
+
+    @Bean(name = PHYSICAL_AGGREGATE)
+    public Invokable sparkAggregateInvokable() {
+        return instrumentInvokable(new AggregateSparkInvokable());
+    }
+
+    @Bean(name = PHYSICAL_UNION)
+    public Invokable sparkUnionInvokable() {
+        return instrumentInvokable(new UnionSparkInvokable());
+    }
+
+    @Bean(name = PHYSICAL_SINK)
+    public Invokable sparkSinkInvokable() {
+        return instrumentInvokable(new SinkSparkInvokable());
+    }
+
+    public Invokable instrumentInvokable(Invokable wrappedInvokable) {
+        return new InstrumentInvokable(wrappedInvokable, operationInstrumentations());
+    }
+
+    @Bean
+    public List<OperationInstrumentation> operationInstrumentations() {
         return Lists.newArrayList();
     }
 
     @Bean
-    public SparkSession getSparkSession() {
+    public SparkSession sparkSession() {
         SparkConf conf = new SparkConf().setAppName(APP_NAME).setMaster(LOCAL);
         SparkContext sparkContext = new SparkContext(conf);
         return new SparkSession(sparkContext);
     }
 
-    @Bean(name = SPARK_PHYSICAL_OPERATION_TO_INVOKABLE_MAPPING)
-    public Map<String, Invokable> getSparkPhysicalOperationToInvokableMapper() {
-        return Map.of(
-                PHYSICAL_LOAD, getSparkLoadInvokable(),
-                PHYSICAL_SELECT, getSparkSelectInvokable(),
-                PHYSICAL_PROJECT, getSparkProjectInvokable(),
-                PHYSICAL_JOIN, getSparkJoinInvokable(),
-                PHYSICAL_GROUP_BY, getSparkGroupByInvokable(),
-                PHYSICAL_AGGREGATE, getSparkAggregateInvokable(),
-                PHYSICAL_UNION, getSparkUnionInvokable(),
-                PHYSICAL_SINK, getSparkSinkInvokable()
-        );
-    }
-
     @Bean
-    public InvocationInstrumentationViewer getInvocationInstrumentationViewer() {
-        return new InvocationInstrumentationViewer(getInvocationInstrumentationViewCSVSerializer(), getObjectMapperWithJavaTimeModule());
+    public InvocationInstrumentationViewer invocationInstrumentationViewer() {
+        return new InvocationInstrumentationViewer(invocationInstrumentationViewCSVSerializer(), objectMapperWithJavaTimeModule());
     }
 
     @Bean(name = OBJECT_MAPPER_WITH_JAVA_TIME_MODULE)
-    public ObjectMapper getObjectMapperWithJavaTimeModule() {
+    public ObjectMapper objectMapperWithJavaTimeModule() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper;
     }
 
     @Bean
-    public CSVSerializer<InvocationInstrumentationView> getInvocationInstrumentationViewCSVSerializer() {
+    public CSVSerializer<InvocationInstrumentationView> invocationInstrumentationViewCSVSerializer() {
         return new CSVSerializer<>(InvocationInstrumentationView.class);
     }
 }

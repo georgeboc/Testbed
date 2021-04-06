@@ -5,6 +5,9 @@ import com.testbed.entities.operations.deserialized.DeserializedSelect;
 import com.testbed.entities.operations.logical.LogicalOperation;
 import com.testbed.entities.operations.logical.LogicalSelect;
 
+import javax.inject.Named;
+
+@Named
 public class SelectDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {

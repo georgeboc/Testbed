@@ -5,6 +5,9 @@ import com.testbed.entities.operations.physical.PhysicalLoad;
 import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.profiles.ProfileEstimation;
 
+import javax.inject.Named;
+
+@Named
 public class LoadLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
