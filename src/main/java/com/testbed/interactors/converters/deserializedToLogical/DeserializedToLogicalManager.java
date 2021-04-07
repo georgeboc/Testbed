@@ -13,10 +13,10 @@ import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalLoad;
 import com.testbed.entities.operations.logical.LogicalOperation;
 import com.testbed.entities.operations.logical.LogicalPlan;
-import com.testbed.interactors.dispatchers.DispatcherManager;
-import com.testbed.interactors.dispatchers.DispatchersFactory;
+import com.testbed.interactors.converters.deserializedToLogical.inputTagStream.InputTagsStream;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
 import org.springframework.context.ApplicationContext;
 
 import javax.inject.Inject;
@@ -24,15 +24,15 @@ import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.testbed.configuration.SpringConfiguration.DESERIALIZED_LOAD;
+
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
 public class DeserializedToLogicalManager {
-    private final DispatchersFactory dispatchersFactory;
     @Inject
     private ApplicationContext applicationContext;
 
@@ -50,18 +50,21 @@ public class DeserializedToLogicalManager {
 
     private Map<DeserializedOperation, LogicalOperation> getOperationsMapping(final DeserializedOperations deserializedOperations) {
         Stream<LogicalOperation> logicalOperationsStream = deserializedOperations.stream()
-                .map(deserializedOperation -> applicationContext.getBean(deserializedOperation.getClass().getSimpleName(),
-                        DeserializedToLogicalConverter.class).convert(deserializedOperation));
+                .map(this::convertDeserializedToLogicalOperation);
         return Streams.zip(deserializedOperations.stream(), logicalOperationsStream, AbstractMap.SimpleEntry::new)
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
+    private LogicalOperation convertDeserializedToLogicalOperation(DeserializedOperation deserializedOperation) {
+        return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
+                DeserializedToLogicalConverter.class,
+                deserializedOperation.getClass().getSimpleName()).convert(deserializedOperation);
+    }
+
     private List<DeserializedLoad> getDeserializedLoads(final DeserializedOperations deserializedOperations) {
-        DispatcherManager dispatcherManager = dispatchersFactory.getDispatcherManagerForDeserializedLoadFilter();
         return deserializedOperations.stream()
-                .map(dispatcherManager::visit)
-                .filter(Objects::nonNull)
-                .map(object -> (DeserializedLoad) object)
+                .filter(deserializedOperation -> deserializedOperation.getClass().getSimpleName().equals(DESERIALIZED_LOAD))
+                .map(deserializedOperation -> (DeserializedLoad) deserializedOperation)
                 .collect(Collectors.toList());
     }
 
@@ -105,18 +108,20 @@ public class DeserializedToLogicalManager {
     }
 
     private Multimap<String, DeserializedOperation> getMappingByInputTag(final List<DeserializedOperation> deserializedOperations) {
-        DispatcherManager dispatcherManager = dispatchersFactory.getDispatcherManagerForInputTagStreamWithoutLoadOperation();
         Stream<Stream<String>> inputTagStreamOfStreams = deserializedOperations.stream()
-                .map(dispatcherManager::visit)
-                .map(object -> (Stream<String>) object);
+                .map(this::getInputTagStream);
         return Streams.zip(inputTagStreamOfStreams, deserializedOperations.stream(), InputTagsStreamAndOperation::new)
-                .filter(inputTagsStreamAndOperation -> Objects.nonNull(inputTagsStreamAndOperation.getInputTagsStream()))
                 .flatMap(inputTagsStreamAndOperation -> inputTagsStreamAndOperation.getInputTagsStream()
                         .map(inputTag -> new AbstractMap.SimpleEntry<>(inputTag,
                                 inputTagsStreamAndOperation.getDeserializedOperation())))
                 .collect(ArrayListMultimap::create,
                         (multimap, simpleEntry) -> multimap.put(simpleEntry.getKey(), simpleEntry.getValue()),
                         Multimap::putAll);
+    }
+
+    private Stream<String> getInputTagStream(DeserializedOperation deserializedOperation) {
+        return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
+                InputTagsStream.class, deserializedOperation.getClass().getSimpleName()).getInputTagStream(deserializedOperation);
     }
 
     private List<LogicalLoad> getLogicalLoads(final Map<DeserializedOperation, LogicalOperation> operationsMapping,

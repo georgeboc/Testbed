@@ -3,6 +3,6 @@ package com.testbed.entities.operations.logical;
 import lombok.Data;
 
 @Data
-public class LogicalGroupBy implements UnaryLogicalOperation {
+public class LogicalGroupBy implements LogicalOperation {
     private final String id;
 }

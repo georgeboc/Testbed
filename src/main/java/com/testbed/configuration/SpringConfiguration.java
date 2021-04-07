@@ -21,11 +21,11 @@ import com.testbed.boundary.invocations.spark.UnionSparkInvokable;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
 import com.testbed.boundary.serializers.CSVSerializer;
-import com.testbed.entities.operations.deserialized.BinaryDeserializedOperation;
-import com.testbed.entities.operations.deserialized.DeserializedLoad;
+import com.testbed.interactors.converters.deserializedToLogical.inputTagStream.BinaryInputTagsStream;
+import com.testbed.interactors.converters.deserializedToLogical.inputTagStream.InputTagsStream;
+import com.testbed.interactors.converters.deserializedToLogical.inputTagStream.UnaryInputTagsStream;
 import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
-import com.testbed.entities.operations.deserialized.UnaryDeserializedOperation;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.interactors.InteractorFactory;
 import com.testbed.interactors.converters.deserializedToLogical.AggregateDeserializedToLogicalConverter;
@@ -37,6 +37,7 @@ import com.testbed.interactors.converters.deserializedToLogical.LoadDeserialized
 import com.testbed.interactors.converters.deserializedToLogical.ProjectDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.SelectDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.UnionDeserializedToLogicalConverter;
+import com.testbed.interactors.converters.deserializedToLogical.inputTagStream.ZeroaryInputTagsStream;
 import com.testbed.interactors.converters.logicalToPhysical.AggregateLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.GroupByLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.JoinLogicalToPhysicalConverter;
@@ -46,14 +47,13 @@ import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalMan
 import com.testbed.interactors.converters.logicalToPhysical.ProjectLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.SelectLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.UnionLogicalToPhysicalConverter;
-import com.testbed.interactors.dispatchers.Dispatcher;
-import com.testbed.interactors.dispatchers.DispatchersFactory;
-import com.testbed.interactors.dispatchers.filterIn.FilterInDeserializedLoadDispatcher;
-import com.testbed.interactors.dispatchers.inputTagStream.BinaryInputTagStreamDispatcher;
-import com.testbed.interactors.dispatchers.inputTagStream.UnaryInputTagStreamDispatcher;
 import com.testbed.interactors.jobs.JobCreator;
 import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.validators.semantic.BinaryInputsCountValidator;
+import com.testbed.interactors.validators.semantic.InputsCountValidator;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
+import com.testbed.interactors.validators.semantic.UnaryInputsCountValidator;
+import com.testbed.interactors.validators.semantic.ZeroaryInputsCountValidator;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidator;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -61,11 +61,11 @@ import com.testbed.views.InvocationInstrumentationView;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.sql.SparkSession;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 @Configuration
 public class SpringConfiguration {
@@ -74,7 +74,7 @@ public class SpringConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
 
-    private static final String DESERIALIZED_LOAD = "DeserializedLoad";
+    public static final String DESERIALIZED_LOAD = "DeserializedLoad";
     private static final String DESERIALIZED_SELECT = "DeserializedSelect";
     private static final String DESERIALIZED_PROJECT = "DeserializedProject";
     private static final String DESERIALIZED_JOIN = "DeserializedJoin";
@@ -132,7 +132,8 @@ public class SpringConfiguration {
         return new NotNullOnAllFieldsValidator();
     }
 
-    @Bean(name = OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN)
+    @Bean
+    @Qualifier(OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN)
     public ObjectMapper objectMapperWithDeserializedOperationMixin() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.addMixIn(DeserializedOperation.class, DeserializedOperationMixin.class);
@@ -141,40 +142,47 @@ public class SpringConfiguration {
 
     @Bean
     public DeserializedToLogicalManager deserializedToLogicalOperationsConverter() {
-        return new DeserializedToLogicalManager(dispatchersFactory());
+        return new DeserializedToLogicalManager();
     }
 
-    @Bean(name = DESERIALIZED_LOAD)
+    @Bean
+    @Qualifier(DESERIALIZED_LOAD)
     public DeserializedToLogicalConverter loadDeserializedToLogicalConverter() {
         return new LoadDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_SELECT)
+    @Bean
+    @Qualifier(DESERIALIZED_SELECT)
     public DeserializedToLogicalConverter selectDeserializedToLogicalConverter() {
         return new SelectDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_PROJECT)
-    public ProjectDeserializedToLogicalConverter projectDeserializedToLogicalConverter() {
+    @Bean
+    @Qualifier(DESERIALIZED_PROJECT)
+    public DeserializedToLogicalConverter projectDeserializedToLogicalConverter() {
         return new ProjectDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_JOIN)
+    @Bean
+    @Qualifier(DESERIALIZED_JOIN)
     public DeserializedToLogicalConverter joinDeserializedToLogicalConverter() {
         return new JoinDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_GROUP_BY)
+    @Bean
+    @Qualifier(DESERIALIZED_GROUP_BY)
     public DeserializedToLogicalConverter groupByDeserializedToLogicalConverter() {
         return new GroupByDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_AGGREGATE)
+    @Bean
+    @Qualifier(DESERIALIZED_AGGREGATE)
     public DeserializedToLogicalConverter aggregateDeserializedToLogicalConverter() {
         return new AggregateDeserializedToLogicalConverter();
     }
 
-    @Bean(name = DESERIALIZED_UNION)
+    @Bean
+    @Qualifier(DESERIALIZED_UNION)
     public DeserializedToLogicalConverter unionDeserializedToLogicalConverter() {
         return new UnionDeserializedToLogicalConverter();
     }
@@ -185,25 +193,45 @@ public class SpringConfiguration {
     }
 
     @Bean
-    public DispatchersFactory dispatchersFactory() {
-        return new DispatchersFactory(filterInDeserializedLoadDispatcher(),
-                unaryInputTagStreamDispatcher(),
-                binaryStreamDispatcher());
+    @Qualifier(DESERIALIZED_LOAD)
+    public InputTagsStream loadInputTagStream() {
+        return new ZeroaryInputTagsStream();
     }
 
     @Bean
-    public Dispatcher<DeserializedLoad, DeserializedLoad> filterInDeserializedLoadDispatcher() {
-        return new FilterInDeserializedLoadDispatcher();
+    @Qualifier(DESERIALIZED_AGGREGATE)
+    public InputTagsStream aggregateInputTagStream() {
+        return new UnaryInputTagsStream();
     }
 
     @Bean
-    public Dispatcher<UnaryDeserializedOperation, Stream<String>> unaryInputTagStreamDispatcher() {
-        return new UnaryInputTagStreamDispatcher();
+    @Qualifier(DESERIALIZED_GROUP_BY)
+    public InputTagsStream groupByInputTagStream() {
+        return new UnaryInputTagsStream();
     }
 
     @Bean
-    public Dispatcher<BinaryDeserializedOperation, Stream<String>> binaryStreamDispatcher() {
-        return new BinaryInputTagStreamDispatcher();
+    @Qualifier(DESERIALIZED_PROJECT)
+    public InputTagsStream projectInputTagStream() {
+        return new UnaryInputTagsStream();
+    }
+
+    @Bean
+    @Qualifier(DESERIALIZED_SELECT)
+    public InputTagsStream selectInputTagStream() {
+        return new UnaryInputTagsStream();
+    }
+
+    @Bean
+    @Qualifier(DESERIALIZED_JOIN)
+    public InputTagsStream joinInputTagStream() {
+        return new BinaryInputTagsStream();
+    }
+
+    @Bean
+    @Qualifier(DESERIALIZED_UNION)
+    public InputTagsStream unionInputTagStream() {
+        return new BinaryInputTagsStream();
     }
 
     @Bean
@@ -216,39 +244,88 @@ public class SpringConfiguration {
         return new AvroProfileDeserializer();
     }
 
-    @Bean(name = LOGICAL_LOAD)
+    @Bean
+    @Qualifier(LOGICAL_LOAD)
     public LogicalToPhysicalConverter loadLogicalToPhysicalConverter() {
         return new LoadLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_SELECT)
+    @Bean
+    @Qualifier(LOGICAL_SELECT)
     public LogicalToPhysicalConverter selectLogicalToPhysicalConverter() {
         return new SelectLogicalToPhysicalConverter(getColumnReader());
     }
 
-    @Bean(name = LOGICAL_PROJECT)
-    public ProjectLogicalToPhysicalConverter projectLogicalToPhysicalConverter() {
+    @Bean
+    @Qualifier(LOGICAL_PROJECT)
+    public LogicalToPhysicalConverter projectLogicalToPhysicalConverter() {
         return new ProjectLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_JOIN)
+    @Bean
+    @Qualifier(LOGICAL_JOIN)
     public LogicalToPhysicalConverter joinLogicalToPhysicalConverter() {
         return new JoinLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_GROUP_BY)
+    @Bean
+    @Qualifier(LOGICAL_GROUP_BY)
     public LogicalToPhysicalConverter groupByLogicalToPhysicalConverter() {
         return new GroupByLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_AGGREGATE)
+    @Bean
+    @Qualifier(LOGICAL_AGGREGATE)
     public LogicalToPhysicalConverter aggregateLogicalToPhysicalConverter() {
         return new AggregateLogicalToPhysicalConverter();
     }
 
-    @Bean(name = LOGICAL_UNION)
+    @Bean
+    @Qualifier(LOGICAL_UNION)
     public LogicalToPhysicalConverter unionLogicalToPhysicalConverter() {
         return new UnionLogicalToPhysicalConverter();
+    }
+
+    @Bean
+    @Qualifier(LOGICAL_LOAD)
+    public InputsCountValidator loadInputsCountValidator() {
+        return new ZeroaryInputsCountValidator();
+    }
+
+    @Bean
+    @Qualifier(LOGICAL_AGGREGATE)
+    public InputsCountValidator aggregateInputsCountValidator() {
+        return new UnaryInputsCountValidator();
+    }
+
+    @Bean
+    @Qualifier(LOGICAL_GROUP_BY)
+    public InputsCountValidator groupByInputsCountValidator() {
+        return new UnaryInputsCountValidator();
+    }
+
+    @Bean
+    @Qualifier(LOGICAL_PROJECT)
+    public InputsCountValidator projectInputsCountValidator() {
+        return new UnaryInputsCountValidator();
+    }
+
+    @Bean
+    @Qualifier(LOGICAL_SELECT)
+    public InputsCountValidator selectInputsCountValidator() {
+        return new UnaryInputsCountValidator();
+    }
+
+    @Bean
+    @Qualifier(LOGICAL_JOIN)
+    public InputsCountValidator joinInputsCountValidator() {
+        return new BinaryInputsCountValidator();
+    }
+
+    @Bean
+    @Qualifier(LOGICAL_UNION)
+    public InputsCountValidator unionInputsCountValidator() {
+        return new BinaryInputsCountValidator();
     }
 
     @Bean

@@ -9,6 +9,7 @@ import com.testbed.boundary.invocations.results.Result;
 import com.testbed.entities.jobs.Job;
 import com.testbed.entities.jobs.JobOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
 import org.springframework.context.ApplicationContext;
 
 import javax.inject.Inject;
@@ -35,11 +36,12 @@ public class JobInvoker {
     }
 
     private Stream<Invokable> getInvokablesStream(final List<JobOperation> jobOperations) {
-        return jobOperations.stream()
-                .map(JobOperation::getPhysicalOperation)
-                .map(Object::getClass)
-                .map(Class::getSimpleName)
-                .map(operationClassName -> applicationContext.getBean(operationClassName, Invokable.class));
+        return jobOperations.stream().map(this::getInvokable);
+    }
+
+    private Invokable getInvokable(JobOperation jobOperation) {
+        return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
+                Invokable.class, jobOperation.getPhysicalOperation().getClass().getSimpleName());
     }
 
     private void invokeJobOperation(final JobOperationInvocation jobOperationInvocation,

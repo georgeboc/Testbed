@@ -16,6 +16,7 @@ import com.testbed.entities.profiles.Profile;
 import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 import org.glassfish.jersey.internal.guava.Sets;
+import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
 import org.springframework.context.ApplicationContext;
 
 import javax.inject.Inject;
@@ -66,9 +67,9 @@ public class LogicalToPhysicalManager {
             Collection<LogicalOperation> successiveLogicalOperations = logicalPlan.getGraph().successors(currentProfileEstimation.getLogicalOperation());
             List<ProfileEstimation> successiveProfileEstimations = getSuccessiveProfileEstimations(currentProfileEstimation, successiveLogicalOperations);
             operationsStack.addAll(getUnvisitedSuccessiveProfileEstimations(successiveProfileEstimations, visitedProfileEstimations));
-            PhysicalOperation currentPhysicalOperation = getPhysicalOperation(currentProfileEstimation);
+            PhysicalOperation currentPhysicalOperation = convertFromProfileEstimationToPhysicalOperation(currentProfileEstimation);
             successiveProfileEstimations.stream()
-                    .map(this::getPhysicalOperation)
+                    .map(this::convertFromProfileEstimationToPhysicalOperation)
                     .forEach(successivePhysicalOperation -> physicalGraph.putEdge(currentPhysicalOperation, successivePhysicalOperation));
             if (successiveProfileEstimations.isEmpty()) {
                 physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink(String.valueOf(currentPhysicalOperation.hashCode())));
@@ -85,9 +86,10 @@ public class LogicalToPhysicalManager {
                 .collect(Collectors.toList());
     }
 
-    private PhysicalOperation getPhysicalOperation(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
+    private PhysicalOperation convertFromProfileEstimationToPhysicalOperation(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         String logicalOperationName = profileEstimation.getLogicalOperation().getClass().getSimpleName();
-        return applicationContext.getBean(logicalOperationName, LogicalToPhysicalConverter.class).convert(profileEstimation);
+        return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
+                LogicalToPhysicalConverter.class, logicalOperationName).convert(profileEstimation);
     }
 
     private List<ProfileEstimation> getSuccessiveProfileEstimations(final ProfileEstimation currentProfileEstimation,
@@ -103,9 +105,13 @@ public class LogicalToPhysicalManager {
 
     private List<PhysicalLoad> getPhysicalLoads(final List<ProfileEstimation> loadProfileEstimations) {
         return loadProfileEstimations.stream()
-                .map(loadProfileEstimation -> applicationContext.getBean(loadProfileEstimation.getLogicalOperation().getClass().getSimpleName(),
-                        LogicalToPhysicalConverter.class).convert(loadProfileEstimation))
-                .map(physicalOperation -> (PhysicalLoad) physicalOperation)
+                .map(this::convertFromProfileEstimationToPhysicalLoad)
                 .collect(Collectors.toList());
+    }
+
+    private PhysicalLoad convertFromProfileEstimationToPhysicalLoad(ProfileEstimation loadProfileEstimation) {
+        return (PhysicalLoad) BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
+                LogicalToPhysicalConverter.class, loadProfileEstimation.getLogicalOperation().getClass().getSimpleName())
+                .convert(loadProfileEstimation);
     }
 }

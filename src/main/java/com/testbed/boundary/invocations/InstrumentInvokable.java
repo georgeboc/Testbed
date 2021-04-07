@@ -14,9 +14,6 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class InstrumentInvokable implements Invokable {
-    private final static String INVOKABLE = "Invokable";
-    private final static String EMPTY = "";
-
     private final Invokable wrappedInvokable;
     private final List<OperationInstrumentation> operationInstrumentations;
 

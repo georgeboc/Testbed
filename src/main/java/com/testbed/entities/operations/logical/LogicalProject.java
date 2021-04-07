@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LogicalProject implements UnaryLogicalOperation {
+public class LogicalProject implements LogicalOperation {
     private final String id;
     private final double columnsSelectionFactor;
 }
