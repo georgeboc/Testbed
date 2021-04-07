@@ -5,8 +5,8 @@ import com.testbed.boundary.invocations.OperationInstrumentation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
-import com.testbed.interactors.jobs.JobCreator;
-import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.invokers.InvocationPlanner;
+import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -21,8 +21,8 @@ public class InteractorFactory {
     private final DeserializedToLogicalManager deserializedToLogicalManager;
     private final InputsCountValidatorManager inputsCountValidatorManager;
     private final LogicalToPhysicalManager logicalToPhysicalManager;
-    private final JobCreator jobCreator;
-    private final JobInvoker jobInvoker;
+    private final InvocationPlanner invocationPlanner;
+    private final InvokerManager invokerManager;
     private final List<OperationInstrumentation> operationInstrumentations;
     private final InvocationInstrumentationViewer invocationInstrumentationViewer;
 
@@ -37,8 +37,8 @@ public class InteractorFactory {
                 deserializedToLogicalManager,
                 inputsCountValidatorManager,
                 logicalToPhysicalManager,
-                jobCreator,
-                jobInvoker,
+                invocationPlanner,
+                invokerManager,
                 operationInstrumentations,
                 invocationInstrumentationViewer);
     }

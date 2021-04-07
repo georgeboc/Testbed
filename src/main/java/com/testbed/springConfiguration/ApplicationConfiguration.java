@@ -17,8 +17,8 @@ import com.testbed.entities.profiles.Profile;
 import com.testbed.interactors.InteractorFactory;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
-import com.testbed.interactors.jobs.JobCreator;
-import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.invokers.InvocationPlanner;
+import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -44,8 +44,8 @@ public class ApplicationConfiguration {
                 deserializedToLogicalManager,
                 inputsCountValidatorManager,
                 logicalToPhysicalManager,
-                jobCreator(),
-                jobInvoker(),
+                invocationPlanner(),
+                invokerManager(),
                 operationInstrumentations(),
                 invocationInstrumentationViewer());
     }
@@ -64,13 +64,13 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public JobCreator jobCreator() {
-        return new JobCreator();
+    public InvocationPlanner invocationPlanner() {
+        return new InvocationPlanner();
     }
 
     @Bean
-    public JobInvoker jobInvoker() {
-        return new JobInvoker();
+    public InvokerManager invokerManager() {
+        return new InvokerManager();
     }
 
     @Bean

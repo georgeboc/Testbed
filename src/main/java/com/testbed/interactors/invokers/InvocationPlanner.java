@@ -1,10 +1,10 @@
-package com.testbed.interactors.jobs;
+package com.testbed.interactors.invokers;
 
 import com.clearspring.analytics.util.Lists;
 import com.google.common.base.Functions;
 import com.google.common.graph.Graph;
-import com.testbed.entities.jobs.Job;
-import com.testbed.entities.jobs.JobOperation;
+import com.testbed.entities.invocations.InvocationPlan;
+import com.testbed.entities.invocations.OperationInvocation;
 import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.operations.physical.PhysicalPlan;
 
@@ -15,19 +15,19 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("UnstableApiUsage")
-public class JobCreator {
-    public Job createJob(final PhysicalPlan physicalPlan) {
+public class InvocationPlanner {
+    public InvocationPlan createInvocationPlan(final PhysicalPlan physicalPlan) {
         Stack<PhysicalOperation> physicalOperationStack = new Stack<>();
-        List<JobOperation> jobOperations = Lists.newArrayList();
+        List<OperationInvocation> operationInvocations = Lists.newArrayList();
         Map<PhysicalOperation, Integer> inputDependencyCounter = countInputDependencies(physicalPlan);
         movePhysicalOperationsWithoutDependenciesFromMapToStack(physicalOperationStack, inputDependencyCounter);
         while (!physicalOperationStack.empty()) {
             PhysicalOperation currentPhysicalOperation = physicalOperationStack.pop();
-            jobOperations.add(createJobOperation(currentPhysicalOperation, physicalPlan.getGraph()));
+            operationInvocations.add(createOperationInvocation(currentPhysicalOperation, physicalPlan.getGraph()));
             decreaseInputDependencyCounterForAllSuccessors(physicalPlan, inputDependencyCounter, currentPhysicalOperation);
             movePhysicalOperationsWithoutDependenciesFromMapToStack(physicalOperationStack, inputDependencyCounter);
         }
-        return new Job(jobOperations);
+        return new InvocationPlan(operationInvocations);
     }
 
     private Map<PhysicalOperation, Integer> countInputDependencies(final PhysicalPlan physicalPlan) {
@@ -50,9 +50,9 @@ public class JobCreator {
                 .collect(Collectors.toList());
     }
 
-    private JobOperation createJobOperation(final PhysicalOperation currentPhysicalOperation,
-                                            final Graph<PhysicalOperation> graph) {
-        return new JobOperation(currentPhysicalOperation,
+    private OperationInvocation createOperationInvocation(final PhysicalOperation currentPhysicalOperation,
+                                                          final Graph<PhysicalOperation> graph) {
+        return new OperationInvocation(currentPhysicalOperation,
                 graph.inDegree(currentPhysicalOperation),
                 graph.outDegree(currentPhysicalOperation));
     }

@@ -2,14 +2,14 @@ package com.testbed.interactors;
 
 import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.boundary.invocations.OperationInstrumentation;
-import com.testbed.entities.jobs.Job;
+import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalPlan;
 import com.testbed.entities.operations.physical.PhysicalPlan;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
-import com.testbed.interactors.jobs.JobCreator;
-import com.testbed.interactors.jobs.JobInvoker;
+import com.testbed.interactors.invokers.InvocationPlanner;
+import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
@@ -32,8 +32,8 @@ public class SparkRunnerInteractor implements Interactor {
     private final InputsCountValidatorManager inputsCountValidatorManager;
     private final LogicalToPhysicalManager logicalToPhysicalManager;
 
-    private final JobCreator jobCreator;
-    private final JobInvoker jobInvoker;
+    private final InvocationPlanner invocationPlanner;
+    private final InvokerManager invokerManager;
 
     private final List<OperationInstrumentation> operationInstrumentations;
 
@@ -56,12 +56,12 @@ public class SparkRunnerInteractor implements Interactor {
         LOG.info("Converting logical operations to physical operations");
         PhysicalPlan physicalPlan = logicalToPhysicalManager.convert(logicalPlan);
         LOG.info("Physical Plan: " + physicalPlan);
-        LOG.info("Creating job");
-        Job job = jobCreator.createJob(physicalPlan);
-        LOG.info("Created job: " + job);
-        LOG.info("Invoking job");
-        jobInvoker.invokeJob(job, tolerableErrorPercentage);
-        LOG.info("Operation Instrumentations after job invocation: " + operationInstrumentations);
+        LOG.info("Creating Invocation Plan");
+        InvocationPlan invocationPlan = invocationPlanner.createInvocationPlan(physicalPlan);
+        LOG.info("Created Invocation Plan: " + invocationPlan);
+        LOG.info("Invoking Invocation Plan");
+        invokerManager.invoke(invocationPlan, tolerableErrorPercentage);
+        LOG.info("Operation Instrumentations after invocations: " + operationInstrumentations);
         LOG.info("Viewing Operation Instrumentations to " + operationInstrumentationsOutputPath);
         invocationInstrumentationViewer.view(operationInstrumentationsOutputPath, operationInstrumentations);
     }
