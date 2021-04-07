@@ -28,7 +28,7 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.testbed.configuration.SpringConfiguration.DESERIALIZED_LOAD;
+import static com.testbed.springConfiguration.DeserializedToLogicalConfiguration.DESERIALIZED_LOAD;
 
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
