@@ -8,7 +8,7 @@ import com.testbed.entities.profiles.ProfileEstimation;
 
 public class JoinLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
-    public PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
+    public PhysicalOperation convert(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         LogicalJoin logicalJoin = (LogicalJoin) profileEstimation.getLogicalOperation();
         return PhysicalJoin.builder()
                 .id(logicalJoin.getId())

@@ -20,7 +20,8 @@ public class AggregateSparkInvokable implements Invokable {
         return new SparkResult(outputDataset);
     }
 
-    private Dataset<Row> getOutputDataset(InvocationParameters invocationParameters, PhysicalAggregate physicalAggregate) {
+    private Dataset<Row> getOutputDataset(final InvocationParameters invocationParameters,
+                                          final PhysicalAggregate physicalAggregate) {
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputResult.getValues();
         return inputDataset.agg(expr(String.format("%s(%s)",

@@ -10,12 +10,12 @@ import javax.inject.Named;
 @Named
 public class UnionDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
-    public LogicalOperation convert(DeserializedOperation deserializedOperation) {
+    public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedUnion deserializedUnion = (DeserializedUnion) deserializedOperation;
         return new LogicalUnion(getId(deserializedUnion));
     }
 
-    private String getId(DeserializedUnion deserializedUnion) {
+    private String getId(final DeserializedUnion deserializedUnion) {
         return deserializedUnion.getLeftInputTag() + "_" + deserializedUnion.getRightInputTag() + "_" +
                 deserializedUnion.getOutputTag();
     }

@@ -18,7 +18,7 @@ public class ProjectDeserializedToLogicalConverter implements DeserializedToLogi
                 .build();
     }
 
-    private String getId(DeserializedProject deserializedProject) {
+    private String getId(final DeserializedProject deserializedProject) {
         return deserializedProject.getInputTag() + "_" + deserializedProject.getOutputTag();
     }
 }

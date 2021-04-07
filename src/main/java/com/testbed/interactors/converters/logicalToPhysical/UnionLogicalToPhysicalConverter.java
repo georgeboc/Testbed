@@ -8,7 +8,7 @@ import com.testbed.entities.profiles.ProfileEstimation;
 
 public class UnionLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
-    public PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
+    public PhysicalOperation convert(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         LogicalUnion logicalUnion = (LogicalUnion) profileEstimation.getLogicalOperation();
         return new PhysicalUnion(logicalUnion.getId());
     }

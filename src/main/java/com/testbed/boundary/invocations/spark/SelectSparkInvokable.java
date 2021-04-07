@@ -24,7 +24,8 @@ public class SelectSparkInvokable implements Invokable {
         return new SparkResult(outputDataset);
     }
 
-    private Dataset<Row> getOutputDataset(InvocationParameters invocationParameters, PhysicalSelect physicalSelect) {
+    private Dataset<Row> getOutputDataset(final InvocationParameters invocationParameters,
+                                          final PhysicalSelect physicalSelect) {
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputResult.getValues();
         return inputDataset.filter(physicalSelect.getColumnName() + " <= '" + physicalSelect.getLessThanValue() + "'");

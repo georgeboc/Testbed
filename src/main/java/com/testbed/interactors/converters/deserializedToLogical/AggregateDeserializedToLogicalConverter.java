@@ -19,7 +19,7 @@ public class AggregateDeserializedToLogicalConverter implements DeserializedToLo
                 .build();
     }
 
-    private String getId(DeserializedAggregate deserializedAggregate) {
+    private String getId(final DeserializedAggregate deserializedAggregate) {
         return deserializedAggregate.getInputTag() + "_" + deserializedAggregate.getOutputTag();
     }
 }

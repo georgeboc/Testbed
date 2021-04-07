@@ -13,14 +13,14 @@ import java.util.stream.Collectors;
 
 public class JoinSparkInvokable implements Invokable {
     @Override
-    public Result invoke(InvocationParameters invocationParameters) {
+    public Result invoke(final InvocationParameters invocationParameters) {
         PhysicalJoin physicalJoin = (PhysicalJoin) invocationParameters.getPhysicalOperation();
         List<Dataset<Row>> inputDatasets = getInputDatasets(invocationParameters);
         Dataset<Row> outputDataset = getOutputDataset(inputDatasets, physicalJoin);
         return new SparkResult(outputDataset);
     }
 
-    private List<Dataset<Row>> getInputDatasets(InvocationParameters invocationParameters) {
+    private List<Dataset<Row>> getInputDatasets(final InvocationParameters invocationParameters) {
         List<Result> inputResults = invocationParameters.getInputResults();
         return inputResults.stream()
                 .map(Result::getValues)
@@ -28,7 +28,7 @@ public class JoinSparkInvokable implements Invokable {
                 .collect(Collectors.toList());
     }
 
-    private Dataset<Row> getOutputDataset(List<Dataset<Row>> inputDatasets, PhysicalJoin physicalJoin) {
+    private Dataset<Row> getOutputDataset(final List<Dataset<Row>> inputDatasets, final PhysicalJoin physicalJoin) {
         Dataset<Row> leftInputDataset = inputDatasets.get(0);
         Dataset<Row> rightInputDataset = inputDatasets.get(1);
         return leftInputDataset.join(rightInputDataset, physicalJoin.getJoinColumnName());

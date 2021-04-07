@@ -5,5 +5,5 @@ import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import java.util.stream.Stream;
 
 public interface InputTagsStream {
-    Stream<String> getInputTagStream(DeserializedOperation deserializedOperation);
+    Stream<String> getInputTagStream(final DeserializedOperation deserializedOperation);
 }

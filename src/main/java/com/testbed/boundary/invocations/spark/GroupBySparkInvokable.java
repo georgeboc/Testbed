@@ -5,7 +5,6 @@ import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.results.Result;
 import com.testbed.boundary.invocations.results.SparkResult;
-import com.testbed.entities.operations.physical.PhysicalGroupBy;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
@@ -21,12 +20,6 @@ import java.util.stream.Collectors;
 public class GroupBySparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
-        PhysicalGroupBy physicalGroupBy = (PhysicalGroupBy) invocationParameters.getPhysicalOperation();
-        Dataset<Row> outputDataset = getOutputDataset(invocationParameters, physicalGroupBy);
-        return new SparkResult(outputDataset);
-    }
-
-    private Dataset<Row> getOutputDataset(InvocationParameters invocationParameters, PhysicalGroupBy physicalGroupBy) {
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputResult.getValues();
         List<Column> groupByColumns = Arrays.stream(inputDataset.columns())
@@ -35,6 +28,7 @@ public class GroupBySparkInvokable implements Invokable {
         Seq<Column> groupByColumnsSeq = JavaConverters.asScalaIteratorConverter(groupByColumns.iterator())
                 .asScala()
                 .toSeq();
-        return inputDataset.groupBy(groupByColumnsSeq).agg(Maps.newHashMap());
+        Dataset<Row> resultDataset = inputDataset.groupBy(groupByColumnsSeq).agg(Maps.newHashMap());
+        return new SparkResult(resultDataset);
     }
 }

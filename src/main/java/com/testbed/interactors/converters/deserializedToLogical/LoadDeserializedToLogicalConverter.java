@@ -15,7 +15,7 @@ public class LoadDeserializedToLogicalConverter implements DeserializedToLogical
                 .build();
     }
 
-    private String getId(DeserializedLoad deserializedLoad) {
+    private String getId(final DeserializedLoad deserializedLoad) {
         return deserializedLoad.getOutputTag();
     }
 }

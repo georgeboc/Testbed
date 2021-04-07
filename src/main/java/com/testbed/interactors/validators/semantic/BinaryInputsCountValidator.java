@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BinaryInputsCountValidator implements InputsCountValidator {
     @Override
-    public void validate(LogicalOperation logicalOperation, Graph<LogicalOperation> logicalOperationGraph) {
+    public void validate(final LogicalOperation logicalOperation, final Graph<LogicalOperation> logicalOperationGraph) {
         int inputsCount = logicalOperationGraph.inDegree(logicalOperation);
         Preconditions.checkArgument(inputsCount == 2,
                 "Binary operation %s is receiving %d inputs, although it is expected to receive two",

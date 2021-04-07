@@ -39,7 +39,7 @@ public class InvokerManager {
         return operationInvocations.stream().map(this::getInvokable);
     }
 
-    private Invokable getInvokable(OperationInvocation operationInvocation) {
+    private Invokable getInvokable(final OperationInvocation operationInvocation) {
         return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
                 Invokable.class, operationInvocation.getPhysicalOperation().getClass().getSimpleName());
     }

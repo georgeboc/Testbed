@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class LogicalAggregate implements LogicalOperation {
     private final String id;
-    private String aggregationColumnName;
-    private String aggregationOperation;
+    private final String aggregationColumnName;
+    private final String aggregationOperation;
 }

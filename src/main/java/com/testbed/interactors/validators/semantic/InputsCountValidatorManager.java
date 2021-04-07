@@ -25,7 +25,7 @@ public class InputsCountValidatorManager {
                         logicalOperationGraph));
     }
 
-    private InputsCountValidator getInputsCountValidator(LogicalOperation logicalOperation) {
+    private InputsCountValidator getInputsCountValidator(final LogicalOperation logicalOperation) {
         return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
                 InputsCountValidator.class, logicalOperation.getClass().getSimpleName());
     }

@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class ProjectLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
-    public PhysicalOperation convert(ProfileEstimation profileEstimation) throws ColumnNotFoundException {
+    public PhysicalOperation convert(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         Set<String> columnNames = profileEstimation.getProfile().getColumns().keySet();
         LogicalProject logicalProject = (LogicalProject) profileEstimation.getLogicalOperation();
         long expectedOutputColumnsCount = (long) (logicalProject.getColumnsSelectionFactor() * columnNames.size());

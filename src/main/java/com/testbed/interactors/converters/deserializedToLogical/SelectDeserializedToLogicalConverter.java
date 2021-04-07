@@ -19,7 +19,7 @@ public class SelectDeserializedToLogicalConverter implements DeserializedToLogic
                 .build();
     }
 
-    private String getId(DeserializedSelect deserializedSelect) {
+    private String getId(final DeserializedSelect deserializedSelect) {
         return deserializedSelect.getInputTag() + "_" + deserializedSelect.getOutputTag();
     }
 }

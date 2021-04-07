@@ -15,7 +15,7 @@ public class GroupByDeserializedToLogicalConverter implements DeserializedToLogi
         return new LogicalGroupBy(getId(deserializedGroupBy));
     }
 
-    private String getId(DeserializedGroupBy deserializedGroupBy) {
+    private String getId(final DeserializedGroupBy deserializedGroupBy) {
         return deserializedGroupBy.getInputTag() + "_" + deserializedGroupBy.getOutputTag();
     }
 }

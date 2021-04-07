@@ -36,8 +36,8 @@ public class InvocationPlanner {
                 .collect(Collectors.toMap(Functions.identity(), physicalOperationGraph::inDegree));
     }
 
-    private void movePhysicalOperationsWithoutDependenciesFromMapToStack(Stack<PhysicalOperation> physicalOperationStack,
-                                                                         Map<PhysicalOperation, Integer> inputDependencyCounter) {
+    private void movePhysicalOperationsWithoutDependenciesFromMapToStack(final Stack<PhysicalOperation> physicalOperationStack,
+                                                                         final Map<PhysicalOperation, Integer> inputDependencyCounter) {
         List<PhysicalOperation> physicalOperationsWithoutDependencies = getPhysicalOperationsWithoutDependencies(inputDependencyCounter);
         physicalOperationStack.addAll(physicalOperationsWithoutDependencies);
         physicalOperationsWithoutDependencies.forEach(inputDependencyCounter::remove);
@@ -52,9 +52,11 @@ public class InvocationPlanner {
 
     private OperationInvocation createOperationInvocation(final PhysicalOperation currentPhysicalOperation,
                                                           final Graph<PhysicalOperation> graph) {
-        return new OperationInvocation(currentPhysicalOperation,
-                graph.inDegree(currentPhysicalOperation),
-                graph.outDegree(currentPhysicalOperation));
+        return OperationInvocation.builder()
+                .physicalOperation(currentPhysicalOperation)
+                .precedingPhysicalOperationsCount(graph.inDegree(currentPhysicalOperation))
+                .succeedingPhysicalOperationsCount(graph.outDegree(currentPhysicalOperation))
+                .build();
     }
 
     private void decreaseInputDependencyCounterForAllSuccessors(final PhysicalPlan physicalPlan,

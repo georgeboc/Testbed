@@ -19,7 +19,7 @@ import static java.lang.Math.abs;
 
 public class ProjectSparkInvokable implements Invokable {
     @Override
-    public Result invoke(InvocationParameters invocationParameters) {
+    public Result invoke(final InvocationParameters invocationParameters) {
         PhysicalProject physicalProject = (PhysicalProject) invocationParameters.getPhysicalOperation();
         Dataset<Row> inputDataset = getInputDataset(invocationParameters);
         Dataset<Row> outputDataset = getOutputDataset(inputDataset, physicalProject);
@@ -30,12 +30,12 @@ public class ProjectSparkInvokable implements Invokable {
         return new SparkResult(outputDataset);
     }
 
-    private Dataset<Row> getInputDataset(InvocationParameters invocationParameters) {
+    private Dataset<Row> getInputDataset(final InvocationParameters invocationParameters) {
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();
         return (Dataset<Row>) inputResult.getValues();
     }
 
-    private Dataset<Row> getOutputDataset(Dataset<Row> inputDataset, PhysicalProject physicalProject) {
+    private Dataset<Row> getOutputDataset(final Dataset<Row> inputDataset, final PhysicalProject physicalProject) {
         List<Column> projectedColumns = physicalProject.getProjectedColumnNames().stream()
                 .map(Column::new)
                 .collect(Collectors.toList());

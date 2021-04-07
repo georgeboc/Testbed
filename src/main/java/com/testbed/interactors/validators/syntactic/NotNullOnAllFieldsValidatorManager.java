@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 public class NotNullOnAllFieldsValidatorManager {
     private final NotNullOnAllFieldsValidator notNullOnAllFieldsValidator;
 
-    public void validate(DeserializedOperations deserializedOperations) {
+    public void validate(final DeserializedOperations deserializedOperations) {
         deserializedOperations.forEach(notNullOnAllFieldsValidator::validate);
     }
 }

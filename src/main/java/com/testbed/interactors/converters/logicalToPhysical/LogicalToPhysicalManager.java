@@ -109,7 +109,7 @@ public class LogicalToPhysicalManager {
                 .collect(Collectors.toList());
     }
 
-    private PhysicalLoad convertFromProfileEstimationToPhysicalLoad(ProfileEstimation loadProfileEstimation) {
+    private PhysicalLoad convertFromProfileEstimationToPhysicalLoad(final ProfileEstimation loadProfileEstimation) {
         return (PhysicalLoad) BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
                 LogicalToPhysicalConverter.class, loadProfileEstimation.getLogicalOperation().getClass().getSimpleName())
                 .convert(loadProfileEstimation);

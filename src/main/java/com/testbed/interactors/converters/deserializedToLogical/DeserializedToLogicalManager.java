@@ -55,7 +55,7 @@ public class DeserializedToLogicalManager {
                 .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
-    private LogicalOperation convertDeserializedToLogicalOperation(DeserializedOperation deserializedOperation) {
+    private LogicalOperation convertDeserializedToLogicalOperation(final DeserializedOperation deserializedOperation) {
         return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
                 DeserializedToLogicalConverter.class,
                 deserializedOperation.getClass().getSimpleName()).convert(deserializedOperation);
@@ -90,10 +90,10 @@ public class DeserializedToLogicalManager {
         return logicalGraph;
     }
 
-    private void addLogicalGraphEdges(Map<DeserializedOperation, LogicalOperation> operationsMapping,
-                                      MutableGraph<LogicalOperation> logicalGraph,
-                                      DeserializedOperation currentDeserializedOperation,
-                                      Collection<DeserializedOperation> successiveDeserializedOperations) {
+    private void addLogicalGraphEdges(final Map<DeserializedOperation, LogicalOperation> operationsMapping,
+                                      final MutableGraph<LogicalOperation> logicalGraph,
+                                      final DeserializedOperation currentDeserializedOperation,
+                                      final Collection<DeserializedOperation> successiveDeserializedOperations) {
         LogicalOperation currentLogicalOperation = operationsMapping.get(currentDeserializedOperation);
         successiveDeserializedOperations.forEach(successiveDeserializedOperation ->
                 logicalGraph.putEdge(currentLogicalOperation, operationsMapping.get(successiveDeserializedOperation)));
@@ -119,7 +119,7 @@ public class DeserializedToLogicalManager {
                         Multimap::putAll);
     }
 
-    private Stream<String> getInputTagStream(DeserializedOperation deserializedOperation) {
+    private Stream<String> getInputTagStream(final DeserializedOperation deserializedOperation) {
         return BeanFactoryAnnotationUtils.qualifiedBeanOfType(applicationContext.getAutowireCapableBeanFactory(),
                 InputTagsStream.class, deserializedOperation.getClass().getSimpleName()).getInputTagStream(deserializedOperation);
     }
