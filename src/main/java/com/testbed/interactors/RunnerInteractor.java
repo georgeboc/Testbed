@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @RequiredArgsConstructor
-public class SparkRunnerInteractor implements Interactor {
-    private final static Logger LOG = Logger.getLogger(SparkRunnerInteractor.class.getName());
+public class RunnerInteractor implements Interactor {
+    private final static Logger LOG = Logger.getLogger(RunnerInteractor.class.getName());
 
     private final String pipelineFileName;
     private final String operationInstrumentationsOutputPath;

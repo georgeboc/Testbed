@@ -29,7 +29,7 @@ public class InteractorFactory {
     public Interactor getReadJsonAndPrintContent(final String pipelineFileName,
                                                  final String operationInstrumentationsOutputPath,
                                                  final double tolerableErrorPercentage) {
-        return new SparkRunnerInteractor(pipelineFileName,
+        return new RunnerInteractor(pipelineFileName,
                 operationInstrumentationsOutputPath,
                 tolerableErrorPercentage,
                 operationsDeserializer,
