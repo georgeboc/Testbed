@@ -11,8 +11,6 @@ import com.testbed.boundary.invocations.spark.ProjectSparkInvokable;
 import com.testbed.boundary.invocations.spark.SelectSparkInvokable;
 import com.testbed.boundary.invocations.spark.SinkSparkInvokable;
 import com.testbed.boundary.invocations.spark.UnionSparkInvokable;
-import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,8 +81,9 @@ public class SparkInvocablesConfiguration {
 
     @Bean
     public SparkSession sparkSession() {
-        SparkConf conf = new SparkConf().setAppName(APP_NAME).setMaster(LOCAL);
-        SparkContext sparkContext = new SparkContext(conf);
-        return new SparkSession(sparkContext);
+        return SparkSession.builder()
+                .appName(APP_NAME)
+                .master(LOCAL)
+                .getOrCreate();
     }
 }

@@ -1,6 +1,5 @@
 package com.testbed.boundary.deserializers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ public class JsonOperationsDeserializer implements Deserializer<DeserializedOper
     private DeserializedOperations tryReadValueFromMapper(final ObjectMapper mapper, final String fileContents) {
         try {
             return mapper.readValue(fileContents, DeserializedOperations.class);
-        } catch (JsonProcessingException exception) {
+        } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
     }
