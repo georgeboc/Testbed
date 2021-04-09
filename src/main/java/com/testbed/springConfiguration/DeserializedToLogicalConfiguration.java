@@ -23,7 +23,7 @@ public class DeserializedToLogicalConfiguration {
     public static final String DESERIALIZED_SELECT = "DeserializedSelect";
     public static final String DESERIALIZED_PROJECT = "DeserializedProject";
     public static final String DESERIALIZED_JOIN = "DeserializedJoin";
-    public static final String DESERIALIZED_GROUP_BY = "DeserializedGroupBy";
+    public static final String DESERIALIZED_GROUP_BY = "DeserializedGroupby";
     public static final String DESERIALIZED_AGGREGATE = "DeserializedAggregate";
     public static final String DESERIALIZED_UNION = "DeserializedUnion";
 

@@ -3,6 +3,6 @@ package com.testbed.entities.operations.physical;
 import lombok.Data;
 
 @Data
-public class PhysicalGroupBy implements PhysicalOperation {
+public class PhysicalGroupby implements PhysicalOperation {
     private final String id;
 }

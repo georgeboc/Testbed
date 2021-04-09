@@ -4,7 +4,7 @@ import com.testbed.boundary.invocations.InstrumentInvokable;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.OperationInstrumentation;
 import com.testbed.boundary.invocations.spark.AggregateSparkInvokable;
-import com.testbed.boundary.invocations.spark.GroupBySparkInvokable;
+import com.testbed.boundary.invocations.spark.GroupbySparkInvokable;
 import com.testbed.boundary.invocations.spark.JoinSparkInvokable;
 import com.testbed.boundary.invocations.spark.LoadSparkInvokable;
 import com.testbed.boundary.invocations.spark.ProjectSparkInvokable;
@@ -27,7 +27,7 @@ public class SparkInvocablesConfiguration {
     private static final String PHYSICAL_SELECT = "PhysicalSelect";
     private static final String PHYSICAL_PROJECT = "PhysicalProject";
     private static final String PHYSICAL_JOIN = "PhysicalJoin";
-    private static final String PHYSICAL_GROUP_BY = "PhysicalGroupBy";
+    private static final String PHYSICAL_GROUP_BY = "PhysicalGroupby";
     private static final String PHYSICAL_AGGREGATE = "PhysicalAggregate";
     private static final String PHYSICAL_UNION = "PhysicalUnion";
     private static final String PHYSICAL_SINK = "PhysicalSink";
@@ -57,7 +57,7 @@ public class SparkInvocablesConfiguration {
 
     @Bean(name = PHYSICAL_GROUP_BY)
     public Invokable sparkGroupByInvokable() {
-        return instrumentInvokable(new GroupBySparkInvokable());
+        return instrumentInvokable(new GroupbySparkInvokable());
     }
 
     @Bean(name = PHYSICAL_AGGREGATE)

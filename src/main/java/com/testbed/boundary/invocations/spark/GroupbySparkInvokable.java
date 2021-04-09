@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class GroupBySparkInvokable implements Invokable {
+public class GroupbySparkInvokable implements Invokable {
     @Override
     public Result invoke(final InvocationParameters invocationParameters) {
         Result inputResult = invocationParameters.getInputResults().stream().findFirst().get();

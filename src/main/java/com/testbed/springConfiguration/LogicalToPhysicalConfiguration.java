@@ -22,7 +22,7 @@ public class LogicalToPhysicalConfiguration {
     public static final String LOGICAL_SELECT = "LogicalSelect";
     public static final String LOGICAL_PROJECT = "LogicalProject";
     public static final String LOGICAL_JOIN = "LogicalJoin";
-    public static final String LOGICAL_GROUP_BY = "LogicalGroupBy";
+    public static final String LOGICAL_GROUP_BY = "LogicalGroupby";
     public static final String LOGICAL_AGGREGATE = "LogicalAggregate";
     public static final String LOGICAL_UNION = "LogicalUnion";
 

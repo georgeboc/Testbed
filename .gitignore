@@ -7,6 +7,6 @@ log/**
 output/**
 parameters/**
 experimental/**
-demo/**
+demo*/**
 target/**
 target
