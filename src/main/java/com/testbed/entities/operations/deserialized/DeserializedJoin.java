@@ -7,5 +7,6 @@ public class DeserializedJoin implements BinaryDeserializedOperation {
     private String leftInputTag;
     private String rightInputTag;
     private String outputTag;
-    private String joinColumnName;
+    private String joinLeftColumnName;
+    private String joinRightColumnName;
 }

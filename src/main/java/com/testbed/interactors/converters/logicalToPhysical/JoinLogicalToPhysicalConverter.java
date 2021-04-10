@@ -12,7 +12,8 @@ public class JoinLogicalToPhysicalConverter implements LogicalToPhysicalConverte
         LogicalJoin logicalJoin = (LogicalJoin) profileEstimation.getLogicalOperation();
         return PhysicalJoin.builder()
                 .id(logicalJoin.getId())
-                .joinColumnName(logicalJoin.getJoinColumnName())
+                .joinLeftColumnName(logicalJoin.getJoinLeftColumnName())
+                .joinRightColumnName(logicalJoin.getJoinRightColumnName())
                 .build();
     }
 }

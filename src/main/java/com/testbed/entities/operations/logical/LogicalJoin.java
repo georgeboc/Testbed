@@ -7,5 +7,6 @@ import lombok.Data;
 @Builder
 public class LogicalJoin implements LogicalOperation {
     private final String id;
-    private final String joinColumnName;
+    private final String joinLeftColumnName;
+    private final String joinRightColumnName;
 }

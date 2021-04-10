@@ -7,5 +7,6 @@ import lombok.Data;
 @Builder
 public class PhysicalJoin implements PhysicalOperation {
     private final String id;
-    private final String joinColumnName;
+    private final String joinLeftColumnName;
+    private final String joinRightColumnName;
 }
