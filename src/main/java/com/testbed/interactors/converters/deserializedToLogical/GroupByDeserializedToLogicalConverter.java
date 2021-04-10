@@ -12,7 +12,10 @@ public class GroupByDeserializedToLogicalConverter implements DeserializedToLogi
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedGroupby deserializedGroupBy = (DeserializedGroupby) deserializedOperation;
-        return new LogicalGroupby(getId(deserializedGroupBy));
+        return LogicalGroupby.builder()
+                .id(getId(deserializedGroupBy))
+                .groupingColumnNames(deserializedGroupBy.getGroupingColumnNames())
+                .build();
     }
 
     private String getId(final DeserializedGroupby deserializedGroupBy) {
