@@ -6,6 +6,6 @@ import lombok.Data;
 public class DeserializedSelect implements UnaryDeserializedOperation {
     private String inputTag;
     private String outputTag;
-    private double selectivityFactor;
+    private Double selectivityFactor;
     private String columnName;
 }
