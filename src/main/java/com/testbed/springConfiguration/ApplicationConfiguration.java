@@ -3,7 +3,6 @@ package com.testbed.springConfiguration;
 import com.clearspring.analytics.util.Lists;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.testbed.boundary.deserializers.AvroProfileDeserializer;
 import com.testbed.boundary.deserializers.DeserializedOperationMixin;
 import com.testbed.boundary.deserializers.Deserializer;
@@ -81,15 +80,13 @@ public class ApplicationConfiguration {
 
     @Bean
     public InvocationInstrumentationViewer invocationInstrumentationViewer() {
-        return new InvocationInstrumentationViewer(invocationInstrumentationViewCSVSerializer(), objectMapperWithJavaTimeModule());
+        return new InvocationInstrumentationViewer(invocationInstrumentationViewCSVSerializer(), objectMapper());
     }
 
     @Bean
     @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE)
-    public ObjectMapper objectMapperWithJavaTimeModule() {
-        return JsonMapper.builder()
-                .addModule(new JavaTimeModule())
-                .build();
+    public ObjectMapper objectMapper() {
+        return JsonMapper.builder().build();
     }
 
     @Bean
