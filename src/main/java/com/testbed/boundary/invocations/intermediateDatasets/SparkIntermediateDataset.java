@@ -1,4 +1,4 @@
-package com.testbed.boundary.invocations.results;
+package com.testbed.boundary.invocations.intermediateDatasets;
 
 import lombok.Data;
 import org.apache.spark.sql.Dataset;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Data
-public class SparkResult implements Result {
+public class SparkIntermediateDataset implements IntermediateDataset {
     private final Dataset<Row> values;
 
     @Override

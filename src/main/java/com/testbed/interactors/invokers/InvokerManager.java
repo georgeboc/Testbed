@@ -4,7 +4,7 @@ import com.clearspring.analytics.util.Lists;
 import com.google.common.collect.Streams;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.results.Result;
+import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.invocations.OperationInvocation;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Stack;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -26,12 +25,12 @@ public class InvokerManager {
     public void invoke(final InvocationPlan invocationPlan, final double tolerableErrorPercentage) {
         Stream<Invokable> invokableStream = getInvokableStream(invocationPlan.getOperationInvocations());
         Stream<OperationInvocation> operationInvocationStream = invocationPlan.getOperationInvocations().stream();
-        Stack<Result> resultStack = new Stack<>();
+        Stack<IntermediateDataset> intermediateDataset = new Stack<>();
         Streams.forEachPair(invokableStream,
                 operationInvocationStream,
                 (invokable, operationInvocation) -> invokeOperation(invokable,
                         operationInvocation,
-                        resultStack,
+                        intermediateDataset,
                         tolerableErrorPercentage));
     }
 
@@ -46,30 +45,33 @@ public class InvokerManager {
 
     private void invokeOperation(final Invokable invokable,
                                  final OperationInvocation operationInvocation,
-                                 final Stack<Result> resultStack,
+                                 final Stack<IntermediateDataset> intermediateDataset,
                                  final double tolerableErrorPercentage) {
         InvocationParameters invocationParameters = createInvocationParameters(operationInvocation,
-                resultStack,
+                intermediateDataset,
                 tolerableErrorPercentage);
-        Result result = invokable.invoke(invocationParameters);
-        IntStream.range(0, operationInvocation.getSucceedingPhysicalOperationsCount())
-                .forEach(unusedParam -> resultStack.push(result));
+        IntermediateDataset outputDataset = invokable.invoke(invocationParameters);
+        for (int i = 0; i < operationInvocation.getSucceedingPhysicalOperationsCount(); ++i) {
+            intermediateDataset.push(outputDataset);
+        }
     }
 
     private InvocationParameters createInvocationParameters(final OperationInvocation operationInvocation,
-                                                            final Stack<Result> resultStack,
+                                                            final Stack<IntermediateDataset> intermediateDatasetStack,
                                                             final double tolerableErrorPercentage) {
         return InvocationParameters.builder()
                 .physicalOperation(operationInvocation.getPhysicalOperation())
-                .inputResults(getInputResults(operationInvocation.getPrecedingPhysicalOperationsCount(), resultStack))
+                .inputIntermediateDatasets(getInputIntermediateDatasets(operationInvocation.getPrecedingPhysicalOperationsCount(), intermediateDatasetStack))
                 .tolerableErrorPercentage(tolerableErrorPercentage)
                 .build();
     }
 
-    private List<Result> getInputResults(final int successivePhysicalOperationsCount,
-                                         final Stack<Result> resultStack) {
-        List<Result> results = Lists.newArrayList();
-        IntStream.range(0, successivePhysicalOperationsCount).forEach(unusedParam -> results.add(resultStack.pop()));
-        return results;
+    private List<IntermediateDataset> getInputIntermediateDatasets(final int successivePhysicalOperationsCount,
+                                                                   final Stack<IntermediateDataset> intermediateDatasetStack) {
+        List<IntermediateDataset> intermediateDatasets = Lists.newArrayList();
+        for (int i = 0; i < successivePhysicalOperationsCount; ++i) {
+            intermediateDatasets.add(intermediateDatasetStack.pop());
+        }
+        return intermediateDatasets;
     }
 }

@@ -1,12 +1,12 @@
-package com.testbed.boundary.invocations.results;
+package com.testbed.boundary.invocations.intermediateDatasets;
 
 import com.clearspring.analytics.util.Lists;
 
 import java.util.List;
 
-public class NoResult implements Result {
+public class NoIntermediateDataset implements IntermediateDataset {
     @Override
-    public Object getValues() {
+    public Object getValue() {
         return new Object();
     }
 

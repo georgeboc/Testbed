@@ -1,7 +1,7 @@
 package com.testbed.boundary.invocations;
 
-import com.testbed.boundary.invocations.results.Result;
+import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 
 public interface Invokable {
-    Result invoke(final InvocationParameters invocationParameters);
+    IntermediateDataset invoke(final InvocationParameters invocationParameters);
 }
