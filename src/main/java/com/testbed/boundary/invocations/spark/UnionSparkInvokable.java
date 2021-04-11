@@ -29,6 +29,6 @@ public class UnionSparkInvokable implements Invokable {
     private Dataset<Row> getOutputDataset(final List<Dataset<Row>> inputDatasets) {
         Dataset<Row> leftInputDataset = inputDatasets.get(0);
         Dataset<Row> rightInputDataset = inputDatasets.get(1);
-        return leftInputDataset.union(rightInputDataset);
+        return leftInputDataset.union(rightInputDataset).distinct();
     }
 }

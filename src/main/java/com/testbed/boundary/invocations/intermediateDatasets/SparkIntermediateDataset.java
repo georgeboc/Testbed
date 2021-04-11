@@ -9,15 +9,15 @@ import java.util.List;
 
 @Data
 public class SparkIntermediateDataset implements IntermediateDataset {
-    private final Dataset<Row> values;
+    private final Dataset<Row> value;
 
     @Override
     public long count() {
-        return values.count();
+        return value.count();
     }
 
     @Override
     public List<String> getColumnNames() {
-        return Arrays.asList(values.columns());
+        return Arrays.asList(value.columns());
     }
 }
