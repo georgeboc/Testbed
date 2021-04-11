@@ -1,24 +1,23 @@
 package com.testbed.boundary.invocations.spark;
 
-import com.google.common.collect.Lists;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
+import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
-import com.testbed.entities.operations.physical.PhysicalJoin;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import scala.collection.JavaConversions;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JoinSparkInvokable implements Invokable {
+public class UnionSparkOperation implements Invokable, Nameable {
+    private static final String UNION = "Union";
+
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
-        PhysicalJoin physicalJoin = (PhysicalJoin) invocationParameters.getPhysicalOperation();
         List<Dataset<Row>> inputDatasets = getInputDatasets(invocationParameters);
-        Dataset<Row> outputDataset = getOutputDataset(inputDatasets, physicalJoin);
+        Dataset<Row> outputDataset = getOutputDataset(inputDatasets);
         return new SparkIntermediateDataset(outputDataset);
     }
 
@@ -30,10 +29,14 @@ public class JoinSparkInvokable implements Invokable {
                 .collect(Collectors.toList());
     }
 
-    private Dataset<Row> getOutputDataset(final List<Dataset<Row>> inputDatasets, final PhysicalJoin physicalJoin) {
+    private Dataset<Row> getOutputDataset(final List<Dataset<Row>> inputDatasets) {
         Dataset<Row> leftInputDataset = inputDatasets.get(0);
         Dataset<Row> rightInputDataset = inputDatasets.get(1);
-        List<String> joinColumnNames = Lists.newArrayList(physicalJoin.getJoinLeftColumnName(), physicalJoin.getJoinRightColumnName());
-        return leftInputDataset.join(rightInputDataset, JavaConversions.asScalaBuffer(joinColumnNames).toList());
+        return leftInputDataset.union(rightInputDataset).distinct();
+    }
+
+    @Override
+    public String getName() {
+        return UNION;
     }
 }

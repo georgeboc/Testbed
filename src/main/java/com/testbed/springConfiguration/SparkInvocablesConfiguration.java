@@ -3,14 +3,14 @@ package com.testbed.springConfiguration;
 import com.testbed.boundary.invocations.InstrumentInvokable;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.OperationInstrumentation;
-import com.testbed.boundary.invocations.spark.AggregateSparkInvokable;
-import com.testbed.boundary.invocations.spark.GroupbySparkInvokable;
-import com.testbed.boundary.invocations.spark.JoinSparkInvokable;
-import com.testbed.boundary.invocations.spark.LoadSparkInvokable;
-import com.testbed.boundary.invocations.spark.ProjectSparkInvokable;
-import com.testbed.boundary.invocations.spark.SelectSparkInvokable;
-import com.testbed.boundary.invocations.spark.SinkSparkInvokable;
-import com.testbed.boundary.invocations.spark.UnionSparkInvokable;
+import com.testbed.boundary.invocations.spark.AggregateSparkOperation;
+import com.testbed.boundary.invocations.spark.GroupbySparkOperation;
+import com.testbed.boundary.invocations.spark.JoinSparkOperation;
+import com.testbed.boundary.invocations.spark.LoadSparkOperation;
+import com.testbed.boundary.invocations.spark.ProjectSparkOperation;
+import com.testbed.boundary.invocations.spark.SelectSparkOperation;
+import com.testbed.boundary.invocations.spark.SinkSparkOperation;
+import com.testbed.boundary.invocations.spark.UnionSparkOperation;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,42 +37,42 @@ public class SparkInvocablesConfiguration {
 
     @Bean(name = PHYSICAL_LOAD)
     public Invokable sparkLoadInvokable() {
-        return instrumentInvokable(new LoadSparkInvokable(sparkSession()));
+        return instrumentInvokable(new LoadSparkOperation(sparkSession()));
     }
 
     @Bean(name = PHYSICAL_SELECT)
     public Invokable sparkSelectInvokable() {
-        return instrumentInvokable(new SelectSparkInvokable());
+        return instrumentInvokable(new SelectSparkOperation());
     }
 
     @Bean(name = PHYSICAL_PROJECT)
     public Invokable sparkProjectInvokable() {
-        return instrumentInvokable(new ProjectSparkInvokable());
+        return instrumentInvokable(new ProjectSparkOperation());
     }
 
     @Bean(name = PHYSICAL_JOIN)
     public Invokable sparkJoinInvokable() {
-        return instrumentInvokable(new JoinSparkInvokable());
+        return instrumentInvokable(new JoinSparkOperation());
     }
 
     @Bean(name = PHYSICAL_GROUP_BY)
     public Invokable sparkGroupByInvokable() {
-        return instrumentInvokable(new GroupbySparkInvokable());
+        return instrumentInvokable(new GroupbySparkOperation());
     }
 
     @Bean(name = PHYSICAL_AGGREGATE)
     public Invokable sparkAggregateInvokable() {
-        return instrumentInvokable(new AggregateSparkInvokable());
+        return instrumentInvokable(new AggregateSparkOperation());
     }
 
     @Bean(name = PHYSICAL_UNION)
     public Invokable sparkUnionInvokable() {
-        return instrumentInvokable(new UnionSparkInvokable());
+        return instrumentInvokable(new UnionSparkOperation());
     }
 
     @Bean(name = PHYSICAL_SINK)
     public Invokable sparkSinkInvokable() {
-        return instrumentInvokable(new SinkSparkInvokable());
+        return instrumentInvokable(new SinkSparkOperation());
     }
 
     public Invokable instrumentInvokable(Invokable wrappedInvokable) {

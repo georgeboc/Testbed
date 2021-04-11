@@ -2,6 +2,7 @@ package com.testbed.boundary.invocations.spark;
 
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
+import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.exceptions.TolerableErrorPercentageExceeded;
@@ -17,7 +18,9 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
 
-public class ProjectSparkInvokable implements Invokable {
+public class ProjectSparkOperation implements Invokable, Nameable {
+    private static final String PROJECT = "Project";
+
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         PhysicalProject physicalProject = (PhysicalProject) invocationParameters.getPhysicalOperation();
@@ -53,5 +56,10 @@ public class ProjectSparkInvokable implements Invokable {
         if (errorPercentage > tolerableErrorPercentage) {
             throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
         }
+    }
+
+    @Override
+    public String getName() {
+        return PROJECT;
     }
 }

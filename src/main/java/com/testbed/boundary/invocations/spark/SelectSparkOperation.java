@@ -2,6 +2,7 @@ package com.testbed.boundary.invocations.spark;
 
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
+import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.exceptions.TolerableErrorPercentageExceeded;
@@ -13,7 +14,9 @@ import org.apache.spark.sql.Row;
 import static java.lang.Math.abs;
 
 @RequiredArgsConstructor
-public class SelectSparkInvokable implements Invokable {
+public class SelectSparkOperation implements Invokable, Nameable {
+    private static final String SELECT = "Select";
+
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         PhysicalSelect physicalSelect = (PhysicalSelect) invocationParameters.getPhysicalOperation();
@@ -38,5 +41,10 @@ public class SelectSparkInvokable implements Invokable {
         if (errorPercentage > tolerableErrorPercentage) {
             throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
         }
+    }
+
+    @Override
+    public String getName() {
+        return SELECT;
     }
 }
