@@ -1,7 +1,7 @@
 package com.testbed.interactors.converters.logicalToPhysical;
 
-import com.testbed.entities.operations.logical.LogicalGroupby;
-import com.testbed.entities.operations.physical.PhysicalGroupby;
+import com.testbed.entities.operations.logical.LogicalGroupBy;
+import com.testbed.entities.operations.physical.PhysicalGroupBy;
 import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 public class GroupByLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     @Override
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) {
-        LogicalGroupby logicalOperation = (LogicalGroupby) profileEstimation.getLogicalOperation();
-        return PhysicalGroupby.builder()
+        LogicalGroupBy logicalOperation = (LogicalGroupBy) profileEstimation.getLogicalOperation();
+        return PhysicalGroupBy.builder()
                 .id(logicalOperation.getId())
                 .groupingColumnNames(logicalOperation.getGroupingColumnNames())
                 .build();

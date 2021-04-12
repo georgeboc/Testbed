@@ -7,6 +7,7 @@ import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.operations.physical.PhysicalJoin;
+import lombok.Getter;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.collection.JavaConversions;
@@ -14,8 +15,11 @@ import scala.collection.JavaConversions;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.testbed.boundary.invocations.OperationsConstants.JOIN;
+
 public class JoinSparkOperation implements Invokable, Nameable {
-    private static final String JOIN = "Join";
+    @Getter
+    private final String name = JOIN;
 
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
@@ -38,10 +42,5 @@ public class JoinSparkOperation implements Invokable, Nameable {
         Dataset<Row> rightInputDataset = inputDatasets.get(1);
         List<String> joinColumnNames = Lists.newArrayList(physicalJoin.getJoinLeftColumnName(), physicalJoin.getJoinRightColumnName());
         return leftInputDataset.join(rightInputDataset, JavaConversions.asScalaBuffer(joinColumnNames).toList());
-    }
-
-    @Override
-    public String getName() {
-        return JOIN;
     }
 }

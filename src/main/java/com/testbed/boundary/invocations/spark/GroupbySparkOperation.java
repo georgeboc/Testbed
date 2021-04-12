@@ -6,7 +6,8 @@ import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
-import com.testbed.entities.operations.physical.PhysicalGroupby;
+import com.testbed.entities.operations.physical.PhysicalGroupBy;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
@@ -17,15 +18,18 @@ import scala.collection.Seq;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.testbed.boundary.invocations.OperationsConstants.GROUP_BY;
+
 @RequiredArgsConstructor
 public class GroupbySparkOperation implements Invokable, Nameable {
-    private static final String GROUP_BY = "Group By";
+    @Getter
+    private final String name = GROUP_BY;
 
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue();
-        PhysicalGroupby physicalGroupBy = (PhysicalGroupby) invocationParameters.getPhysicalOperation();
+        PhysicalGroupBy physicalGroupBy = (PhysicalGroupBy) invocationParameters.getPhysicalOperation();
         List<Column> groupByColumns =  physicalGroupBy.getGroupingColumnNames().stream()
                 .map(Column::new)
                 .collect(Collectors.toList());
@@ -34,10 +38,5 @@ public class GroupbySparkOperation implements Invokable, Nameable {
                 .toSeq();
         Dataset<Row> groupedDataset = inputDataset.groupBy(groupByColumnsSeq).agg(Maps.newHashMap());
         return new SparkIntermediateDataset(groupedDataset);
-    }
-
-    @Override
-    public String getName() {
-        return GROUP_BY;
     }
 }

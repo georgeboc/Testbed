@@ -6,15 +6,18 @@ import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.operations.physical.PhysicalAggregate;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import static com.testbed.boundary.invocations.OperationsConstants.AGGREGATE;
 import static org.apache.spark.sql.functions.expr;
 
 @RequiredArgsConstructor
 public class AggregateSparkOperation implements Invokable, Nameable {
-    private static final String AGGREGATE = "Aggregate";
+    @Getter
+    private final String name = AGGREGATE;
 
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
@@ -30,10 +33,5 @@ public class AggregateSparkOperation implements Invokable, Nameable {
         return inputDataset.agg(expr(String.format("%s(%s)",
                 physicalAggregate.getAggregationOperation(),
                 physicalAggregate.getAggregationColumnName())));
-    }
-
-    @Override
-    public String getName() {
-        return AGGREGATE;
     }
 }

@@ -1,6 +1,5 @@
 package com.testbed.springConfiguration;
 
-import com.testbed.boundary.invocations.InstrumentInvokable;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.OperationInstrumentation;
 import com.testbed.boundary.invocations.spark.AggregateSparkOperation;
@@ -15,68 +14,61 @@ import org.apache.spark.sql.SparkSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.inject.Inject;
 import java.util.List;
+
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_AGGREGATE;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_GROUP_BY;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_JOIN;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_LOAD;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_PROJECT;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_SELECT;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_SINK;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_UNION;
+import static com.testbed.springConfiguration.InvocablesConfigurationCommons.instrumentInvokable;
 
 @Configuration
 public class SparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
     private static final String LOCAL = "local[*]";
 
-    private static final String PHYSICAL_LOAD = "PhysicalLoad";
-    private static final String PHYSICAL_SELECT = "PhysicalSelect";
-    private static final String PHYSICAL_PROJECT = "PhysicalProject";
-    private static final String PHYSICAL_JOIN = "PhysicalJoin";
-    private static final String PHYSICAL_GROUP_BY = "PhysicalGroupby";
-    private static final String PHYSICAL_AGGREGATE = "PhysicalAggregate";
-    private static final String PHYSICAL_UNION = "PhysicalUnion";
-    private static final String PHYSICAL_SINK = "PhysicalSink";
-
-    @Inject
-    private List<OperationInstrumentation> operationInstrumentations;
-
     @Bean(name = PHYSICAL_LOAD)
-    public Invokable sparkLoadInvokable() {
-        return instrumentInvokable(new LoadSparkOperation(sparkSession()));
+    public Invokable sparkLoadInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new LoadSparkOperation(sparkSession()), operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_SELECT)
-    public Invokable sparkSelectInvokable() {
-        return instrumentInvokable(new SelectSparkOperation());
+    public Invokable sparkSelectInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new SelectSparkOperation(), operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_PROJECT)
-    public Invokable sparkProjectInvokable() {
-        return instrumentInvokable(new ProjectSparkOperation());
+    public Invokable sparkProjectInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new ProjectSparkOperation(), operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_JOIN)
-    public Invokable sparkJoinInvokable() {
-        return instrumentInvokable(new JoinSparkOperation());
+    public Invokable sparkJoinInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new JoinSparkOperation(), operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_GROUP_BY)
-    public Invokable sparkGroupByInvokable() {
-        return instrumentInvokable(new GroupbySparkOperation());
+    public Invokable sparkGroupByInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new GroupbySparkOperation(), operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_AGGREGATE)
-    public Invokable sparkAggregateInvokable() {
-        return instrumentInvokable(new AggregateSparkOperation());
+    public Invokable sparkAggregateInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new AggregateSparkOperation(), operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_UNION)
-    public Invokable sparkUnionInvokable() {
-        return instrumentInvokable(new UnionSparkOperation());
+    public Invokable sparkUnionInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new UnionSparkOperation(), operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_SINK)
-    public Invokable sparkSinkInvokable() {
-        return instrumentInvokable(new SinkSparkOperation());
-    }
-
-    public Invokable instrumentInvokable(Invokable wrappedInvokable) {
-        return new InstrumentInvokable(wrappedInvokable, operationInstrumentations);
+    public Invokable sparkSinkInvokable(List<OperationInstrumentation> operationInstrumentations) {
+        return instrumentInvokable(new SinkSparkOperation(), operationInstrumentations);
     }
 
     @Bean

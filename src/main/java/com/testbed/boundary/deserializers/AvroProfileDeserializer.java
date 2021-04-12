@@ -1,6 +1,7 @@
 package com.testbed.boundary.deserializers;
 
 import com.google.common.collect.Streams;
+import com.testbed.boundary.commons.DirectoryCommons;
 import com.testbed.entities.profiles.ColumnProfile;
 import com.testbed.entities.profiles.Profile;
 import org.apache.avro.file.DataFileReader;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("UnstableApiUsage")
-public class AvroProfileDeserializer implements Deserializer<Profile> {
+public class  AvroProfileDeserializer implements Deserializer<Profile> {
     private static final String ROWS_COUNT = "rows_count";
     private static final String IS_UNIQUE = "is_unique";
     private static final String METADATA_FILENAME = "metadata.avro";
@@ -35,21 +36,11 @@ public class AvroProfileDeserializer implements Deserializer<Profile> {
 
     private Map<String, ColumnProfile> getColumnProfiles(final String path) {
         Pattern columnFileNamePattern = Pattern.compile("count_value_stats_([^/])*\\.avro$");
-        List<String> columnFilePaths = tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
+        List<String> columnFilePaths = DirectoryCommons.tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
         Stream<String> columnNamesStream = getColumnNamesStream(columnFilePaths);
         Stream<ColumnProfile> columnProfilesStream = getColumnProfileStream(columnFilePaths);
         return Streams.zip(columnNamesStream, columnProfilesStream, AbstractMap.SimpleEntry::new)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    private List<String> tryGetFilesInDirectoryByPattern(final String directory, final Pattern pattern) {
-        try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
-            return paths.map(Path::toString)
-                    .filter(pattern.asPredicate())
-                    .collect(Collectors.toList());
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
     }
 
     private Stream<String> getColumnNamesStream(final List<String> columnProfileFileNames) {

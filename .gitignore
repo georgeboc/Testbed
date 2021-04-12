@@ -1,12 +1,12 @@
-.gradle/**
+*.iml
 .idea/**
 build/**
-gradle/**
+demo*/**
+experimental/**
 input/**
 log/**
+mapReduceSwap/**
 output/**
 parameters/**
-experimental/**
-demo*/**
-target/**
 target
+target/**

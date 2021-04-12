@@ -5,14 +5,18 @@ import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
+import lombok.Getter;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.testbed.boundary.invocations.OperationsConstants.UNION;
+
 public class UnionSparkOperation implements Invokable, Nameable {
-    private static final String UNION = "Union";
+    @Getter
+    private final String name = UNION;
 
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
@@ -33,10 +37,5 @@ public class UnionSparkOperation implements Invokable, Nameable {
         Dataset<Row> leftInputDataset = inputDatasets.get(0);
         Dataset<Row> rightInputDataset = inputDatasets.get(1);
         return leftInputDataset.union(rightInputDataset).distinct();
-    }
-
-    @Override
-    public String getName() {
-        return UNION;
     }
 }

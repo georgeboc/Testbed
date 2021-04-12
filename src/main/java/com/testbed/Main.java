@@ -16,7 +16,7 @@ public class Main {
     private static final String DEFAULT_TOLERABLE_ERROR_PERCENTAGE = "5.0";
 
     public static void main(final String[] args) throws Exception {
-        ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {"Sprint-AutoScan.xml"});
+        ApplicationContext context = new ClassPathXmlApplicationContext("InstrumentedMapReduceComponentScan.xml");
         InteractorFactory interactorFactory = context.getBean(InteractorFactory.class);
         System.out.printf("Introduce JSON pipeline file path (default: %s):%n", DEFAULT_PIPELINE_PATH);
         String pipelinePath = StringUtils.defaultIfBlank(readLine(), DEFAULT_PIPELINE_PATH);

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AvroColumnReader implements ColumnReader {
-
     private static final String VALUE = "Value";
 
     @Override

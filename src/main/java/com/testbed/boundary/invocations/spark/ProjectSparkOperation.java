@@ -7,6 +7,7 @@ import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.exceptions.TolerableErrorPercentageExceeded;
 import com.testbed.entities.operations.physical.PhysicalProject;
+import lombok.Getter;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -16,10 +17,12 @@ import scala.collection.Seq;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.testbed.boundary.invocations.OperationsConstants.PROJECT;
 import static java.lang.Math.abs;
 
 public class ProjectSparkOperation implements Invokable, Nameable {
-    private static final String PROJECT = "Project";
+    @Getter
+    private final String name = PROJECT;
 
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
@@ -56,10 +59,5 @@ public class ProjectSparkOperation implements Invokable, Nameable {
         if (errorPercentage > tolerableErrorPercentage) {
             throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
         }
-    }
-
-    @Override
-    public String getName() {
-        return PROJECT;
     }
 }

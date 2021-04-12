@@ -18,6 +18,7 @@ import java.util.List;
 public class CSVSerializer<T> implements Serializer<List<T>> {
     private static final char UNDERSCORE = '_';
     private static final char SPACE = ' ';
+
     private final Class<T> tType;
 
     @Override

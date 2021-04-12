@@ -1,8 +1,8 @@
 package com.testbed.interactors.converters.deserializedToLogical;
 
-import com.testbed.entities.operations.deserialized.DeserializedGroupby;
+import com.testbed.entities.operations.deserialized.DeserializedGroupBy;
 import com.testbed.entities.operations.deserialized.DeserializedOperation;
-import com.testbed.entities.operations.logical.LogicalGroupby;
+import com.testbed.entities.operations.logical.LogicalGroupBy;
 import com.testbed.entities.operations.logical.LogicalOperation;
 
 import javax.inject.Named;
@@ -11,14 +11,14 @@ import javax.inject.Named;
 public class GroupByDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
-        DeserializedGroupby deserializedGroupBy = (DeserializedGroupby) deserializedOperation;
-        return LogicalGroupby.builder()
+        DeserializedGroupBy deserializedGroupBy = (DeserializedGroupBy) deserializedOperation;
+        return LogicalGroupBy.builder()
                 .id(getId(deserializedGroupBy))
                 .groupingColumnNames(deserializedGroupBy.getGroupingColumnNames())
                 .build();
     }
 
-    private String getId(final DeserializedGroupby deserializedGroupBy) {
+    private String getId(final DeserializedGroupBy deserializedGroupBy) {
         return deserializedGroupBy.getInputTag() + "_" + deserializedGroupBy.getOutputTag();
     }
 }
