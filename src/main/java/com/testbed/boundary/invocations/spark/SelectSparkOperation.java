@@ -34,7 +34,7 @@ public class SelectSparkOperation implements Invokable, Nameable {
                                           final PhysicalSelect physicalSelect) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
-        return inputDataset.filter(physicalSelect.getColumnName() + " <= '" + physicalSelect.getLessThanValue() + "'");
+        return inputDataset.filter(physicalSelect.getColumnName() + " <= '" + physicalSelect.getLessThanOrEqualValue() + "'");
     }
 
     private void checkIfErrorIsTolerable(final long rowCount,

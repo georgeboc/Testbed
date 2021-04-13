@@ -30,7 +30,7 @@ public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConver
         return PhysicalSelect.builder()
                 .id(logicalSelect.getId())
                 .columnName(logicalSelect.getColumnName())
-                .lessThanValue(value)
+                .lessThanOrEqualValue(value)
                 .expectedOutputRowsCount(expectedOutputRowsCount)
                 .build();
     }

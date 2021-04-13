@@ -10,7 +10,6 @@ import com.testbed.entities.operations.physical.PhysicalSelect;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.parquet.example.data.Group;
@@ -28,7 +27,7 @@ import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons
 @RequiredArgsConstructor
 public class SelectMapReduceOperation implements Invokable, Nameable {
     private static final int FIRST = 0;
-    private static final String LESS_THAN_VALUE = "lessThanValue";
+    private static final String LESS_THAN_OR_EQUAL_VALUE = "lessThanOrEqualValue";
     private static final String COLUMN_INDEX = "columnIndex";
     private final JobConfigurationCommons jobConfigurationCommons;
     private final ParquetSchemaReader parquetSchemaReader;
@@ -64,7 +63,7 @@ public class SelectMapReduceOperation implements Invokable, Nameable {
         MessageType schema = parquetSchemaReader.readSchema(inputPath);
         ExampleOutputFormat.setSchema(job, schema);
         ExampleOutputFormat.setCompression(job, CompressionCodecName.UNCOMPRESSED);
-        job.getConfiguration().set(LESS_THAN_VALUE, physicalSelect.getLessThanValue());
+        job.getConfiguration().set(LESS_THAN_OR_EQUAL_VALUE, physicalSelect.getLessThanOrEqualValue());
         job.getConfiguration().setInt(COLUMN_INDEX, schema.getFieldIndex(physicalSelect.getColumnName()));
         job.waitForCompletion(VERBOSE);
         return new ReferenceIntermediateDataset(outputPath);
@@ -72,16 +71,17 @@ public class SelectMapReduceOperation implements Invokable, Nameable {
 
     private static class SelectMapper extends Mapper<LongWritable, Group, LongWritable, Group> {
         private static final int DEFAULT_VALUE = 0;
-        private static final int VALUE = 1;
+        private static final int SKIP_SEPARATOR = 2;
 
         @Override
         public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
             int columnIndex = context.getConfiguration().getInt(COLUMN_INDEX, DEFAULT_VALUE);
             String line = value.toString();
             String[] fields = line.split("\n");
-            String[] field = fields[columnIndex].split(": ");
-            String lessThanValue = context.getConfiguration().get(LESS_THAN_VALUE);
-            if (field[VALUE].compareTo(lessThanValue) < 0) {
+            int fieldSeparatorPosition = fields[columnIndex].indexOf(':');
+            String fieldValue = fields[columnIndex].substring(fieldSeparatorPosition + SKIP_SEPARATOR);
+            String lessThanOrEqualValue = context.getConfiguration().get(LESS_THAN_OR_EQUAL_VALUE);
+            if (fieldValue.compareTo(lessThanOrEqualValue) <= 0) {
                 context.write(key, value);
             }
         }
