@@ -1,4 +1,4 @@
-package com.testbed.boundary.commons;
+package com.testbed.boundary.utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class DirectoryCommons {
+public class DirectoryUtils {
     public static List<String> tryGetFilesInDirectoryByPattern(final String directory, final Pattern pattern) {
         try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
             return paths.map(Path::toString)

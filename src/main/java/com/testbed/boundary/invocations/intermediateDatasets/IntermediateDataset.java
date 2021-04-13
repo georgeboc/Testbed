@@ -1,9 +1,7 @@
 package com.testbed.boundary.invocations.intermediateDatasets;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface IntermediateDataset {
-    Object getValue();
-    long count();
-    List<String> getColumnNames();
+    Optional<Object> getValue();
 }

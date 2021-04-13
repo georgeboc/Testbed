@@ -29,7 +29,7 @@ public class AggregateSparkOperation implements Invokable, Nameable {
     private Dataset<Row> getOutputDataset(final InvocationParameters invocationParameters,
                                           final PhysicalAggregate physicalAggregate) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
-        Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue();
+        Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
         return inputDataset.agg(expr(String.format("%s(%s)",
                 physicalAggregate.getAggregationOperation(),
                 physicalAggregate.getAggregationColumnName())));

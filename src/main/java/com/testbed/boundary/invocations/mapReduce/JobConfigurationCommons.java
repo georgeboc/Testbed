@@ -23,7 +23,6 @@ public class JobConfigurationCommons {
     public Job createMapperOnlyJob(final JobConfiguration jobConfiguration) throws IOException, InterruptedException, ClassNotFoundException {
         cleanUpOldResults(jobConfiguration);
         Job job = createJob(jobConfiguration);
-        job.setJarByClass(jobConfiguration.getMapperClass());
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setNumReduceTasks(0);
         return job;
@@ -32,7 +31,6 @@ public class JobConfigurationCommons {
     public Job createMapperReducerJob(final JobConfiguration jobConfiguration) throws IOException, InterruptedException, ClassNotFoundException {
         cleanUpOldResults(jobConfiguration);
         Job job = createJob(jobConfiguration);
-        job.setJarByClass(jobConfiguration.getJarByClass());
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setReducerClass(jobConfiguration.getReducerClass());
         return job;
@@ -41,19 +39,16 @@ public class JobConfigurationCommons {
     public Job createMapperCombinerReducerJob(final JobConfiguration jobConfiguration) throws IOException, InterruptedException, ClassNotFoundException {
         cleanUpOldResults(jobConfiguration);
         Job job = createJob(jobConfiguration);
-        job.setJarByClass(jobConfiguration.getJarByClass());
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setCombinerClass(jobConfiguration.getCombinerClass());
         job.setReducerClass(jobConfiguration.getReducerClass());
         return job;
     }
 
-    private Job createJob(final JobConfiguration jobConfiguration) throws IOException {
+    private Job createJob(JobConfiguration jobConfiguration) throws IOException {
         Job job = Job.getInstance(configuration, JOB_NAME);
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
+        job.setOutputKeyClass(jobConfiguration.getOutputKeyClass());
+        job.setOutputValueClass(jobConfiguration.getOutputValueClass());
         job.setInputFormatClass(jobConfiguration.getInputFormatClass());
         job.setOutputFormatClass(jobConfiguration.getOutputFormatClass());
         FileInputFormat.addInputPath(job, new Path(jobConfiguration.getInputPath()));

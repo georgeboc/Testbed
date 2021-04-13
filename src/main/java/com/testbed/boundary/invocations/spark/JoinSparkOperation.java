@@ -13,6 +13,7 @@ import org.apache.spark.sql.Row;
 import scala.collection.JavaConversions;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.testbed.boundary.invocations.OperationsConstants.JOIN;
@@ -33,6 +34,7 @@ public class JoinSparkOperation implements Invokable, Nameable {
         List<IntermediateDataset> inputIntermediateDatasets = invocationParameters.getInputIntermediateDatasets();
         return inputIntermediateDatasets.stream()
                 .map(IntermediateDataset::getValue)
+                .map(Optional::get)
                 .map(object -> (Dataset<Row>) object)
                 .collect(Collectors.toList());
     }

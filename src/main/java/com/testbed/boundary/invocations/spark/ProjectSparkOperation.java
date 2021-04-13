@@ -38,7 +38,7 @@ public class ProjectSparkOperation implements Invokable, Nameable {
 
     private Dataset<Row> getInputDataset(final InvocationParameters invocationParameters) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
-        return (Dataset<Row>) inputIntermediateDataset.getValue();
+        return (Dataset<Row>) inputIntermediateDataset.getValue().get();
     }
 
     private Dataset<Row> getOutputDataset(final Dataset<Row> inputDataset, final PhysicalProject physicalProject) {

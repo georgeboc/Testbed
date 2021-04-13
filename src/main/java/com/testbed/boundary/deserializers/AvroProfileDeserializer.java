@@ -1,7 +1,7 @@
 package com.testbed.boundary.deserializers;
 
 import com.google.common.collect.Streams;
-import com.testbed.boundary.commons.DirectoryCommons;
+import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.entities.profiles.ColumnProfile;
 import com.testbed.entities.profiles.Profile;
 import org.apache.avro.file.DataFileReader;
@@ -11,9 +11,6 @@ import org.apache.avro.io.DatumReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +33,7 @@ public class  AvroProfileDeserializer implements Deserializer<Profile> {
 
     private Map<String, ColumnProfile> getColumnProfiles(final String path) {
         Pattern columnFileNamePattern = Pattern.compile("count_value_stats_([^/])*\\.avro$");
-        List<String> columnFilePaths = DirectoryCommons.tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
+        List<String> columnFilePaths = DirectoryUtils.tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
         Stream<String> columnNamesStream = getColumnNamesStream(columnFilePaths);
         Stream<ColumnProfile> columnProfilesStream = getColumnProfileStream(columnFilePaths);
         return Streams.zip(columnNamesStream, columnProfilesStream, AbstractMap.SimpleEntry::new)

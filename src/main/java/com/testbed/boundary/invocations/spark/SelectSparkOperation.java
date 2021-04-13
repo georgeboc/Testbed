@@ -33,7 +33,7 @@ public class SelectSparkOperation implements Invokable, Nameable {
     private Dataset<Row> getOutputDataset(final InvocationParameters invocationParameters,
                                           final PhysicalSelect physicalSelect) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
-        Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue();
+        Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
         return inputDataset.filter(physicalSelect.getColumnName() + " <= '" + physicalSelect.getLessThanValue() + "'");
     }
 

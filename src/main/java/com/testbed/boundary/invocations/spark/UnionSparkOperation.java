@@ -10,6 +10,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.testbed.boundary.invocations.OperationsConstants.UNION;
@@ -29,6 +30,7 @@ public class UnionSparkOperation implements Invokable, Nameable {
         List<IntermediateDataset> inputIntermediateDatasets = invocationParameters.getInputIntermediateDatasets();
         return inputIntermediateDatasets.stream()
                 .map(IntermediateDataset::getValue)
+                .map(Optional::get)
                 .map(object -> (Dataset<Row>) object)
                 .collect(Collectors.toList());
     }

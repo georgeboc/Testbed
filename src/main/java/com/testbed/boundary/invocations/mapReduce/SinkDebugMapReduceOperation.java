@@ -12,6 +12,7 @@ import com.testbed.entities.operations.physical.PhysicalSink;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -29,6 +30,7 @@ import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons
 
 @RequiredArgsConstructor
 public class SinkDebugMapReduceOperation implements Invokable, Nameable {
+    private static final int FIRST = 0;
     private final JobConfigurationCommons jobConfigurationCommons;
     @Getter
     private final String name = SINK;
@@ -44,10 +46,9 @@ public class SinkDebugMapReduceOperation implements Invokable, Nameable {
 
     private IntermediateDataset tryRunJob(InvocationParameters invocationParameters) throws IOException, InterruptedException, ClassNotFoundException {
         PhysicalSink physicalSink = (PhysicalSink) invocationParameters.getPhysicalOperation();
-        String inputPath = invocationParameters.getInputIntermediateDatasets().stream()
-                .findFirst()
-                .get()
+        String inputPath = invocationParameters.getInputIntermediateDatasets().get(FIRST)
                 .getValue()
+                .get()
                 .toString();
         String outputPath = PATH_PREFIX + physicalSink.getId();
         jobConfigurationCommons.createMapperOnlyJob(JobConfiguration.builder()
@@ -55,13 +56,15 @@ public class SinkDebugMapReduceOperation implements Invokable, Nameable {
                 .outputPath(outputPath)
                 .inputFormatClass(ExampleInputFormat.class)
                 .outputFormatClass(TextOutputFormat.class)
-                .jarByClass(SinkMapper.class)
+                .outputKeyClass(LongWritable.class)
+                .outputValueClass(Group.class)
                 .mapperClass(SinkMapper.class)
                 .build()).waitForCompletion(VERBOSE);
         return new NoIntermediateDataset();
     }
 
     private static class SinkMapper extends Mapper<LongWritable, Group, LongWritable, Group> {
+        @Override
         public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
             context.write(key, value);
         }

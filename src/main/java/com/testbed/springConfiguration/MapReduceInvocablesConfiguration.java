@@ -1,7 +1,10 @@
 package com.testbed.springConfiguration;
 
+import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.OperationInstrumentation;
+import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.CountMapReduce;
+import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.MapReduceIntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import com.testbed.boundary.invocations.mapReduce.LoadMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
@@ -18,31 +21,53 @@ import static com.testbed.springConfiguration.InvocablesConfigurationCommons.ins
 
 public class MapReduceInvocablesConfiguration {
     @Bean(name = PHYSICAL_LOAD)
-    public Invokable mapReduceLoadInvokable(List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentInvokable(new LoadMapReduceOperation(), operationInstrumentations);
+    public Invokable mapReduceLoadInvokable(List<OperationInstrumentation> operationInstrumentations,
+                                            MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
+        return instrumentInvokable(new LoadMapReduceOperation(), mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_SELECT)
     public Invokable mapReduceSelectInvokable(JobConfigurationCommons jobConfigurationCommons,
-                                              Configuration configuration,
+                                              ParquetSchemaReader parquetSchemaReader,
+                                              MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation,
                                               List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentInvokable(new SelectMapReduceOperation(jobConfigurationCommons, configuration),
+        return instrumentInvokable(new SelectMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+                mapReduceIntermediateDatasetInstrumentation,
                 operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_SINK)
     public Invokable mapReduceSinkInvokable(JobConfigurationCommons jobConfigurationCommons,
+                                            MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation,
                                             List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentInvokable(new SinkDebugMapReduceOperation(jobConfigurationCommons), operationInstrumentations);
+        return instrumentInvokable(new SinkDebugMapReduceOperation(jobConfigurationCommons),
+                mapReduceIntermediateDatasetInstrumentation,
+                operationInstrumentations);
     }
 
     @Bean
-    public JobConfigurationCommons jobConfigurationCommons(Configuration configuration) {
-        return new JobConfigurationCommons(configuration);
+    public MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation(CountMapReduce countMapReduce,
+                                                                                                   ParquetSchemaReader parquetSchemaReader) {
+        return new MapReduceIntermediateDatasetInstrumentation(countMapReduce, parquetSchemaReader);
+    }
+
+    @Bean
+    public CountMapReduce countMapReduce(JobConfigurationCommons jobConfigurationCommons) {
+        return new CountMapReduce(jobConfigurationCommons);
+    }
+
+    @Bean
+    public ParquetSchemaReader parquetSchemaReader(Configuration configuration) {
+        return new ParquetSchemaReader(configuration);
     }
 
     @Bean
     public Configuration configuration() {
         return new Configuration();
+    }
+
+    @Bean
+    public JobConfigurationCommons jobConfigurationCommons(Configuration configuration) {
+        return new JobConfigurationCommons(configuration);
     }
 }

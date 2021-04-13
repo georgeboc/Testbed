@@ -1,6 +1,7 @@
 package com.testbed.boundary.invocations;
 
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
+import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class InstrumentInvokable implements Invokable {
     private final Invokable wrappedInvokable;
+    private final IntermediateDatasetInstrumentation intermediateDatasetInstrumentation;
     private final List<OperationInstrumentation> operationInstrumentations;
 
     @Override
@@ -17,9 +19,9 @@ public class InstrumentInvokable implements Invokable {
         IntermediateDataset intermediateDataset = wrappedInvokable.invoke(invocationParameters);
         Nameable nameable = (Nameable) wrappedInvokable;
         List<Long> inputsRowsCounts = getRowsCounts(invocationParameters.getInputIntermediateDatasets());
-        long outputRowsCount = intermediateDataset.count();
+        long outputRowsCount = intermediateDatasetInstrumentation.count(intermediateDataset);
         List<List<String>> inputsColumnNames = getColumnNames(invocationParameters.getInputIntermediateDatasets());
-        List<String> outputColumnNames = intermediateDataset.getColumnNames();
+        List<String> outputColumnNames = intermediateDatasetInstrumentation.getColumnNames(intermediateDataset);
         operationInstrumentations.add(OperationInstrumentation.builder()
                 .operationName(nameable.getName())
                 .inputsRowsCount(inputsRowsCounts)
@@ -32,13 +34,13 @@ public class InstrumentInvokable implements Invokable {
 
     private List<Long> getRowsCounts(final Collection<IntermediateDataset> inputIntermediateDatasets) {
         return inputIntermediateDatasets.stream()
-                .map(IntermediateDataset::count)
+                .map(intermediateDatasetInstrumentation::count)
                 .collect(Collectors.toList());
     }
 
     private List<List<String>> getColumnNames(final Collection<IntermediateDataset> inputIntermediateDatasets) {
         return inputIntermediateDatasets.stream()
-                .map(IntermediateDataset::getColumnNames)
+                .map(intermediateDatasetInstrumentation::getColumnNames)
                 .collect(Collectors.toList());
     }
 }

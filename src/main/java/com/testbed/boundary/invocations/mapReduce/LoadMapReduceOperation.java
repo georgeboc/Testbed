@@ -22,12 +22,15 @@ import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.VERBOSE;
 
 public class LoadMapReduceOperation implements Invokable, Nameable {
+    private static final String PARSED_DATASET_FILENAME = "parsed_dataset.parquet";
     @Getter
     private final String name = LOAD;
 
     @Override
     public IntermediateDataset invoke(InvocationParameters invocationParameters) {
         PhysicalLoad physicalLoad = (PhysicalLoad) invocationParameters.getPhysicalOperation();
-        return new ReferenceIntermediateDataset(physicalLoad.getDatasetDirectoryPath());
+        return new ReferenceIntermediateDataset(String.format("%s/%s",
+                physicalLoad.getDatasetDirectoryPath(),
+                PARSED_DATASET_FILENAME));
     }
 }

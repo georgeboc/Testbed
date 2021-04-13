@@ -28,7 +28,7 @@ public class GroupbySparkOperation implements Invokable, Nameable {
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
-        Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue();
+        Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
         PhysicalGroupBy physicalGroupBy = (PhysicalGroupBy) invocationParameters.getPhysicalOperation();
         List<Column> groupByColumns =  physicalGroupBy.getGroupingColumnNames().stream()
                 .map(Column::new)
