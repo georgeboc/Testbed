@@ -5,11 +5,8 @@ import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.invocations.mapReduce.JobConfiguration;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.output.NullWriter;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -20,6 +17,7 @@ import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.PATH_PREFIX;
@@ -29,12 +27,13 @@ import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons
 public class CountMapReduce {
     private static final String COUNT = "count";
     private static final int FIRST = 0;
+    private static final String ZERO_COUNT = "0";
     private final JobConfigurationCommons jobConfigurationCommons;
 
     public long count(final String inputPath) {
         try {
             return tryRunJob(inputPath);
-        } catch (Exception exception) {
+        } catch (IOException | ClassNotFoundException | InterruptedException exception) {
             throw new RuntimeException(exception);
         }
     }
@@ -57,7 +56,7 @@ public class CountMapReduce {
         job.waitForCompletion(VERBOSE);
         String resultFilePath = DirectoryUtils.tryGetFilesInDirectoryByPattern(outputPath,
                 Pattern.compile(".*part-r-\\d+$")).get(FIRST);
-        return Long.parseLong(readLine(new FileReader(resultFilePath)));
+        return Long.parseLong(Optional.ofNullable(readLine(new FileReader(resultFilePath))).orElse(ZERO_COUNT));
     }
 
     private static String readLine(FileReader fileReader) throws IOException {
