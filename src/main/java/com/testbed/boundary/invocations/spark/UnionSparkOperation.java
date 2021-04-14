@@ -1,8 +1,7 @@
 package com.testbed.boundary.invocations.spark;
 
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static com.testbed.boundary.invocations.OperationsConstants.UNION;
 
-public class UnionSparkOperation implements Invokable, Nameable {
+public class UnionSparkOperation implements Operation {
     @Getter
     private final String name = UNION;
 

@@ -1,15 +1,16 @@
 package com.testbed.springConfiguration;
 
-import com.testbed.boundary.invocations.InstrumentInvokable;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.OperationInstrumentation;
+import com.testbed.boundary.invocations.Operation;
+import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
+import com.testbed.boundary.invocations.instrumentation.OperationInstrumenter;
+import com.testbed.boundary.invocations.instrumentation.SelectOperationTolerableErrorCheck;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
 @Configuration
-public class InvocablesConfigurationCommons {
+public class OperationsConfigurationCommons {
     public static final String PHYSICAL_LOAD = "PhysicalLoad";
     public static final String PHYSICAL_SELECT = "PhysicalSelect";
     public static final String PHYSICAL_PROJECT = "PhysicalProject";
@@ -19,9 +20,14 @@ public class InvocablesConfigurationCommons {
     public static final String PHYSICAL_UNION = "PhysicalUnion";
     public static final String PHYSICAL_SINK = "PhysicalSink";
 
-    public static Invokable instrumentInvokable(Invokable wrappedInvokable,
+    public static Operation instrumentOperation(Operation wrappedOperation,
                                                 IntermediateDatasetInstrumentation intermediateDatasetInstrumentation,
                                                 List<OperationInstrumentation> operationInstrumentations) {
-        return new InstrumentInvokable(wrappedInvokable, intermediateDatasetInstrumentation, operationInstrumentations);
+        return new OperationInstrumenter(wrappedOperation, intermediateDatasetInstrumentation, operationInstrumentations);
+    }
+
+    public static Operation checkSelectOperationTolerableError(Operation wrappedOperation,
+                                                               IntermediateDatasetInstrumentation intermediateDatasetInstrumentation) {
+        return new SelectOperationTolerableErrorCheck(wrappedOperation, intermediateDatasetInstrumentation);
     }
 }

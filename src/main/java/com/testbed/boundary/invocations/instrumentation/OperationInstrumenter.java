@@ -1,5 +1,8 @@
-package com.testbed.boundary.invocations;
+package com.testbed.boundary.invocations.instrumentation;
 
+import com.testbed.boundary.invocations.InvocationParameters;
+import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import lombok.RequiredArgsConstructor;
@@ -9,21 +12,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
-public class InstrumentInvokable implements Invokable {
-    private final Invokable wrappedInvokable;
+public class OperationInstrumenter implements Operation {
+    private final Operation wrappedOperation;
     private final IntermediateDatasetInstrumentation intermediateDatasetInstrumentation;
     private final List<OperationInstrumentation> operationInstrumentations;
 
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
-        IntermediateDataset intermediateDataset = wrappedInvokable.invoke(invocationParameters);
-        Nameable nameable = (Nameable) wrappedInvokable;
+        IntermediateDataset intermediateDataset = wrappedOperation.invoke(invocationParameters);
         List<Long> inputsRowsCounts = getRowsCounts(invocationParameters.getInputIntermediateDatasets());
         long outputRowsCount = intermediateDatasetInstrumentation.count(intermediateDataset);
         List<List<String>> inputsColumnNames = getColumnNames(invocationParameters.getInputIntermediateDatasets());
         List<String> outputColumnNames = intermediateDatasetInstrumentation.getColumnNames(intermediateDataset);
         operationInstrumentations.add(OperationInstrumentation.builder()
-                .operationName(nameable.getName())
+                .operationName(wrappedOperation.getName())
                 .inputsRowsCount(inputsRowsCounts)
                 .outputRowsCount(outputRowsCount)
                 .inputsColumnNames(inputsColumnNames)
@@ -42,5 +44,10 @@ public class InstrumentInvokable implements Invokable {
         return inputIntermediateDatasets.stream()
                 .map(intermediateDatasetInstrumentation::getColumnNames)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getName() {
+        return wrappedOperation.getName();
     }
 }

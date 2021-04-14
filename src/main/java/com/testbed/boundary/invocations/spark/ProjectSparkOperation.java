@@ -1,11 +1,9 @@
 package com.testbed.boundary.invocations.spark;
 
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
-import com.testbed.entities.exceptions.TolerableErrorPercentageExceeded;
 import com.testbed.entities.operations.physical.PhysicalProject;
 import lombok.Getter;
 import org.apache.spark.sql.Column;
@@ -18,9 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.testbed.boundary.invocations.OperationsConstants.PROJECT;
-import static java.lang.Math.abs;
 
-public class ProjectSparkOperation implements Invokable, Nameable {
+public class ProjectSparkOperation implements Operation {
     @Getter
     private final String name = PROJECT;
 

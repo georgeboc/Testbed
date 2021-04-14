@@ -1,11 +1,9 @@
 package com.testbed.boundary.invocations.spark;
 
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
-import com.testbed.entities.exceptions.TolerableErrorPercentageExceeded;
 import com.testbed.entities.operations.physical.PhysicalSelect;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +14,9 @@ import scala.Tuple2;
 import java.util.Arrays;
 
 import static com.testbed.boundary.invocations.OperationsConstants.SELECT;
-import static java.lang.Math.abs;
 
 @RequiredArgsConstructor
-public class SelectSparkOperation implements Invokable, Nameable {
+public class SelectSparkOperation implements Operation {
     private static final String TIMESTAMP_TYPE = "TimestampType";
     @Getter
     private final String name = SELECT;
@@ -28,9 +25,6 @@ public class SelectSparkOperation implements Invokable, Nameable {
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         PhysicalSelect physicalSelect = (PhysicalSelect) invocationParameters.getPhysicalOperation();
         Dataset<Row> outputDataset = getOutputDataset(invocationParameters, physicalSelect);
-        checkIfErrorIsTolerable(outputDataset.count(),
-                physicalSelect.getApproximatedOutputRowsCount(),
-                invocationParameters.getTolerableErrorPercentage());
         return new SparkIntermediateDataset(outputDataset);
     }
 
@@ -54,14 +48,5 @@ public class SelectSparkOperation implements Invokable, Nameable {
                     physicalSelect.getLessThanOrEqualValue());
         }
         return String.format("string(%s) <= '%s'", physicalSelect.getColumnName(), physicalSelect.getLessThanOrEqualValue());
-    }
-
-    private void checkIfErrorIsTolerable(final long realRowsCount,
-                                         final long approximatedOutputRowsCount,
-                                         final double tolerableErrorPercentage) {
-        double errorPercentage = abs(realRowsCount - approximatedOutputRowsCount)*100/(double)realRowsCount;
-        if (errorPercentage > tolerableErrorPercentage) {
-            throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
-        }
     }
 }

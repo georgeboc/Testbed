@@ -2,8 +2,7 @@ package com.testbed.boundary.invocations.spark;
 
 import com.google.common.collect.Lists;
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.operations.physical.PhysicalJoin;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 
 import static com.testbed.boundary.invocations.OperationsConstants.JOIN;
 
-public class JoinSparkOperation implements Invokable, Nameable {
+public class JoinSparkOperation implements Operation {
     @Getter
     private final String name = JOIN;
 

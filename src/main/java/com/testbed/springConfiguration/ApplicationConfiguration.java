@@ -7,7 +7,7 @@ import com.testbed.boundary.deserializers.AvroProfileDeserializer;
 import com.testbed.boundary.deserializers.DeserializedOperationMixin;
 import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
-import com.testbed.boundary.invocations.OperationInstrumentation;
+import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
 import com.testbed.boundary.serializers.CSVSerializer;

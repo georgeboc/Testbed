@@ -1,29 +1,30 @@
 package com.testbed.springConfiguration;
 
-import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.OperationInstrumentation;
+import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.CountMapReduce;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.MapReduceIntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import com.testbed.boundary.invocations.mapReduce.LoadMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SinkDebugMapReduceOperation;
+import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 
-import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_LOAD;
-import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_SELECT;
-import static com.testbed.springConfiguration.InvocablesConfigurationCommons.PHYSICAL_SINK;
-import static com.testbed.springConfiguration.InvocablesConfigurationCommons.instrumentInvokable;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_LOAD;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SINK;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.checkSelectOperationTolerableError;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.instrumentOperation;
 
 public class MapReduceInvocablesConfiguration {
     @Bean(name = PHYSICAL_LOAD)
     public Invokable mapReduceLoadInvokable(List<OperationInstrumentation> operationInstrumentations,
                                             MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
-        return instrumentInvokable(new LoadMapReduceOperation(), mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
+        return instrumentOperation(new LoadMapReduceOperation(), mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_SELECT)
@@ -31,16 +32,18 @@ public class MapReduceInvocablesConfiguration {
                                               ParquetSchemaReader parquetSchemaReader,
                                               MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation,
                                               List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentInvokable(new SelectMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
-                mapReduceIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+        return checkSelectOperationTolerableError(
+                instrumentOperation(new SelectMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+                        mapReduceIntermediateDatasetInstrumentation,
+                        operationInstrumentations),
+                mapReduceIntermediateDatasetInstrumentation);
     }
 
     @Bean(name = PHYSICAL_SINK)
     public Invokable mapReduceSinkInvokable(JobConfigurationCommons jobConfigurationCommons,
                                             MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation,
                                             List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentInvokable(new SinkDebugMapReduceOperation(jobConfigurationCommons),
+        return instrumentOperation(new SinkDebugMapReduceOperation(jobConfigurationCommons),
                 mapReduceIntermediateDatasetInstrumentation,
                 operationInstrumentations);
     }

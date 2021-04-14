@@ -2,7 +2,7 @@ package com.testbed.interactors.viewers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import com.testbed.boundary.invocations.OperationInstrumentation;
+import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.boundary.serializers.CSVSerializer;
 import com.testbed.views.InvocationInstrumentationView;
 import lombok.RequiredArgsConstructor;

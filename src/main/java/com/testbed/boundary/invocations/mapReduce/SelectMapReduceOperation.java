@@ -1,31 +1,21 @@
 package com.testbed.boundary.invocations.mapReduce;
 
-import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.ReferenceIntermediateDataset;
+import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.entities.operations.physical.PhysicalSelect;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.parquet.column.impl.ColumnWriteStoreV1;
 import org.apache.parquet.example.data.Group;
-import org.apache.parquet.example.data.GroupFactory;
-import org.apache.parquet.example.data.GroupWriter;
-import org.apache.parquet.example.data.simple.SimpleGroupFactory;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import org.apache.parquet.hadoop.example.ExampleOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
-import org.apache.parquet.io.ColumnIOFactory;
-import org.apache.parquet.io.MessageColumnIO;
-import org.apache.parquet.io.api.RecordConsumer;
-import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.Type;
 
 import java.io.IOException;
 
@@ -34,7 +24,7 @@ import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
-public class SelectMapReduceOperation implements Invokable, Nameable {
+public class SelectMapReduceOperation implements Operation {
     private static final int FIRST = 0;
     private static final String LESS_THAN_OR_EQUAL_VALUE = "lessThanOrEqualValue";
     private static final String COLUMN_INDEX = "columnIndex";

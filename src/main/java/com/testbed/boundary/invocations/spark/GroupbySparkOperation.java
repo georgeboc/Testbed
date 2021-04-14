@@ -2,8 +2,7 @@ package com.testbed.boundary.invocations.spark;
 
 import com.google.common.collect.Maps;
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.operations.physical.PhysicalGroupBy;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 import static com.testbed.boundary.invocations.OperationsConstants.GROUP_BY;
 
 @RequiredArgsConstructor
-public class GroupbySparkOperation implements Invokable, Nameable {
+public class GroupbySparkOperation implements Operation {
     @Getter
     private final String name = GROUP_BY;
 

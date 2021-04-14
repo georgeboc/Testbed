@@ -2,8 +2,6 @@ package com.testbed.boundary.invocations.mapReduce;
 
 import lombok.Builder;
 import lombok.Data;
-import org.apache.hadoop.io.BinaryComparable;
-import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.OutputFormat;

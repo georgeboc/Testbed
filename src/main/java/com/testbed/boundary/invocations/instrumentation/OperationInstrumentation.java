@@ -1,4 +1,4 @@
-package com.testbed.boundary.invocations;
+package com.testbed.boundary.invocations.instrumentation;
 
 import lombok.Builder;
 import lombok.Data;

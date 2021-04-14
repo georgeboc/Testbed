@@ -1,7 +1,7 @@
 package com.testbed.interactors;
 
 import com.testbed.boundary.deserializers.Deserializer;
-import com.testbed.boundary.invocations.OperationInstrumentation;
+import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;

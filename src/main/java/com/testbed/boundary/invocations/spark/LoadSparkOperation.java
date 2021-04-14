@@ -1,8 +1,7 @@
 package com.testbed.boundary.invocations.spark;
 
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.Nameable;
+import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.SparkIntermediateDataset;
 import com.testbed.entities.operations.physical.PhysicalLoad;
@@ -15,7 +14,7 @@ import org.apache.spark.sql.SparkSession;
 import static com.testbed.boundary.invocations.OperationsConstants.LOAD;
 
 @RequiredArgsConstructor
-public class LoadSparkOperation implements Invokable, Nameable {
+public class LoadSparkOperation implements Operation {
     private static final String PARSED_DATASET_FILENAME = "parsed_dataset.parquet";
     private final SparkSession sparkSession;
     @Getter
