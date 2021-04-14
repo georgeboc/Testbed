@@ -11,12 +11,17 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.Tuple2;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
 
 import static com.testbed.boundary.invocations.OperationsConstants.SELECT;
 import static java.lang.Math.abs;
 
 @RequiredArgsConstructor
 public class SelectSparkOperation implements Invokable, Nameable {
+    private static final String TIMESTAMP_TYPE = "TimestampType";
     @Getter
     private final String name = SELECT;
 
@@ -34,7 +39,22 @@ public class SelectSparkOperation implements Invokable, Nameable {
                                           final PhysicalSelect physicalSelect) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
-        return inputDataset.filter(physicalSelect.getColumnName() + " <= '" + physicalSelect.getLessThanOrEqualValue() + "'");
+        String filterQuery = getFilterQuery(inputDataset, physicalSelect);
+        return inputDataset.filter(filterQuery);
+    }
+
+    private String getFilterQuery(final Dataset<Row> inputDataset, final PhysicalSelect physicalSelect) {
+        String columnType = Arrays.stream(inputDataset.dtypes())
+                .filter(columnNameAndType -> columnNameAndType._1().equals(physicalSelect.getColumnName()))
+                .map(Tuple2::_2)
+                .findFirst()
+                .get();
+        if (columnType.equals(TIMESTAMP_TYPE)) {
+            return String.format("unix_timestamp(%s)*1000 <= %s",
+                    physicalSelect.getColumnName(),
+                    physicalSelect.getLessThanOrEqualValue());
+        }
+        return String.format("string(%s) <= '%s'", physicalSelect.getColumnName(), physicalSelect.getLessThanOrEqualValue());
     }
 
     private void checkIfErrorIsTolerable(final long rowCount,
