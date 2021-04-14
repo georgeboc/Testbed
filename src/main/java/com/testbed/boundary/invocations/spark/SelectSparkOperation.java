@@ -17,7 +17,6 @@ import static com.testbed.boundary.invocations.OperationsConstants.SELECT;
 
 @RequiredArgsConstructor
 public class SelectSparkOperation implements Operation {
-    private static final String TIMESTAMP_TYPE = "TimestampType";
     @Getter
     private final String name = SELECT;
 
@@ -32,21 +31,6 @@ public class SelectSparkOperation implements Operation {
                                           final PhysicalSelect physicalSelect) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
-        String filterQuery = getFilterQuery(inputDataset, physicalSelect);
-        return inputDataset.filter(filterQuery);
-    }
-
-    private String getFilterQuery(final Dataset<Row> inputDataset, final PhysicalSelect physicalSelect) {
-        String columnType = Arrays.stream(inputDataset.dtypes())
-                .filter(columnNameAndType -> columnNameAndType._1().equals(physicalSelect.getColumnName()))
-                .map(Tuple2::_2)
-                .findFirst()
-                .get();
-        if (columnType.equals(TIMESTAMP_TYPE)) {
-            return String.format("unix_timestamp(%s)*1000 <= %s",
-                    physicalSelect.getColumnName(),
-                    physicalSelect.getLessThanOrEqualValue());
-        }
-        return String.format("string(%s) <= '%s'", physicalSelect.getColumnName(), physicalSelect.getLessThanOrEqualValue());
+        return inputDataset.filter(String.format("%s <= '%s'", physicalSelect.getColumnName(), physicalSelect.getLessThanOrEqualValue()));
     }
 }
