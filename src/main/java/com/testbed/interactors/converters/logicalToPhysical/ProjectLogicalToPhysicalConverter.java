@@ -15,15 +15,15 @@ public class ProjectLogicalToPhysicalConverter implements LogicalToPhysicalConve
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         Set<String> columnNames = profileEstimation.getProfile().getColumns().keySet();
         LogicalProject logicalProject = (LogicalProject) profileEstimation.getLogicalOperation();
-        long expectedOutputColumnsCount = (long) (logicalProject.getColumnsSelectionFactor() * columnNames.size());
+        long approximatedOutputColumnsCount = (long) (logicalProject.getColumnsSelectionFactor() * columnNames.size());
         List<String> projectedColumnNames = columnNames.stream()
                 .sorted()
-                .limit(expectedOutputColumnsCount)
+                .limit(approximatedOutputColumnsCount)
                 .collect(Collectors.toList());
         return PhysicalProject.builder()
                 .id(logicalProject.getId())
                 .projectedColumnNames(projectedColumnNames)
-                .expectedColumnsSelectionFactor(logicalProject.getColumnsSelectionFactor())
+                .approximatedColumnsSelectionFactor(logicalProject.getColumnsSelectionFactor())
                 .build();
     }
 }

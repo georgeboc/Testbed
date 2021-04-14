@@ -21,7 +21,8 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("UnstableApiUsage")
 public class  AvroProfileDeserializer implements Deserializer<Profile> {
-    private static final String ROWS_COUNT = "rows_count";
+    private static final String DISTINCT_ROWS_COUNT = "distinct_rows_count";
+    private static final String TOTAL_ROWS_COUNT = "total_rows_count";
     private static final String IS_UNIQUE = "is_unique";
     private static final String METADATA_FILENAME = "metadata.avro";
 
@@ -68,7 +69,9 @@ public class  AvroProfileDeserializer implements Deserializer<Profile> {
     private ColumnProfile getColumnProfileFromDataFileReader(final DataFileReader<GenericRecord> dataFileReader) {
         GenericRecord genericRecord = dataFileReader.next();
         return ColumnProfile.builder()
-            .isUnique(Boolean.parseBoolean(genericRecord.get(IS_UNIQUE).toString()))
-            .rowsCount(Long.parseLong(genericRecord.get(ROWS_COUNT).toString())).build();
+                .isUnique(Boolean.parseBoolean(genericRecord.get(IS_UNIQUE).toString()))
+                .distinctRowsCount(Long.parseLong(genericRecord.get(DISTINCT_ROWS_COUNT).toString()))
+                .totalRowsCount(Long.parseLong(genericRecord.get(TOTAL_ROWS_COUNT).toString()))
+                .build();
     }
 }

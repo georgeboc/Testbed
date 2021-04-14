@@ -23,15 +23,15 @@ public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConver
         }
         ColumnProfile columnProfile = profile.getColumns().get(logicalSelect.getColumnName());
         String value = columnReader.getValueFromSelectivityFactor(logicalSelect.getSelectivityFactor(),
-                columnProfile,
+                columnProfile.getDistinctRowsCount(),
                 logicalSelect.getColumnName(),
                 profileEstimation.getColumnStatsPath());
-        long expectedOutputRowsCount = (long) (columnProfile.getRowsCount()*logicalSelect.getSelectivityFactor());
+        long approximatedOutputRowsCount = (long) (columnProfile.getTotalRowsCount()*logicalSelect.getSelectivityFactor());
         return PhysicalSelect.builder()
                 .id(logicalSelect.getId())
                 .columnName(logicalSelect.getColumnName())
                 .lessThanOrEqualValue(value)
-                .expectedOutputRowsCount(expectedOutputRowsCount)
+                .approximatedOutputRowsCount(approximatedOutputRowsCount)
                 .build();
     }
 }

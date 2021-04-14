@@ -10,5 +10,5 @@ import java.util.List;
 public class PhysicalProject implements PhysicalOperation {
     private final String id;
     private final List<String> projectedColumnNames;
-    private final double expectedColumnsSelectionFactor;
+    private final double approximatedColumnsSelectionFactor;
 }

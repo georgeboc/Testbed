@@ -17,20 +17,22 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.min;
+
 public class AvroColumnReader implements ColumnReader {
     private static final String VALUE = "Value";
 
     @Override
     public String getValueFromSelectivityFactor(final double selectivityFactor,
-                                                final ColumnProfile columnProfile,
+                                                final long columnDistinctRowsCount,
                                                 final String columnName,
                                                 final String directory) {
         List<String> columnPartsPaths = tryGetFilesInDirectoryByPattern(directory, columnName);
         int columnPartsCount = columnPartsPaths.size();
         int columnPartId = (int) (columnPartsCount*selectivityFactor);
-        String columnPartPath = columnPartsPaths.get(columnPartId);
+        String columnPartPath = columnPartsPaths.get(min(columnPartId, columnPartsPaths.size() - 1));
         DataFileReader<GenericRecord> dataFileReader = tryGetDataFileReaderFromFileName(columnPartPath);
-        long rowId = getRowId(selectivityFactor, columnProfile, columnPartsCount, columnPartId);
+        long rowId = getRowId(selectivityFactor, columnDistinctRowsCount, columnPartsCount, columnPartId);
         return getGenericRecordByRowId(dataFileReader, rowId).get(VALUE).toString();
     }
 
@@ -56,10 +58,10 @@ public class AvroColumnReader implements ColumnReader {
     }
 
     private long getRowId(final double selectivityFactor,
-                          final ColumnProfile columnProfile,
+                          final long columnDistinctRowsCount,
                           final int columnPartsCount,
                           final double columnPartId) {
-        long rowsPerColumnPart = columnProfile.getRowsCount()/columnPartsCount;
+        long rowsPerColumnPart = columnDistinctRowsCount/columnPartsCount;
         double deltaSelectivityFactor = selectivityFactor - columnPartId/columnPartsCount;
         long rowId = (long) (rowsPerColumnPart * deltaSelectivityFactor);
         if (rowId == rowsPerColumnPart) {

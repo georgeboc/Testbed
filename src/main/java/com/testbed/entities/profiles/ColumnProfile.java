@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ColumnProfile {
-    private final long rowsCount;
+    private final long distinctRowsCount;
+    private final long totalRowsCount;
     private final boolean isUnique;
 }

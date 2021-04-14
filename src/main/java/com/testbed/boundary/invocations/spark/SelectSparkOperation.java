@@ -13,7 +13,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import scala.Tuple2;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 
 import static com.testbed.boundary.invocations.OperationsConstants.SELECT;
@@ -30,7 +29,7 @@ public class SelectSparkOperation implements Invokable, Nameable {
         PhysicalSelect physicalSelect = (PhysicalSelect) invocationParameters.getPhysicalOperation();
         Dataset<Row> outputDataset = getOutputDataset(invocationParameters, physicalSelect);
         checkIfErrorIsTolerable(outputDataset.count(),
-                physicalSelect.getExpectedOutputRowsCount(),
+                physicalSelect.getApproximatedOutputRowsCount(),
                 invocationParameters.getTolerableErrorPercentage());
         return new SparkIntermediateDataset(outputDataset);
     }
@@ -57,10 +56,10 @@ public class SelectSparkOperation implements Invokable, Nameable {
         return String.format("string(%s) <= '%s'", physicalSelect.getColumnName(), physicalSelect.getLessThanOrEqualValue());
     }
 
-    private void checkIfErrorIsTolerable(final long rowCount,
-                                         final long expectedOutputRowsCount,
+    private void checkIfErrorIsTolerable(final long realRowsCount,
+                                         final long approximatedOutputRowsCount,
                                          final double tolerableErrorPercentage) {
-        double errorPercentage = abs(rowCount - expectedOutputRowsCount)*100/(double)expectedOutputRowsCount;
+        double errorPercentage = abs(realRowsCount - approximatedOutputRowsCount)*100/(double)realRowsCount;
         if (errorPercentage > tolerableErrorPercentage) {
             throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
         }

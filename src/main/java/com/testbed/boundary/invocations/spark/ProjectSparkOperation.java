@@ -31,7 +31,7 @@ public class ProjectSparkOperation implements Invokable, Nameable {
         Dataset<Row> outputDataset = getOutputDataset(inputDataset, physicalProject);
         checkIfErrorIsTolerable(inputDataset.columns().length,
                 outputDataset.columns().length,
-                physicalProject.getExpectedColumnsSelectionFactor(),
+                physicalProject.getApproximatedColumnsSelectionFactor(),
                 invocationParameters.getTolerableErrorPercentage());
         return new SparkIntermediateDataset(outputDataset);
     }
@@ -53,9 +53,9 @@ public class ProjectSparkOperation implements Invokable, Nameable {
 
     private void checkIfErrorIsTolerable(final long inputColumnsCount,
                                          final long outputColumnsCount,
-                                         final double expectedColumnsSelectionFactor,
+                                         final double approximatedColumnsSelectionFactor,
                                          final double tolerableErrorPercentage) {
-        double errorPercentage = abs((double)outputColumnsCount/inputColumnsCount - expectedColumnsSelectionFactor)*100;
+        double errorPercentage = abs((double)outputColumnsCount/inputColumnsCount - approximatedColumnsSelectionFactor)*100;
         if (errorPercentage > tolerableErrorPercentage) {
             throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
         }
