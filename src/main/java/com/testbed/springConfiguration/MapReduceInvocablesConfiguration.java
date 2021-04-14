@@ -6,6 +6,7 @@ import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.Cou
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.MapReduceIntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import com.testbed.boundary.invocations.mapReduce.LoadMapReduceOperation;
+import com.testbed.boundary.invocations.mapReduce.ProjectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SinkDebugMapReduceOperation;
 import com.testbed.boundary.utils.ParquetSchemaReader;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import java.util.List;
 
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_LOAD;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_PROJECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SINK;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.checkSelectOperationTolerableError;
@@ -37,6 +39,15 @@ public class MapReduceInvocablesConfiguration {
                         mapReduceIntermediateDatasetInstrumentation,
                         operationInstrumentations),
                 mapReduceIntermediateDatasetInstrumentation);
+    }
+
+    @Bean(name = PHYSICAL_PROJECT)
+    public Invokable mapReduceProjectInvokable(List<OperationInstrumentation> operationInstrumentations,
+                                               JobConfigurationCommons jobConfigurationCommons,
+                                               ParquetSchemaReader parquetSchemaReader,
+                                               MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
+        return instrumentOperation(new ProjectMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+                mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_SINK)
