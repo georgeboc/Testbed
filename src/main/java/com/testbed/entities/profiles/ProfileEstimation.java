@@ -12,4 +12,5 @@ public class ProfileEstimation {
     private final LogicalOperation logicalOperation;
     private final Profile profile;
     private final String columnStatsPath;
+    private final double tolerableErrorPercentage;
 }

@@ -54,7 +54,7 @@ public class RunnerInteractor implements Interactor {
         inputsCountValidatorManager.validate(logicalPlan.getGraph());
         LOG.info("Logical Plan is valid");
         LOG.info("Converting logical operations to physical operations");
-        PhysicalPlan physicalPlan = logicalToPhysicalManager.convert(logicalPlan);
+        PhysicalPlan physicalPlan = logicalToPhysicalManager.convert(logicalPlan, tolerableErrorPercentage);
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Creating Invocation Plan");
         InvocationPlan invocationPlan = invocationPlanner.createInvocationPlan(physicalPlan);

@@ -34,9 +34,9 @@ public class LogicalToPhysicalManager {
     private ApplicationContext applicationContext;
 
 
-    public PhysicalPlan convert(final LogicalPlan logicalPlan) {
+    public PhysicalPlan convert(final LogicalPlan logicalPlan, final double tolerableError) {
         List<LogicalLoad> logicalLoads = logicalPlan.getLogicalLoads();
-        List<ProfileEstimation> loadProfileEstimations = getLoadProfileEstimations(logicalLoads);
+        List<ProfileEstimation> loadProfileEstimations = getLoadProfileEstimations(logicalLoads, tolerableError);
         Graph<PhysicalOperation> graph = createPhysicalGraph(loadProfileEstimations, logicalPlan);
         List<PhysicalLoad> physicalLoads = getPhysicalLoads(loadProfileEstimations);
         return PhysicalPlan.builder()
@@ -45,12 +45,13 @@ public class LogicalToPhysicalManager {
                 .build();
     }
 
-    private List<ProfileEstimation> getLoadProfileEstimations(final List<LogicalLoad> logicalLoads) {
+    private List<ProfileEstimation> getLoadProfileEstimations(final List<LogicalLoad> logicalLoads, final double tolerableError) {
         return logicalLoads.stream()
                 .map(logicalLoad -> ProfileEstimation.builder()
                         .logicalOperation(logicalLoad)
                         .profile(profileDeserializer.deserialize(logicalLoad.getDatasetDirectoryPath()))
                         .columnStatsPath(logicalLoad.getDatasetDirectoryPath())
+                        .tolerableErrorPercentage(tolerableError)
                         .build())
                 .collect(Collectors.toList());
     }
@@ -99,6 +100,7 @@ public class LogicalToPhysicalManager {
                         .logicalOperation(logicalOperation)
                         .profile(currentProfileEstimation.getProfile())
                         .columnStatsPath(currentProfileEstimation.getColumnStatsPath())
+                        .tolerableErrorPercentage(currentProfileEstimation.getTolerableErrorPercentage())
                         .build())
                 .collect(Collectors.toList());
     }

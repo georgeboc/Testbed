@@ -29,10 +29,6 @@ public class ProjectSparkOperation implements Invokable, Nameable {
         PhysicalProject physicalProject = (PhysicalProject) invocationParameters.getPhysicalOperation();
         Dataset<Row> inputDataset = getInputDataset(invocationParameters);
         Dataset<Row> outputDataset = getOutputDataset(inputDataset, physicalProject);
-        checkIfErrorIsTolerable(inputDataset.columns().length,
-                outputDataset.columns().length,
-                physicalProject.getApproximatedColumnsSelectionFactor(),
-                invocationParameters.getTolerableErrorPercentage());
         return new SparkIntermediateDataset(outputDataset);
     }
 
@@ -49,15 +45,5 @@ public class ProjectSparkOperation implements Invokable, Nameable {
                 .asScala()
                 .toSeq();
         return inputDataset.select(projectedColumnsSeq);
-    }
-
-    private void checkIfErrorIsTolerable(final long inputColumnsCount,
-                                         final long outputColumnsCount,
-                                         final double approximatedColumnsSelectionFactor,
-                                         final double tolerableErrorPercentage) {
-        double errorPercentage = abs((double)outputColumnsCount/inputColumnsCount - approximatedColumnsSelectionFactor)*100;
-        if (errorPercentage > tolerableErrorPercentage) {
-            throw new TolerableErrorPercentageExceeded(errorPercentage, tolerableErrorPercentage);
-        }
     }
 }
