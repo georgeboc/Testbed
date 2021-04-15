@@ -42,7 +42,7 @@ public class SinkDebugMapReduceOperation implements Operation {
                 .get()
                 .toString();
         String outputPath = PATH_PREFIX + physicalSink.getId();
-        jobConfigurationCommons.createMapperOnlyJob(JobConfiguration.builder()
+        jobConfigurationCommons.createMapperOnlyJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)
                 .inputFormatClass(ExampleInputFormat.class)

@@ -62,7 +62,7 @@ public class GroupByMapReduceOperation implements Operation {
                 .get()
                 .toString();
         String outputPath = PATH_PREFIX + physicalGroupBy.getId();
-        Job job = jobConfigurationCommons.createMapperReducerJob(JobConfiguration.builder()
+        Job job = jobConfigurationCommons.createMapperReducerJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)
                 .inputFormatClass(ExampleInputFormat.class)

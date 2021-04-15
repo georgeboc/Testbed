@@ -57,7 +57,7 @@ public class ProjectMapReduceOperation implements Operation {
                 .get()
                 .toString();
         String outputPath = PATH_PREFIX + physicalProject.getId();
-        Job job = jobConfigurationCommons.createMapperOnlyJob(JobConfiguration.builder()
+        Job job = jobConfigurationCommons.createMapperOnlyJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)
                 .inputFormatClass(ExampleInputFormat.class)

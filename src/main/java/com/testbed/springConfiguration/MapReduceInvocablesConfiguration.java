@@ -6,6 +6,7 @@ import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.Cou
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.MapReduceIntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.mapReduce.GroupByMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
+import com.testbed.boundary.invocations.mapReduce.JoinMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.LoadMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.ProjectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_AGGREGATE;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_GROUP_BY;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_JOIN;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_LOAD;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_PROJECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
@@ -69,6 +71,15 @@ public class MapReduceInvocablesConfiguration {
                                                  ParquetSchemaReader parquetSchemaReader,
                                                  MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
         return instrumentOperation(new SumAggregateMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+                mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
+    }
+
+    @Bean(name = PHYSICAL_JOIN)
+    public Invokable mapReduceJoinInvokable(List<OperationInstrumentation> operationInstrumentations,
+                                            JobConfigurationCommons jobConfigurationCommons,
+                                            ParquetSchemaReader parquetSchemaReader,
+                                            MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
+        return instrumentOperation(new JoinMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
                 mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 

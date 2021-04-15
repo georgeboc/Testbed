@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -58,7 +57,7 @@ public class SumAggregateMapReduceOperation implements Operation {
                 .get()
                 .toString();
         String outputPath = PATH_PREFIX + physicalAggregate.getId();
-        Job job = jobConfigurationCommons.createMapperCombinerReducerJob(JobConfiguration.builder()
+        Job job = jobConfigurationCommons.createMapperCombinerReducerJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)
                 .inputFormatClass(ExampleInputFormat.class)

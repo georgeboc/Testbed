@@ -2,12 +2,11 @@ package com.testbed.boundary.invocations.intermediateDatasets.instrumentation;
 
 import com.google.common.collect.Streams;
 import com.testbed.boundary.utils.DirectoryUtils;
-import com.testbed.boundary.invocations.mapReduce.JobConfiguration;
+import com.testbed.boundary.invocations.mapReduce.UnaryOperationJobConfiguration;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -42,7 +41,7 @@ public class CountMapReduce {
     private long tryRunJob(final String inputPath) throws IOException,
             InterruptedException, ClassNotFoundException {
         String outputPath = PATH_PREFIX + COUNT;
-        Job job = jobConfigurationCommons.createMapperCombinerReducerJob(JobConfiguration.builder()
+        Job job = jobConfigurationCommons.createMapperCombinerReducerJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)
                 .mapOutputKeyClass(NullWritable.class)

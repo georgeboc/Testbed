@@ -9,13 +9,16 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 @Data
 @Builder
-public class JobConfiguration {
-    private final String inputPath;
+public class BinaryOperationJobConfiguration implements OperationJobConfiguration {
+    private final String leftInputPath;
+    private final String rightInputPath;
     private final String outputPath;
-    private final Class<? extends Mapper> mapperClass;
+    private final Class<? extends Mapper> leftMapperClass;
+    private final Class<? extends Mapper> rightMapperClass;
     private final Class<? extends Reducer> combinerClass;
     private final Class<? extends Reducer> reducerClass;
-    private final Class<? extends InputFormat> inputFormatClass;
+    private final Class<? extends InputFormat> leftInputFormatClass;
+    private final Class<? extends InputFormat> rightInputFormatClass;
     private final Class<? extends OutputFormat> outputFormatClass;
     private final Class<?> mapOutputKeyClass;
     private final Class<?> mapOutputValueClass;

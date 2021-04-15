@@ -50,7 +50,7 @@ public class SelectMapReduceOperation implements Operation {
                 .get()
                 .toString();
         String outputPath = PATH_PREFIX + physicalSelect.getId();
-        Job job = jobConfigurationCommons.createMapperOnlyJob(JobConfiguration.builder()
+        Job job = jobConfigurationCommons.createMapperOnlyJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)
                 .inputFormatClass(ExampleInputFormat.class)
