@@ -10,12 +10,14 @@ import com.testbed.boundary.invocations.mapReduce.LoadMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.ProjectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SinkDebugMapReduceOperation;
+import com.testbed.boundary.invocations.mapReduce.SumAggregateMapReduceOperation;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_AGGREGATE;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_GROUP_BY;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_LOAD;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_PROJECT;
@@ -58,6 +60,15 @@ public class MapReduceInvocablesConfiguration {
                                                ParquetSchemaReader parquetSchemaReader,
                                                MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
         return instrumentOperation(new GroupByMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+                mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
+    }
+
+    @Bean(name = PHYSICAL_AGGREGATE)
+    public Invokable mapReduceAggregateInvokable(List<OperationInstrumentation> operationInstrumentations,
+                                                 JobConfigurationCommons jobConfigurationCommons,
+                                                 ParquetSchemaReader parquetSchemaReader,
+                                                 MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
+        return instrumentOperation(new SumAggregateMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
                 mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 
