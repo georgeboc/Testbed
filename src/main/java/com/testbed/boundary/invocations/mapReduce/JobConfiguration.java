@@ -17,6 +17,8 @@ public class JobConfiguration {
     private final Class<? extends Reducer> reducerClass;
     private final Class<? extends InputFormat> inputFormatClass;
     private final Class<? extends OutputFormat> outputFormatClass;
+    private final Class<?> mapOutputKeyClass;
+    private final Class<?> mapOutputValueClass;
     private final Class<?> outputKeyClass;
     private final Class<?> outputValueClass;
 }

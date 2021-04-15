@@ -30,6 +30,8 @@ public class JobConfigurationCommons {
     public Job createMapperReducerJob(final JobConfiguration jobConfiguration) throws IOException, InterruptedException, ClassNotFoundException {
         cleanUpOldResults(jobConfiguration);
         Job job = createJob(jobConfiguration);
+        job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
+        job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setReducerClass(jobConfiguration.getReducerClass());
         return job;
@@ -38,6 +40,8 @@ public class JobConfigurationCommons {
     public Job createMapperCombinerReducerJob(final JobConfiguration jobConfiguration) throws IOException, InterruptedException, ClassNotFoundException {
         cleanUpOldResults(jobConfiguration);
         Job job = createJob(jobConfiguration);
+        job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
+        job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setCombinerClass(jobConfiguration.getCombinerClass());
         job.setReducerClass(jobConfiguration.getReducerClass());

@@ -12,17 +12,12 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.parquet.example.data.Group;
-import org.apache.parquet.example.data.simple.BinaryValue;
-import org.apache.parquet.example.data.simple.Primitive;
 import org.apache.parquet.example.data.simple.SimpleGroup;
-import org.apache.parquet.format.converter.ParquetMetadataConverter;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import org.apache.parquet.hadoop.example.ExampleOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
-import org.apache.parquet.io.api.Binary;
 import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Type;
 
 import java.io.IOException;
@@ -81,16 +76,16 @@ public class ProjectMapReduceOperation implements Operation {
         return new ReferenceIntermediateDataset(outputPath);
     }
 
-    private MessageType getProjectedSchema(List<String> projectedColumnNames, MessageType schema) {
-        Set<String> projectedColumnNamesSet = new HashSet<>(projectedColumnNames);
+    private MessageType getProjectedSchema(List<String> columnNames, MessageType schema) {
+        Set<String> columnNamesSet = new HashSet<>(columnNames);
         List<Type> projectedFields = schema.getFields().stream()
-                .filter(field -> projectedColumnNamesSet.contains(field.getName()))
+                .filter(field -> columnNamesSet.contains(field.getName()))
                 .collect(Collectors.toList());
         return new MessageType(schema.getName(), projectedFields);
     }
 
-    private String[] getProjectedColumnIndexes(List<String> projectedColumnNames, MessageType schema) {
-        return projectedColumnNames.stream()
+    private String[] getProjectedColumnIndexes(List<String> columnNames, MessageType schema) {
+        return columnNames.stream()
                 .map(schema::getFieldIndex)
                 .map(String::valueOf)
                 .toArray(String[]::new);

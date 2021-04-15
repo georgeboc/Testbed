@@ -7,6 +7,7 @@ import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -44,6 +45,8 @@ public class CountMapReduce {
         Job job = jobConfigurationCommons.createMapperCombinerReducerJob(JobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)
+                .mapOutputKeyClass(NullWritable.class)
+                .mapOutputValueClass(LongWritable.class)
                 .outputKeyClass(NullWritable.class)
                 .outputValueClass(LongWritable.class)
                 .mapperClass(CountMapper.class)

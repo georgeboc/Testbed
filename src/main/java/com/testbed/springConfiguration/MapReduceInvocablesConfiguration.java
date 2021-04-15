@@ -4,6 +4,7 @@ import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.CountMapReduce;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.MapReduceIntermediateDatasetInstrumentation;
+import com.testbed.boundary.invocations.mapReduce.GroupByMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import com.testbed.boundary.invocations.mapReduce.LoadMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.ProjectMapReduceOperation;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 
 import java.util.List;
 
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_GROUP_BY;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_LOAD;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_PROJECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
@@ -47,6 +49,15 @@ public class MapReduceInvocablesConfiguration {
                                                ParquetSchemaReader parquetSchemaReader,
                                                MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
         return instrumentOperation(new ProjectMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+                mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
+    }
+
+    @Bean(name = PHYSICAL_GROUP_BY)
+    public Invokable mapReduceGroupByInvokable(List<OperationInstrumentation> operationInstrumentations,
+                                               JobConfigurationCommons jobConfigurationCommons,
+                                               ParquetSchemaReader parquetSchemaReader,
+                                               MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
+        return instrumentOperation(new GroupByMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
                 mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 
