@@ -12,6 +12,7 @@ import com.testbed.boundary.invocations.mapReduce.ProjectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SinkDebugMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SumAggregateMapReduceOperation;
+import com.testbed.boundary.invocations.mapReduce.UnionMapReduceOperation;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHY
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_PROJECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SINK;
+import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_UNION;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.checkSelectOperationTolerableError;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.instrumentOperation;
 
@@ -80,6 +82,15 @@ public class MapReduceInvocablesConfiguration {
                                             ParquetSchemaReader parquetSchemaReader,
                                             MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
         return instrumentOperation(new JoinMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+                mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
+    }
+
+    @Bean(name = PHYSICAL_UNION)
+    public Invokable mapReduceUnionInvokable(List<OperationInstrumentation> operationInstrumentations,
+                                             JobConfigurationCommons jobConfigurationCommons,
+                                             ParquetSchemaReader parquetSchemaReader,
+                                             MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
+        return instrumentOperation(new UnionMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
                 mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 

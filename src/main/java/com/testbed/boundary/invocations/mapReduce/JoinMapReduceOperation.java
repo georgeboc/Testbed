@@ -12,24 +12,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.ListUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.parquet.example.data.Group;
-import org.apache.parquet.example.data.simple.SimpleGroup;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import org.apache.parquet.hadoop.example.ExampleOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
-import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.MessageTypeParser;
 import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Type;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -37,6 +35,9 @@ import java.util.stream.Stream;
 import static com.testbed.boundary.invocations.OperationsConstants.JOIN;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.PATH_PREFIX;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.VERBOSE;
+import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.tryWriteRow;
+import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.Row;
+import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.RowsParser;
 
 @RequiredArgsConstructor
 public class JoinMapReduceOperation implements Operation {
@@ -154,8 +155,6 @@ public class JoinMapReduceOperation implements Operation {
         private static final String MAPPER_TYPE_AND_ROW_DELIMITER = ",";
         private static final int MAPPER_TYPE_POSITION = 0;
         private static final int ROW_POSITION = 1;
-        private static final String FIELD_DELIMITER = "\n";
-        private static final String TYPE_DELIMITER = ": ";
         private static final String LEFT_PREFIX = "Left";
         private static final String RIGHT_PREFIX = "Right";
 
@@ -163,28 +162,13 @@ public class JoinMapReduceOperation implements Operation {
         public void reduce(Text key, Iterable<Text> values, Context context) {
             String joinSchemaString = context.getConfiguration().get(JOIN_SCHEMA);
             MessageType joinSchema = MessageTypeParser.parseMessageType(joinSchemaString);
-            GroupType joinGroupType = new GroupType(joinSchema.getRepetition(), joinSchema.getName(), joinSchema.getFields());
-            doJoin(values, joinGroupType, context);
+            doJoin(values, joinSchema, context);
         }
 
-        private void doJoin(Iterable<Text> rows, GroupType joinGroupType, Context context) {
+        private void doJoin(Iterable<Text> rows, MessageType joinSchema, Context context) {
             LeftRightRows leftRightRows = getLeftRightRows(rows);
-            Stream<Row> result = doCrossProduct(leftRightRows);
-            result.forEach(row -> tryWriteRow(row, joinGroupType, context));
-        }
-
-        private void tryWriteRow(Row row, GroupType groupType, Context context) {
-            try {
-                writeRow(row, groupType, context);
-            } catch (IOException | InterruptedException exception) {
-                throw new RuntimeException(exception);
-            }
-        }
-
-        private void writeRow(Row row, GroupType groupType, Context context) throws IOException, InterruptedException {
-            Group group = new SimpleGroup(groupType);
-            row.getFields().forEach(field -> group.append(field.name, field.value));
-            context.write(null, group);
+            Stream<Row> crossProductStream = getCrossProductStream(leftRightRows);
+            crossProductStream.forEach(row -> tryWriteRow(row, joinSchema, context));
         }
 
         private LeftRightRows getLeftRightRows(Iterable<Text> rows) {
@@ -201,58 +185,27 @@ public class JoinMapReduceOperation implements Operation {
 
         private void classifyByMapperType(String[] mapperTypeAndRows, List<Row> leftRows, List<Row> rightRows) {
             if (mapperTypeAndRows[MAPPER_TYPE_POSITION].equals(LEFT_MAPPER)) {
-                leftRows.add(RowsParser.parseRow(mapperTypeAndRows[ROW_POSITION], LEFT_PREFIX));
+                leftRows.add(RowsParser.parseRowWithFieldNamePrefix(mapperTypeAndRows[ROW_POSITION], LEFT_PREFIX));
             } else {
-                rightRows.add(RowsParser.parseRow(mapperTypeAndRows[ROW_POSITION], RIGHT_PREFIX));
+                rightRows.add(RowsParser.parseRowWithFieldNamePrefix(mapperTypeAndRows[ROW_POSITION], RIGHT_PREFIX));
             }
         }
 
-        private Stream<Row> doCrossProduct(LeftRightRows leftRightRows) {
+        private Stream<Row> getCrossProductStream(LeftRightRows leftRightRows) {
             return leftRightRows.getLeftRows().stream()
                     .flatMap(leftRow -> leftRightRows.getRightRows().stream()
-                        .map(rightRow -> concatenateFields(leftRow, rightRow)));
+                        .map(rightRow -> uniteFields(leftRow, rightRow)));
         }
 
-        private Row concatenateFields(Row leftRow, Row rightRow) {
-            List<Field> concatenatedFields = Streams.concat(leftRow.getFields().stream(),
-                    rightRow.getFields().stream()).collect(Collectors.toList());
-            return new Row(concatenatedFields);
-        }
-
-        private static class RowsParser {
-            private static final int NAME_POSITION = 0;
-            private static final int VALUE_POSITION = 1;
-
-            public static Row parseRow(String rowString, String fieldNamePrefix) {
-                String[] fields = rowString.split(FIELD_DELIMITER);
-                return new Row(Arrays.stream(fields)
-                        .map(field -> field.split(TYPE_DELIMITER))
-                        .map(fieldParts -> Field.builder()
-                                .name(fieldNamePrefix + fieldParts[NAME_POSITION])
-                                .value(fieldParts[VALUE_POSITION])
-                                .build())
-                        .collect(Collectors.toList()));
-            }
+        private Row uniteFields(Row leftRow, Row rightRow) {
+            return new Row(ListUtils.union(leftRow.getFields(), rightRow.getFields()));
         }
 
         @Data
         @Builder
         private static class LeftRightRows {
-            private final List<Row> leftRows;
-            private final List<Row> rightRows;
-        }
-
-
-        @Data
-        private static class Row {
-            private final List<Field> fields;
-        }
-
-        @Data
-        @Builder
-        private static class Field {
-            private final String name;
-            private final String value;
+            private final List<MapReduceCommons.Row> leftRows;
+            private final List<MapReduceCommons.Row> rightRows;
         }
     }
 }
