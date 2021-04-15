@@ -9,6 +9,8 @@ import javax.inject.Named;
 
 @Named
 public class GroupByDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
+    private static final String OPERATION_PREFIX_ID = "operation_";
+
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedGroupBy deserializedGroupBy = (DeserializedGroupBy) deserializedOperation;
@@ -19,6 +21,6 @@ public class GroupByDeserializedToLogicalConverter implements DeserializedToLogi
     }
 
     private String getId(final DeserializedGroupBy deserializedGroupBy) {
-        return deserializedGroupBy.getInputTag() + "_" + deserializedGroupBy.getOutputTag();
+        return OPERATION_PREFIX_ID + deserializedGroupBy.getInputTag() + "_" + deserializedGroupBy.getOutputTag();
     }
 }

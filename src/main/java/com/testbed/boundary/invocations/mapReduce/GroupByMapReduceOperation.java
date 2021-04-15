@@ -38,8 +38,8 @@ import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons
 @RequiredArgsConstructor
 public class GroupByMapReduceOperation implements Operation {
     private static final int FIRST = 0;
-    private static final String GROUP_BY_COLUMN_INDEXES = "groupingColumnIndexes";
-    private static final String GROUP_BY_SCHEMA = "outputSchema";
+    private static final String GROUP_BY_COLUMN_INDEXES = "groupByColumnIndexes";
+    private static final String GROUP_BY_SCHEMA = "groupBySchema";
     private final JobConfigurationCommons jobConfigurationCommons;
     private final ParquetSchemaReader parquetSchemaReader;
     @Getter

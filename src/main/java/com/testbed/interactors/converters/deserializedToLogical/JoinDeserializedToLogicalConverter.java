@@ -9,6 +9,8 @@ import javax.inject.Named;
 
 @Named
 public class JoinDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
+    private static final String OPERATION_PREFIX_ID = "operation_";
+
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedJoin deserializedJoin = (DeserializedJoin) deserializedOperation;
@@ -20,7 +22,7 @@ public class JoinDeserializedToLogicalConverter implements DeserializedToLogical
     }
 
     private String getId(final DeserializedJoin deserializedJoin) {
-        return deserializedJoin.getLeftInputTag() + "_" + deserializedJoin.getRightInputTag() + "_" +
-                deserializedJoin.getOutputTag();
+        return OPERATION_PREFIX_ID + deserializedJoin.getLeftInputTag() + "_" +
+                deserializedJoin.getRightInputTag() + "_" + deserializedJoin.getOutputTag();
     }
 }

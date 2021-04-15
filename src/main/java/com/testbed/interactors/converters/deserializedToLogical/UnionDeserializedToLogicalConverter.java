@@ -9,6 +9,8 @@ import javax.inject.Named;
 
 @Named
 public class UnionDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
+    private static final String OPERATION_PREFIX_ID = "operation_";
+
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedUnion deserializedUnion = (DeserializedUnion) deserializedOperation;
@@ -16,7 +18,7 @@ public class UnionDeserializedToLogicalConverter implements DeserializedToLogica
     }
 
     private String getId(final DeserializedUnion deserializedUnion) {
-        return deserializedUnion.getLeftInputTag() + "_" + deserializedUnion.getRightInputTag() + "_" +
-                deserializedUnion.getOutputTag();
+        return OPERATION_PREFIX_ID + deserializedUnion.getLeftInputTag() + "_" +
+                deserializedUnion.getRightInputTag() + "_" + deserializedUnion.getOutputTag();
     }
 }

@@ -6,6 +6,8 @@ import com.testbed.entities.operations.logical.LogicalLoad;
 import com.testbed.entities.operations.logical.LogicalOperation;
 
 public class LoadDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
+    private static final String OPERATION_PREFIX_ID = "operation_";
+
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedLoad deserializedLoad = (DeserializedLoad) deserializedOperation;
@@ -16,6 +18,6 @@ public class LoadDeserializedToLogicalConverter implements DeserializedToLogical
     }
 
     private String getId(final DeserializedLoad deserializedLoad) {
-        return deserializedLoad.getOutputTag();
+        return OPERATION_PREFIX_ID + deserializedLoad.getOutputTag();
     }
 }

@@ -9,6 +9,8 @@ import javax.inject.Named;
 
 @Named
 public class AggregateDeserializedToLogicalConverter implements DeserializedToLogicalConverter {
+    private static final String OPERATION_PREFIX_ID = "operation_";
+
     @Override
     public LogicalOperation convert(final DeserializedOperation deserializedOperation) {
         DeserializedAggregate deserializedAggregate = (DeserializedAggregate) deserializedOperation;
@@ -20,6 +22,6 @@ public class AggregateDeserializedToLogicalConverter implements DeserializedToLo
     }
 
     private String getId(final DeserializedAggregate deserializedAggregate) {
-        return deserializedAggregate.getInputTag() + "_" + deserializedAggregate.getOutputTag();
+        return OPERATION_PREFIX_ID + deserializedAggregate.getInputTag() + "_" + deserializedAggregate.getOutputTag();
     }
 }

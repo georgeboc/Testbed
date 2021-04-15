@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
 public class LogicalToPhysicalManager {
+    private static final String SINK_PREFIX_ID = "sink_";
     private final Deserializer<Profile> profileDeserializer;
     @Inject
     private ApplicationContext applicationContext;
@@ -73,7 +74,7 @@ public class LogicalToPhysicalManager {
                     .map(this::convertFromProfileEstimationToPhysicalOperation)
                     .forEach(successivePhysicalOperation -> physicalGraph.putEdge(currentPhysicalOperation, successivePhysicalOperation));
             if (successiveProfileEstimations.isEmpty()) {
-                physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink(String.valueOf(currentPhysicalOperation.hashCode())));
+                physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink(SINK_PREFIX_ID + currentPhysicalOperation.getId()));
             }
             visitedProfileEstimations.add(currentProfileEstimation);
         }
