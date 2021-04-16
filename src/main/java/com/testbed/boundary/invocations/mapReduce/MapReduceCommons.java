@@ -5,7 +5,6 @@ import lombok.Data;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.example.data.simple.SimpleGroup;
-import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.MessageType;
 
 import java.io.IOException;

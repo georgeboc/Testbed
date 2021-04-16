@@ -126,8 +126,7 @@ public class GroupByMapReduceOperation implements Operation {
         public void reduce(Text key, Iterable<NullWritable> notUsed, Context context) throws IOException, InterruptedException {
             String groupBySchemaString = context.getConfiguration().get(GROUP_BY_SCHEMA);
             MessageType groupBySchema = MessageTypeParser.parseMessageType(groupBySchemaString);
-            GroupType groupByGroupType = new GroupType(groupBySchema.getRepetition(), groupBySchema.getName(), groupBySchema.getFields());
-            Group groupByGroup = new SimpleGroup(groupByGroupType);
+            Group groupByGroup = new SimpleGroup(groupBySchema);
             String[] groupByColumnNameValues = key.toString().split(COLUMN_NAME_VALUES_DELIMITER);
             Arrays.stream(groupByColumnNameValues)
                     .map(columnNameValue -> columnNameValue.split(TYPE_DELIMITER))
