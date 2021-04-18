@@ -22,6 +22,7 @@ import org.apache.parquet.schema.Type;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,6 +81,7 @@ public class ProjectMapReduceOperation implements Operation {
         Set<String> columnNamesSet = new HashSet<>(columnNames);
         List<Type> projectedFields = schema.getFields().stream()
                 .filter(field -> columnNamesSet.contains(field.getName()))
+                .sorted((Comparator.comparing(Type::getName)))
                 .collect(Collectors.toList());
         return new MessageType(schema.getName(), projectedFields);
     }

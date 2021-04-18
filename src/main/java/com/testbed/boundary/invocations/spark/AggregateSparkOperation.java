@@ -1,5 +1,6 @@
 package com.testbed.boundary.invocations.spark;
 
+import com.google.common.base.CaseFormat;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
@@ -29,8 +30,13 @@ public class AggregateSparkOperation implements Operation {
                                           final PhysicalAggregate physicalAggregate) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
-        return inputDataset.agg(expr(String.format("%s(%s)",
+        String operationExpression = String.format("%s(%s)",
                 physicalAggregate.getAggregationOperation(),
-                physicalAggregate.getAggregationColumnName())));
+                physicalAggregate.getAggregationColumnName());
+        Dataset<Row> aggregatedDataset = inputDataset.agg(expr(operationExpression));
+        String operationName = CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_CAMEL,
+                physicalAggregate.getAggregationOperation());
+        String operationColumnName = operationName + physicalAggregate.getAggregationColumnName();
+        return aggregatedDataset.withColumnRenamed(operationExpression, operationColumnName);
     }
 }

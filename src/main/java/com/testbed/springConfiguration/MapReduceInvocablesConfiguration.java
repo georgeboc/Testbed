@@ -70,9 +70,8 @@ public class MapReduceInvocablesConfiguration {
     @Bean(name = PHYSICAL_AGGREGATE)
     public Invokable mapReduceAggregateInvokable(List<OperationInstrumentation> operationInstrumentations,
                                                  JobConfigurationCommons jobConfigurationCommons,
-                                                 ParquetSchemaReader parquetSchemaReader,
                                                  MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
-        return instrumentOperation(new SumAggregateMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+        return instrumentOperation(new SumAggregateMapReduceOperation(jobConfigurationCommons),
                 mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
     }
 
