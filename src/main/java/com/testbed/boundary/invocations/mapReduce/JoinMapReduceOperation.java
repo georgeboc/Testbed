@@ -35,9 +35,10 @@ import java.util.stream.Stream;
 import static com.testbed.boundary.invocations.OperationsConstants.JOIN;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.PATH_PREFIX;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.VERBOSE;
+import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.RowsParser.addPrefixToRowsFieldName;
+import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.RowsParser.parseRow;
 import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.tryWriteRow;
 import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.Row;
-import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.RowsParser;
 
 @RequiredArgsConstructor
 public class JoinMapReduceOperation implements Operation {
@@ -185,9 +186,9 @@ public class JoinMapReduceOperation implements Operation {
 
         private void classifyByMapperType(String[] mapperTypeAndRows, List<Row> leftRows, List<Row> rightRows) {
             if (mapperTypeAndRows[MAPPER_TYPE_POSITION].equals(LEFT_MAPPER)) {
-                leftRows.add(RowsParser.parseRowWithFieldNamePrefix(mapperTypeAndRows[ROW_POSITION], LEFT_PREFIX));
+                leftRows.add(addPrefixToRowsFieldName(parseRow(mapperTypeAndRows[ROW_POSITION]), LEFT_PREFIX));
             } else {
-                rightRows.add(RowsParser.parseRowWithFieldNamePrefix(mapperTypeAndRows[ROW_POSITION], RIGHT_PREFIX));
+                rightRows.add(addPrefixToRowsFieldName(parseRow(mapperTypeAndRows[ROW_POSITION]), RIGHT_PREFIX));
             }
         }
 

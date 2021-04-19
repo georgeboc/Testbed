@@ -17,6 +17,7 @@ public class JobConfigurationCommons {
     public static final boolean VERBOSE = true;
     private static final boolean DELETE_RECURSIVELY = true;
     private static final String JOB_NAME = "LocalMapReduce";
+    private static final int ZERO_REDUCE_TASKS = 0;
 
     private final Configuration configuration;
 
@@ -24,15 +25,14 @@ public class JobConfigurationCommons {
         cleanUpOldResults(jobConfiguration);
         Job job = createUnarySourceJob(jobConfiguration);
         job.setMapperClass(jobConfiguration.getMapperClass());
-        job.setNumReduceTasks(0);
+        job.setNumReduceTasks(ZERO_REDUCE_TASKS);
         return job;
     }
 
     public Job createMapperReducerJobWithUnaryInputs(final UnaryOperationJobConfiguration jobConfiguration) throws IOException {
         cleanUpOldResults(jobConfiguration);
         Job job = createUnarySourceJob(jobConfiguration);
-        job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
-        job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
+        setMapperOutputClasses(jobConfiguration, job);
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setReducerClass(jobConfiguration.getReducerClass());
         return job;
@@ -41,8 +41,7 @@ public class JobConfigurationCommons {
     public Job createMapperReducerJobWithBinaryInputs(final BinaryOperationJobConfiguration jobConfiguration) throws IOException {
         cleanUpOldResults(jobConfiguration);
         Job job = createBinarySourceJob(jobConfiguration);
-        job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
-        job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
+        setMapperOutputClasses(jobConfiguration, job);
         job.setReducerClass(jobConfiguration.getReducerClass());
         return job;
     }
@@ -50,8 +49,7 @@ public class JobConfigurationCommons {
     public Job createMapperCombinerReducerJobWithUnaryInputs(final UnaryOperationJobConfiguration jobConfiguration) throws IOException {
         cleanUpOldResults(jobConfiguration);
         Job job = createUnarySourceJob(jobConfiguration);
-        job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
-        job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
+        setMapperOutputClasses(jobConfiguration, job);
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setCombinerClass(jobConfiguration.getCombinerClass());
         job.setReducerClass(jobConfiguration.getReducerClass());
@@ -61,28 +59,32 @@ public class JobConfigurationCommons {
     public Job createMapperCombinerReducerJobWithBinaryInputs(final BinaryOperationJobConfiguration jobConfiguration) throws IOException {
         cleanUpOldResults(jobConfiguration);
         Job job = createBinarySourceJob(jobConfiguration);
-        job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
-        job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
+        setMapperOutputClasses(jobConfiguration, job);
         job.setCombinerClass(jobConfiguration.getCombinerClass());
         job.setReducerClass(jobConfiguration.getReducerClass());
         return job;
     }
 
+    private void cleanUpOldResults(final OperationJobConfiguration jobConfiguration) throws IOException {
+        FileSystem fileSystem = FileSystem.get(configuration);
+        fileSystem.delete(new Path(jobConfiguration.getOutputPath()), DELETE_RECURSIVELY);
+    }
+
+    private void setMapperOutputClasses(OperationJobConfiguration jobConfiguration, Job job) {
+        job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
+        job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
+    }
+
     private Job createUnarySourceJob(UnaryOperationJobConfiguration jobConfiguration) throws IOException {
         Job job = Job.getInstance(configuration, JOB_NAME);
-        job.setOutputKeyClass(jobConfiguration.getOutputKeyClass());
-        job.setOutputValueClass(jobConfiguration.getOutputValueClass());
         job.setInputFormatClass(jobConfiguration.getInputFormatClass());
-        job.setOutputFormatClass(jobConfiguration.getOutputFormatClass());
         FileInputFormat.addInputPath(job, new Path(jobConfiguration.getInputPath()));
-        FileOutputFormat.setOutputPath(job, new Path(jobConfiguration.getOutputPath()));
+        setJobOutputClasses(jobConfiguration, job);
         return job;
     }
 
     private Job createBinarySourceJob(BinaryOperationJobConfiguration jobConfiguration) throws IOException {
         Job job = Job.getInstance(configuration, JOB_NAME);
-        job.setOutputKeyClass(jobConfiguration.getOutputKeyClass());
-        job.setOutputValueClass(jobConfiguration.getOutputValueClass());
         MultipleInputs.addInputPath(job,
                 new Path(jobConfiguration.getLeftInputPath()),
                 jobConfiguration.getLeftInputFormatClass(),
@@ -91,13 +93,14 @@ public class JobConfigurationCommons {
                 new Path(jobConfiguration.getRightInputPath()),
                 jobConfiguration.getRightInputFormatClass(),
                 jobConfiguration.getRightMapperClass());
-        job.setOutputFormatClass(jobConfiguration.getOutputFormatClass());
-        FileOutputFormat.setOutputPath(job, new Path(jobConfiguration.getOutputPath()));
+        setJobOutputClasses(jobConfiguration, job);
         return job;
     }
 
-    private void cleanUpOldResults(final OperationJobConfiguration jobConfiguration) throws IOException {
-        FileSystem fileSystem = FileSystem.get(configuration);
-        fileSystem.delete(new Path(jobConfiguration.getOutputPath()), DELETE_RECURSIVELY);
+    private void setJobOutputClasses(OperationJobConfiguration jobConfiguration, Job job) {
+        job.setOutputKeyClass(jobConfiguration.getOutputKeyClass());
+        job.setOutputValueClass(jobConfiguration.getOutputValueClass());
+        job.setOutputFormatClass(jobConfiguration.getOutputFormatClass());
+        FileOutputFormat.setOutputPath(job, new Path(jobConfiguration.getOutputPath()));
     }
 }

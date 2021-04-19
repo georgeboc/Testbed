@@ -6,6 +6,7 @@ import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset
 import com.testbed.boundary.invocations.intermediateDatasets.ReferenceIntermediateDataset;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.entities.operations.physical.PhysicalUnion;
+import com.testbed.boundary.invocations.mapReduce.MapReduceCommons.Row;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import static com.testbed.boundary.invocations.OperationsConstants.UNION;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.PATH_PREFIX;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.VERBOSE;
+import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.RowsParser.parseRow;
 import static com.testbed.boundary.invocations.mapReduce.MapReduceCommons.tryWriteRow;
 
 @RequiredArgsConstructor
@@ -111,7 +113,7 @@ public class UnionMapReduceOperation implements Operation {
         public void reduce(Text key, Iterable<NullWritable> notUsed, Context context) {
             String unionSchemaString = context.getConfiguration().get(UNION_SCHEMA);
             MessageType unionSchema = MessageTypeParser.parseMessageType(unionSchemaString);
-            MapReduceCommons.Row row = MapReduceCommons.RowsParser.parseRow(key.toString());
+            Row row = parseRow(key.toString());
             tryWriteRow(row, unionSchema, context);
         }
     }

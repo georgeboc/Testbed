@@ -101,16 +101,28 @@ public class ProjectMapReduceOperation implements Operation {
         public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
             int[] projectedColumnIndexes = context.getConfiguration().getInts(PROJECTED_COLUMN_INDEXES);
             GroupType originalGroupType = value.getType();
-            List<Type> projectedColumns = Arrays.stream(projectedColumnIndexes)
+            List<Type> projectedColumns = getProjectedColumns(projectedColumnIndexes, originalGroupType);
+            Group projectedGroup = createProjectedGroup(originalGroupType, projectedColumns);
+            writeProjectedColumnsToGroup(value, projectedColumns, projectedGroup);
+            context.write(key, projectedGroup);
+        }
+
+        private List<Type> getProjectedColumns(int[] projectedColumnIndexes, GroupType originalGroupType) {
+            return Arrays.stream(projectedColumnIndexes)
                     .mapToObj(originalGroupType::getType)
                     .collect(Collectors.toList());
+        }
+
+        private Group createProjectedGroup(GroupType originalGroupType, List<Type> projectedColumns) {
             GroupType projectedGroupType = new GroupType(originalGroupType.getRepetition(), PROJECTED_COLUMNS, projectedColumns);
-            Group projectedGroup = new SimpleGroup(projectedGroupType);
+            return new SimpleGroup(projectedGroupType);
+        }
+
+        private void writeProjectedColumnsToGroup(Group value, List<Type> projectedColumns, Group projectedGroup) {
             projectedColumns.stream()
                     .map(Type::getName)
                     .forEach(projectedColumnName -> projectedGroup.append(projectedColumnName,
                             value.getString(projectedColumnName, DEFAULT_POSITION)));
-            context.write(key, projectedGroup);
         }
     }
 }

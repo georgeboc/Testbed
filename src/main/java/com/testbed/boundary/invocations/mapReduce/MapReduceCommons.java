@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.example.data.simple.SimpleGroup;
 import org.apache.parquet.schema.MessageType;
+import org.apache.parquet.schema.MessageTypeParser;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,23 +29,27 @@ public class MapReduceCommons {
     }
 
     public static class RowsParser {
-        private static final String FIELD_DELIMITER = "\n";
-        private static final String TYPE_DELIMITER = ": ";
         private static final int NAME_POSITION = 0;
         private static final int VALUE_POSITION = 1;
-        private static final String EMPTY_STRING = "";
+        private static final String FIELD_DELIMITER = "\n";
+        private static final String TYPE_DELIMITER = ": ";
 
         public static Row parseRow(String rowString) {
-            return parseRowWithFieldNamePrefix(rowString, EMPTY_STRING);
-        }
-
-        public static Row parseRowWithFieldNamePrefix(String rowString, String fieldNamePrefix) {
             String[] fields = rowString.split(FIELD_DELIMITER);
             return new Row(Arrays.stream(fields)
                     .map(field -> field.split(TYPE_DELIMITER))
                     .map(fieldParts -> Field.builder()
-                            .name(fieldNamePrefix + fieldParts[NAME_POSITION])
+                            .name(fieldParts[NAME_POSITION])
                             .value(fieldParts[VALUE_POSITION])
+                            .build())
+                    .collect(Collectors.toList()));
+        }
+
+        public static Row addPrefixToRowsFieldName(Row row, String fieldNamePrefix) {
+            return new Row(row.getFields().stream()
+                    .map(field -> Field.builder()
+                            .name(fieldNamePrefix + field.getName())
+                            .value(field.getValue())
                             .build())
                     .collect(Collectors.toList()));
         }

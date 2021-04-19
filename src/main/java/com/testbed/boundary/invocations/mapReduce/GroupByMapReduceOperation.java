@@ -121,17 +121,27 @@ public class GroupByMapReduceOperation implements Operation {
     private static class GroupByReducer extends Reducer<Text, NullWritable, LongWritable, Group> {
         private static final String TYPE_DELIMITER = ":";
         private static final String COLUMN_NAME_VALUES_DELIMITER = ",";
+        private static final int COLUMN_NAME_POSITION = 0;
+        private static final int COLUMN_VALUE_POSITION = 1;
 
         @Override
         public void reduce(Text key, Iterable<NullWritable> notUsed, Context context) throws IOException, InterruptedException {
-            String groupBySchemaString = context.getConfiguration().get(GROUP_BY_SCHEMA);
-            MessageType groupBySchema = MessageTypeParser.parseMessageType(groupBySchemaString);
-            Group groupByGroup = new SimpleGroup(groupBySchema);
+            Group groupByGroup = createGroupFromSchema(context.getConfiguration().get(GROUP_BY_SCHEMA));
             String[] groupByColumnNameValues = key.toString().split(COLUMN_NAME_VALUES_DELIMITER);
+            writeColumnNameValuesToGroup(groupByGroup, groupByColumnNameValues);
+            context.write(null, groupByGroup);
+        }
+
+        private void writeColumnNameValuesToGroup(Group groupByGroup, String[] groupByColumnNameValues) {
             Arrays.stream(groupByColumnNameValues)
                     .map(columnNameValue -> columnNameValue.split(TYPE_DELIMITER))
-                    .forEach(columnNameAndValue -> groupByGroup.append(columnNameAndValue[0], columnNameAndValue[1]));
-            context.write(null, groupByGroup);
+                    .forEach(columnNameAndValue -> groupByGroup.append(columnNameAndValue[COLUMN_NAME_POSITION],
+                            columnNameAndValue[COLUMN_VALUE_POSITION]));
+        }
+
+        private Group createGroupFromSchema(String groupBySchemaString) {
+            MessageType groupBySchema = MessageTypeParser.parseMessageType(groupBySchemaString);
+            return new SimpleGroup(groupBySchema);
         }
     }
 }

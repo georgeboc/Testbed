@@ -113,14 +113,22 @@ public class SumAggregateMapReduceOperation implements Operation {
         public void reduce(NullWritable notUsed, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
             String aggregateColumnName = context.getConfiguration().get(AGGREGATE_COLUMN_NAME);
             String sumAggregatedColumnName = SUM_PREFIX + aggregateColumnName;
+            Group aggregateGroup = createAggregateGroup(sumAggregatedColumnName);
+            double aggregateValue = getAggregateValue(values);
+            aggregateGroup.append(sumAggregatedColumnName, String.valueOf(aggregateValue));
+            context.write(null, aggregateGroup);
+        }
+
+        private Double getAggregateValue(Iterable<DoubleWritable> values) {
+            return Streams.stream(values).map(DoubleWritable::get).reduce(INITIAL_VALUE, Double::sum);
+        }
+
+        private Group createAggregateGroup(String sumAggregatedColumnName) {
             Type columnType = new PrimitiveType(Type.Repetition.OPTIONAL,
                     PrimitiveType.PrimitiveTypeName.BINARY,
                     sumAggregatedColumnName);
             MessageType aggregateSchema = new MessageType(SCHEMA_NAME, columnType);
-            Group aggregateGroup = new SimpleGroup(aggregateSchema);
-            double aggregateValue = Streams.stream(values).map(DoubleWritable::get).reduce(INITIAL_VALUE, Double::sum);
-            aggregateGroup.append(sumAggregatedColumnName, String.valueOf(aggregateValue));
-            context.write(null, aggregateGroup);
+            return new SimpleGroup(aggregateSchema);
         }
     }
 }
