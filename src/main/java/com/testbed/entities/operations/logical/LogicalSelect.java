@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class LogicalSelect implements LogicalOperation {
     private final String id;
-    private final double selectivityFactor;
+    private final double approximatedRowsSelectivityFactor;
     private final String columnName;
 }

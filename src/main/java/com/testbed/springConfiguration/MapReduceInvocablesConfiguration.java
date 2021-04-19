@@ -27,14 +27,15 @@ import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHY
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SINK;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_UNION;
-import static com.testbed.springConfiguration.OperationsConfigurationCommons.checkSelectOperationTolerableError;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.instrumentOperation;
 
 public class MapReduceInvocablesConfiguration {
     @Bean(name = PHYSICAL_LOAD)
     public Invokable mapReduceLoadInvokable(List<OperationInstrumentation> operationInstrumentations,
                                             MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation) {
-        return instrumentOperation(new LoadMapReduceOperation(), mapReduceIntermediateDatasetInstrumentation, operationInstrumentations);
+        return instrumentOperation(new LoadMapReduceOperation(),
+                mapReduceIntermediateDatasetInstrumentation,
+                operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_SELECT)
@@ -42,11 +43,9 @@ public class MapReduceInvocablesConfiguration {
                                               ParquetSchemaReader parquetSchemaReader,
                                               MapReduceIntermediateDatasetInstrumentation mapReduceIntermediateDatasetInstrumentation,
                                               List<OperationInstrumentation> operationInstrumentations) {
-        return checkSelectOperationTolerableError(
-                instrumentOperation(new SelectMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
+        return instrumentOperation(new SelectMapReduceOperation(jobConfigurationCommons, parquetSchemaReader),
                         mapReduceIntermediateDatasetInstrumentation,
-                        operationInstrumentations),
-                mapReduceIntermediateDatasetInstrumentation);
+                        operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_PROJECT)

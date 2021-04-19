@@ -25,7 +25,6 @@ import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHY
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SINK;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_UNION;
-import static com.testbed.springConfiguration.OperationsConfigurationCommons.checkSelectOperationTolerableError;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.instrumentOperation;
 
 @Configuration
@@ -44,11 +43,9 @@ public class SparkInvocablesConfiguration {
     @Bean(name = PHYSICAL_SELECT)
     public Invokable sparkSelectInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
                                           List<OperationInstrumentation> operationInstrumentations) {
-        return checkSelectOperationTolerableError(
-                instrumentOperation(new SelectSparkOperation(),
-                        sparkIntermediateDatasetInstrumentation,
-                        operationInstrumentations),
-                sparkIntermediateDatasetInstrumentation);
+        return instrumentOperation(new SelectSparkOperation(),
+                sparkIntermediateDatasetInstrumentation,
+                operationInstrumentations);
     }
 
     @Bean(name = PHYSICAL_PROJECT)

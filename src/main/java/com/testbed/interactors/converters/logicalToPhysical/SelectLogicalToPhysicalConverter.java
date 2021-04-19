@@ -10,6 +10,9 @@ import com.testbed.entities.profiles.Profile;
 import com.testbed.entities.profiles.ProfileEstimation;
 import lombok.RequiredArgsConstructor;
 
+import static com.testbed.interactors.converters.ConvertersCommons.checkIfErrorIsTolerable;
+import static java.lang.Math.abs;
+
 @RequiredArgsConstructor
 public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
     private final ColumnReader columnReader;
@@ -22,16 +25,19 @@ public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConver
             throw new ColumnNotFoundException(logicalSelect.getColumnName());
         }
         ColumnProfile columnProfile = profile.getColumns().get(logicalSelect.getColumnName());
-        String value = columnReader.getValueFromSelectivityFactor(logicalSelect.getSelectivityFactor(),
+        String value = columnReader.getValueFromSelectivityFactor(logicalSelect.getApproximatedRowsSelectivityFactor(),
                 columnProfile.getDistinctRowsCount(),
                 logicalSelect.getColumnName(),
                 profileEstimation.getColumnStatsPath());
-        long approximatedOutputRowsCount = (long) (columnProfile.getTotalRowsCount()*logicalSelect.getSelectivityFactor());
+        long realOutputRowsCount = (long) (columnProfile.getTotalRowsCount()*logicalSelect.getApproximatedRowsSelectivityFactor());
+        double realSelectivityFactor = (double) realOutputRowsCount/columnProfile.getTotalRowsCount();
+        checkIfErrorIsTolerable(realSelectivityFactor,
+                logicalSelect.getApproximatedRowsSelectivityFactor(),
+                profileEstimation.getTolerableErrorPercentage());
         return PhysicalSelect.builder()
                 .id(logicalSelect.getId())
                 .columnName(logicalSelect.getColumnName())
                 .lessThanOrEqualValue(value)
-                .approximatedOutputRowsCount(approximatedOutputRowsCount)
                 .build();
     }
 }

@@ -9,5 +9,4 @@ public class PhysicalSelect implements PhysicalOperation {
     private final String id;
     private final String lessThanOrEqualValue;
     private final String columnName;
-    private final long approximatedOutputRowsCount;
 }

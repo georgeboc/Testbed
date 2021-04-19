@@ -16,7 +16,7 @@ public class ProjectDeserializedToLogicalConverter implements DeserializedToLogi
         DeserializedProject deserializedProject = (DeserializedProject) deserializedOperation;
         return LogicalProject.builder()
                 .id(getId(deserializedProject))
-                .columnsSelectionFactor(deserializedProject.getColumnsSelectionFactor())
+                .approximatedColumnsSelectivityFactor(deserializedProject.getColumnsSelectivityFactor())
                 .build();
     }
 

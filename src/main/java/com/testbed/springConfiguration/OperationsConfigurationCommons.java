@@ -3,7 +3,6 @@ package com.testbed.springConfiguration;
 import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumenter;
-import com.testbed.boundary.invocations.instrumentation.SelectOperationTolerableErrorCheck;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,10 +23,5 @@ public class OperationsConfigurationCommons {
                                                 IntermediateDatasetInstrumentation intermediateDatasetInstrumentation,
                                                 List<OperationInstrumentation> operationInstrumentations) {
         return new OperationInstrumenter(wrappedOperation, intermediateDatasetInstrumentation, operationInstrumentations);
-    }
-
-    public static Operation checkSelectOperationTolerableError(Operation wrappedOperation,
-                                                               IntermediateDatasetInstrumentation intermediateDatasetInstrumentation) {
-        return new SelectOperationTolerableErrorCheck(wrappedOperation, intermediateDatasetInstrumentation);
     }
 }
