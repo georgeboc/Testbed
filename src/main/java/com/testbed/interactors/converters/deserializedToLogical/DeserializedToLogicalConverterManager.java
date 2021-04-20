@@ -32,7 +32,7 @@ import static com.testbed.springConfiguration.DeserializedToLogicalConfiguration
 
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
-public class DeserializedToLogicalManager {
+public class DeserializedToLogicalConverterManager {
     @Inject
     private ApplicationContext applicationContext;
 

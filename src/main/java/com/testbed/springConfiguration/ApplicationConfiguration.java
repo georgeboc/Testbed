@@ -15,8 +15,8 @@ import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.interactors.InteractorFactory;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverterManager;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
@@ -36,14 +36,14 @@ public class ApplicationConfiguration {
 
     @Bean
     public InteractorFactory interactorFactory(NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager,
-                                               DeserializedToLogicalManager deserializedToLogicalManager,
+                                               DeserializedToLogicalConverterManager deserializedToLogicalConverterManager,
                                                InputsCountValidatorManager inputsCountValidatorManager,
-                                               LogicalToPhysicalManager logicalToPhysicalManager) {
+                                               LogicalToPhysicalConverterManager logicalToPhysicalConverterManager) {
         return new InteractorFactory(operationsDeserializer(),
                 notNullOnAllFieldsValidatorManager,
-                deserializedToLogicalManager,
+                deserializedToLogicalConverterManager,
                 inputsCountValidatorManager,
-                logicalToPhysicalManager,
+                logicalToPhysicalConverterManager,
                 invocationPlanner(),
                 invokerManager(),
                 operationInstrumentations(),

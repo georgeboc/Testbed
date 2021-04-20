@@ -2,7 +2,7 @@ package com.testbed.springConfiguration;
 
 import com.testbed.interactors.converters.deserializedToLogical.AggregateDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverter;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverterManager;
 import com.testbed.interactors.converters.deserializedToLogical.GroupByDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.JoinDeserializedToLogicalConverter;
 import com.testbed.interactors.converters.deserializedToLogical.LoadDeserializedToLogicalConverter;
@@ -28,8 +28,8 @@ public class DeserializedToLogicalConfiguration {
     public static final String DESERIALIZED_UNION = "DeserializedUnion";
 
     @Bean
-    public DeserializedToLogicalManager deserializedToLogicalOperationsConverter() {
-        return new DeserializedToLogicalManager();
+    public DeserializedToLogicalConverterManager deserializedToLogicalOperationsConverter() {
+        return new DeserializedToLogicalConverterManager();
     }
 
     @Bean

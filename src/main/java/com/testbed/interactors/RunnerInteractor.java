@@ -6,8 +6,8 @@ import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalPlan;
 import com.testbed.entities.operations.physical.PhysicalPlan;
-import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalManager;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
+import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverterManager;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
@@ -28,9 +28,9 @@ public class RunnerInteractor implements Interactor {
 
     private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager;
-    private final DeserializedToLogicalManager deserializedToLogicalManager;
+    private final DeserializedToLogicalConverterManager deserializedToLogicalConverterManager;
     private final InputsCountValidatorManager inputsCountValidatorManager;
-    private final LogicalToPhysicalManager logicalToPhysicalManager;
+    private final LogicalToPhysicalConverterManager logicalToPhysicalConverterManager;
 
     private final InvocationPlanner invocationPlanner;
     private final InvokerManager invokerManager;
@@ -48,13 +48,13 @@ public class RunnerInteractor implements Interactor {
         notNullOnAllFieldsValidatorManager.validate(deserializedOperations);
         LOG.info("Deserialized operations are valid");
         LOG.info("Converting deserialized operations to logical operations");
-        LogicalPlan logicalPlan = deserializedToLogicalManager.convert(deserializedOperations);
+        LogicalPlan logicalPlan = deserializedToLogicalConverterManager.convert(deserializedOperations);
         LOG.info("Logical Plan: " + logicalPlan);
         LOG.info("Validating if all operations have corresponding number of inputs in Logical Plan");
         inputsCountValidatorManager.validate(logicalPlan.getGraph());
         LOG.info("Logical Plan is valid");
         LOG.info("Converting logical operations to physical operations");
-        PhysicalPlan physicalPlan = logicalToPhysicalManager.convert(logicalPlan, tolerableErrorPercentage);
+        PhysicalPlan physicalPlan = logicalToPhysicalConverterManager.convert(logicalPlan, tolerableErrorPercentage);
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Creating Invocation Plan");
         InvocationPlan invocationPlan = invocationPlanner.createInvocationPlan(physicalPlan);

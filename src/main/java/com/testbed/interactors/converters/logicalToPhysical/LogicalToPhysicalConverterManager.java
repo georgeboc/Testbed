@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
-public class LogicalToPhysicalManager {
+public class LogicalToPhysicalConverterManager {
     private static final String SINK_PREFIX_ID = "sink_";
     private final Deserializer<Profile> profileDeserializer;
     @Inject

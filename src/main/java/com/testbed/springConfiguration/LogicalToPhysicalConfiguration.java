@@ -8,7 +8,7 @@ import com.testbed.interactors.converters.logicalToPhysical.GroupByLogicalToPhys
 import com.testbed.interactors.converters.logicalToPhysical.JoinLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LoadLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverter;
-import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalManager;
+import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.converters.logicalToPhysical.ProjectLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.SelectLogicalToPhysicalConverter;
 import com.testbed.interactors.converters.logicalToPhysical.UnionLogicalToPhysicalConverter;
@@ -27,8 +27,8 @@ public class LogicalToPhysicalConfiguration {
     public static final String LOGICAL_UNION = "LogicalUnion";
 
     @Bean
-    public LogicalToPhysicalManager logicalToPhysicalManager(Deserializer<Profile> profileDeserializer) {
-        return new LogicalToPhysicalManager(profileDeserializer);
+    public LogicalToPhysicalConverterManager logicalToPhysicalConverterManager(Deserializer<Profile> profileDeserializer) {
+        return new LogicalToPhysicalConverterManager(profileDeserializer);
     }
 
     @Bean
