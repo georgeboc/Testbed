@@ -14,13 +14,14 @@ import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class RunnerInteractor implements Interactor {
-    private static final Logger LOG = Logger.getLogger(RunnerInteractor.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(RunnerInteractor.class.getName());
 
     private final String pipelineFileName;
     private final String operationInstrumentationsOutputPath;
