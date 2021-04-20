@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
-    private static final String DEFAULT_PIPELINE_PATH = "parameters/pipeline.json";
+    private static final String DEFAULT_PIPELINE_PATH = "pipelines/pipeline.json";
     private static final String DEFAULT_OPERATION_INSTRUMENTATIONS_PATH = "output/operation_instrumentations.csv";
     private static final String DEFAULT_TOLERABLE_ERROR_PERCENTAGE = "5.0";
 

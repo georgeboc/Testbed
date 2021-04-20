@@ -7,6 +7,6 @@ input/**
 log/**
 mapReduceSwap/**
 output/**
-parameters/**
+pipelines/**
 target
 target/**
