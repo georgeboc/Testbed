@@ -35,24 +35,30 @@ public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
 
     @Bean
-    public InteractorFactory interactorFactory(NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager,
+    public InteractorFactory interactorFactory(Deserializer<DeserializedOperations> operationsDeserializer,
+                                               NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager,
                                                DeserializedToLogicalConverterManager deserializedToLogicalConverterManager,
                                                InputsCountValidatorManager inputsCountValidatorManager,
-                                               LogicalToPhysicalConverterManager logicalToPhysicalConverterManager) {
-        return new InteractorFactory(operationsDeserializer(),
+                                               LogicalToPhysicalConverterManager logicalToPhysicalConverterManager,
+                                               InvocationPlanner invocationPlanner,
+                                               InvokerManager invokerManager,
+                                               List<OperationInstrumentation> operationInstrumentations,
+                                               InvocationInstrumentationViewer invocationInstrumentationViewer) {
+        return new InteractorFactory(operationsDeserializer,
                 notNullOnAllFieldsValidatorManager,
                 deserializedToLogicalConverterManager,
                 inputsCountValidatorManager,
                 logicalToPhysicalConverterManager,
-                invocationPlanner(),
-                invokerManager(),
-                operationInstrumentations(),
-                invocationInstrumentationViewer());
+                invocationPlanner,
+                invokerManager,
+                operationInstrumentations,
+                invocationInstrumentationViewer);
     }
 
     @Bean
-    public Deserializer<DeserializedOperations> operationsDeserializer() {
-        return new JsonOperationsDeserializer(objectMapperWithDeserializedOperationMixin());
+    public Deserializer<DeserializedOperations> operationsDeserializer(
+            @Qualifier(OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN) ObjectMapper objectMapperWithDeserializedOperationMixin) {
+        return new JsonOperationsDeserializer(objectMapperWithDeserializedOperationMixin);
     }
 
     @Bean
@@ -79,8 +85,10 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public InvocationInstrumentationViewer invocationInstrumentationViewer() {
-        return new InvocationInstrumentationViewer(invocationInstrumentationViewCSVSerializer(), objectMapper());
+    public InvocationInstrumentationViewer invocationInstrumentationViewer(
+            CSVSerializer<InvocationInstrumentationView> invocationInstrumentationViewCSVSerializer,
+            @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE) ObjectMapper objectMapper) {
+        return new InvocationInstrumentationViewer(invocationInstrumentationViewCSVSerializer, objectMapper);
     }
 
     @Bean

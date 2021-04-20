@@ -1,7 +1,8 @@
 package com.testbed.springConfiguration;
 
 import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
+import com.testbed.boundary.invocations.instrumentation.OperationInstrumenter;
+import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.SparkIntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.spark.AggregateSparkOperation;
 import com.testbed.boundary.invocations.spark.GroupbySparkOperation;
@@ -12,10 +13,10 @@ import com.testbed.boundary.invocations.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.spark.UnionSparkOperation;
 import org.apache.spark.sql.SparkSession;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
+import javax.inject.Inject;
 
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_AGGREGATE;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_GROUP_BY;
@@ -25,79 +26,56 @@ import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHY
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SELECT;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_SINK;
 import static com.testbed.springConfiguration.OperationsConfigurationCommons.PHYSICAL_UNION;
-import static com.testbed.springConfiguration.OperationsConfigurationCommons.instrumentOperation;
 
-@Configuration
 public class SparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
     private static final String LOCAL = "local[*]";
 
+    @Inject
+    private BeanFactory beanFactory;
+
     @Bean(name = PHYSICAL_LOAD)
-    public Invokable sparkLoadInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                        List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new LoadSparkOperation(sparkSession()),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkLoadInvokable(SparkSession sparkSession) {
+        return beanFactory.getBean(OperationInstrumenter.class, new LoadSparkOperation(sparkSession));
     }
 
     @Bean(name = PHYSICAL_SELECT)
-    public Invokable sparkSelectInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                          List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new SelectSparkOperation(),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkSelectInvokable() {
+        return beanFactory.getBean(OperationInstrumenter.class, new SelectSparkOperation());
     }
 
     @Bean(name = PHYSICAL_PROJECT)
-    public Invokable sparkProjectInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                           List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new ProjectSparkOperation(),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkProjectInvokable() {
+        return beanFactory.getBean(OperationInstrumenter.class, new ProjectSparkOperation());
     }
 
     @Bean(name = PHYSICAL_JOIN)
-    public Invokable sparkJoinInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                        List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new JoinSparkOperation(),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkJoinInvokable() {
+        return beanFactory.getBean(OperationInstrumenter.class, new JoinSparkOperation());
     }
 
     @Bean(name = PHYSICAL_GROUP_BY)
-    public Invokable sparkGroupByInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                           List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new GroupbySparkOperation(),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkGroupByInvokable() {
+        return beanFactory.getBean(OperationInstrumenter.class, new GroupbySparkOperation());
     }
 
     @Bean(name = PHYSICAL_AGGREGATE)
-    public Invokable sparkAggregateInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                             List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new AggregateSparkOperation(),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkAggregateInvokable() {
+        return beanFactory.getBean(OperationInstrumenter.class, new AggregateSparkOperation());
     }
 
     @Bean(name = PHYSICAL_UNION)
-    public Invokable sparkUnionInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                         List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new UnionSparkOperation(),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkUnionInvokable() {
+        return beanFactory.getBean(OperationInstrumenter.class, new UnionSparkOperation());
     }
 
     @Bean(name = PHYSICAL_SINK)
-    public Invokable sparkSinkInvokable(SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation,
-                                        List<OperationInstrumentation> operationInstrumentations) {
-        return instrumentOperation(new SinkSparkOperation(sparkIntermediateDatasetInstrumentation),
-                sparkIntermediateDatasetInstrumentation,
-                operationInstrumentations);
+    public Invokable sparkSinkInvokable(IntermediateDatasetInstrumentation intermediateDatasetInstrumentation) {
+        return beanFactory.getBean(OperationInstrumenter.class, new SinkSparkOperation(intermediateDatasetInstrumentation));
     }
 
     @Bean
-    public SparkIntermediateDatasetInstrumentation sparkIntermediateDatasetInstrumentation() {
+    public IntermediateDatasetInstrumentation intermediateDatasetInstrumentation() {
         return new SparkIntermediateDatasetInstrumentation();
     }
 
