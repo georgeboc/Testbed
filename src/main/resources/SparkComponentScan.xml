@@ -11,11 +11,11 @@
         <context:include-filter type="assignable" expression="com.testbed.springConfiguration.ApplicationConfiguration"/>
         <context:include-filter type="assignable" expression="com.testbed.springConfiguration.DeserializedToLogicalConfiguration"/>
         <context:include-filter type="assignable" expression="com.testbed.springConfiguration.LogicalToPhysicalConfiguration"/>
-        <context:include-filter type="assignable" expression="com.testbed.springConfiguration.InstrumentedSparkInvocablesConfiguration"/>
+        <context:include-filter type="assignable" expression="com.testbed.springConfiguration.SparkInvocablesConfiguration"/>
         <context:include-filter type="assignable" expression="com.testbed.springConfiguration.ValidatorsConfiguration"/>
-        <context:include-filter type="assignable" expression="com.testbed.springConfiguration.OperationInstrumenterConfiguration"/>
         <context:exclude-filter type="assignable" expression="com.testbed.springConfiguration.InstrumentedMapReduceInvocablesConfiguration"/>
-        <context:exclude-filter type="assignable" expression="com.testbed.springConfiguration.SparkInvocablesConfiguration"/>
+        <context:exclude-filter type="assignable" expression="com.testbed.springConfiguration.InstrumentedSparkInvocablesConfiguration"/>
         <context:exclude-filter type="assignable" expression="com.testbed.springConfiguration.MapReduceInvocablesConfiguration"/>
+        <context:exclude-filter type="assignable" expression="com.testbed.springConfiguration.OperationInstrumenterConfiguration"/>
     </context:component-scan>
 </beans>

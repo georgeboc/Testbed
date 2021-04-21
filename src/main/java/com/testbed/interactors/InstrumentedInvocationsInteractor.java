@@ -6,6 +6,7 @@ import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalPlan;
 import com.testbed.entities.operations.physical.PhysicalPlan;
+import com.testbed.entities.parameters.Parameters;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverterManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
@@ -20,12 +21,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class RunnerInteractor implements Interactor {
-    private static final Logger LOG = LoggerFactory.getLogger(RunnerInteractor.class.getName());
-
-    private final String pipelineFileName;
-    private final String operationInstrumentationsOutputPath;
-    private final double tolerableErrorPercentage;
+public class InstrumentedInvocationsInteractor implements Interactor {
+    private static final Logger LOG = LoggerFactory.getLogger(InstrumentedInvocationsInteractor.class.getName());
 
     private final Deserializer<DeserializedOperations> operationsDeserializer;
     private final NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager;
@@ -41,9 +38,9 @@ public class RunnerInteractor implements Interactor {
     private final InvocationInstrumentationViewer invocationInstrumentationViewer;
 
     @Override
-    public void execute() {
-        LOG.info("Deserializing operations from pipeline whose filename is: " + pipelineFileName);
-        DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(pipelineFileName);
+    public void execute(final Parameters parameters) {
+        LOG.info("Deserializing operations from pipeline whose filename is: " + parameters.getPipelineFileName());
+        DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(parameters.getPipelineFileName());
         LOG.info("Deserialized pipeline: " + deserializedOperations);
         LOG.info("Validating if deserialized operations have values for all fields");
         notNullOnAllFieldsValidatorManager.validate(deserializedOperations);
@@ -55,15 +52,15 @@ public class RunnerInteractor implements Interactor {
         inputsCountValidatorManager.validate(logicalPlan.getGraph());
         LOG.info("Logical Plan is valid");
         LOG.info("Converting logical operations to physical operations");
-        PhysicalPlan physicalPlan = logicalToPhysicalConverterManager.convert(logicalPlan, tolerableErrorPercentage);
+        PhysicalPlan physicalPlan = logicalToPhysicalConverterManager.convert(logicalPlan, parameters.getTolerableErrorPercentage());
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Creating Invocation Plan");
         InvocationPlan invocationPlan = invocationPlanner.createInvocationPlan(physicalPlan);
         LOG.info("Created Invocation Plan: " + invocationPlan);
         LOG.info("Invoking Invocation Plan");
-        invokerManager.invoke(invocationPlan, tolerableErrorPercentage);
+        invokerManager.invoke(invocationPlan, parameters.getTolerableErrorPercentage());
         LOG.info("Operation Instrumentations after invocations: " + operationInstrumentations);
-        LOG.info("Viewing Operation Instrumentations to " + operationInstrumentationsOutputPath);
-        invocationInstrumentationViewer.view(operationInstrumentationsOutputPath, operationInstrumentations);
+        LOG.info("Viewing Operation Instrumentations to " + parameters.getOutputPath());
+        invocationInstrumentationViewer.view(parameters.getOutputPath(), operationInstrumentations);
     }
 }

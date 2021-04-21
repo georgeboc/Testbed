@@ -19,6 +19,7 @@ import static com.testbed.boundary.invocations.OperationsConstants.SINK;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.PATH_PREFIX;
 import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.VERBOSE;
 
+//TODO: Drop implementation
 @RequiredArgsConstructor
 public class SinkDebugMapReduceOperation implements Operation {
     private static final int FIRST = 0;

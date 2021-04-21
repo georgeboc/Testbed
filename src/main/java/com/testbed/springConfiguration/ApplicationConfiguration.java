@@ -14,7 +14,9 @@ import com.testbed.boundary.serializers.CSVSerializer;
 import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.profiles.Profile;
-import com.testbed.interactors.InteractorFactory;
+import com.testbed.interactors.InstrumentedInvocationsInteractor;
+import com.testbed.interactors.Interactor;
+import com.testbed.interactors.TimedInvocationsInteractor;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverterManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
@@ -33,18 +35,21 @@ import java.util.List;
 public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
+    private static final String INSTRUMENTED = "INSTRUMENTED";
+    private static final String TESTED = "TESTED";
 
     @Bean
-    public InteractorFactory interactorFactory(Deserializer<DeserializedOperations> operationsDeserializer,
-                                               NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager,
-                                               DeserializedToLogicalConverterManager deserializedToLogicalConverterManager,
-                                               InputsCountValidatorManager inputsCountValidatorManager,
-                                               LogicalToPhysicalConverterManager logicalToPhysicalConverterManager,
-                                               InvocationPlanner invocationPlanner,
-                                               InvokerManager invokerManager,
-                                               List<OperationInstrumentation> operationInstrumentations,
-                                               InvocationInstrumentationViewer invocationInstrumentationViewer) {
-        return new InteractorFactory(operationsDeserializer,
+    @Qualifier(INSTRUMENTED)
+    public Interactor instrumentedInvocationsInteractor(Deserializer<DeserializedOperations> operationsDeserializer,
+                                                        NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager,
+                                                        DeserializedToLogicalConverterManager deserializedToLogicalConverterManager,
+                                                        InputsCountValidatorManager inputsCountValidatorManager,
+                                                        LogicalToPhysicalConverterManager logicalToPhysicalConverterManager,
+                                                        InvocationPlanner invocationPlanner,
+                                                        InvokerManager invokerManager,
+                                                        List<OperationInstrumentation> operationInstrumentations,
+                                                        InvocationInstrumentationViewer invocationInstrumentationViewer) {
+        return new InstrumentedInvocationsInteractor(operationsDeserializer,
                 notNullOnAllFieldsValidatorManager,
                 deserializedToLogicalConverterManager,
                 inputsCountValidatorManager,
@@ -53,6 +58,12 @@ public class ApplicationConfiguration {
                 invokerManager,
                 operationInstrumentations,
                 invocationInstrumentationViewer);
+    }
+
+    @Bean
+    @Qualifier(TESTED)
+    public Interactor timedInvocationsInteractor() {
+        return new TimedInvocationsInteractor();
     }
 
     @Bean

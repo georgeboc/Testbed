@@ -1,5 +1,7 @@
 package com.testbed.interactors;
 
+import com.testbed.entities.parameters.Parameters;
+
 public interface Interactor {
-    void execute() throws Exception;
+    void execute(Parameters parameters) throws Exception;
 }

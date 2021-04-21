@@ -12,15 +12,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 @Configuration
-public class OperationsConfigurationCommons {
-    public static final String PHYSICAL_LOAD = "PhysicalLoad";
-    public static final String PHYSICAL_SELECT = "PhysicalSelect";
-    public static final String PHYSICAL_PROJECT = "PhysicalProject";
-    public static final String PHYSICAL_JOIN = "PhysicalJoin";
-    public static final String PHYSICAL_GROUP_BY = "PhysicalGroupBy";
-    public static final String PHYSICAL_AGGREGATE = "PhysicalAggregate";
-    public static final String PHYSICAL_UNION = "PhysicalUnion";
-    public static final String PHYSICAL_SINK = "PhysicalSink";
+public class OperationInstrumenterConfiguration {
     private static final String WITH_LATE_INITIALIZATION = "prototype";
 
     @Inject
