@@ -24,39 +24,14 @@ import java.util.List;
 public class InstrumentedInvocationsInteractor implements Interactor {
     private static final Logger LOG = LoggerFactory.getLogger(InstrumentedInvocationsInteractor.class.getName());
 
-    private final Deserializer<DeserializedOperations> operationsDeserializer;
-    private final NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager;
-    private final DeserializedToLogicalConverterManager deserializedToLogicalConverterManager;
-    private final InputsCountValidatorManager inputsCountValidatorManager;
-    private final LogicalToPhysicalConverterManager logicalToPhysicalConverterManager;
-
-    private final InvocationPlanner invocationPlanner;
+    private final InteractorCommons interactorCommons;
     private final InvokerManager invokerManager;
-
     private final List<OperationInstrumentation> operationInstrumentations;
-
     private final InvocationInstrumentationViewer invocationInstrumentationViewer;
 
     @Override
     public void execute(final Parameters parameters) {
-        LOG.info("Deserializing operations from pipeline whose filename is: " + parameters.getPipelineFileName());
-        DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(parameters.getPipelineFileName());
-        LOG.info("Deserialized pipeline: " + deserializedOperations);
-        LOG.info("Validating if deserialized operations have values for all fields");
-        notNullOnAllFieldsValidatorManager.validate(deserializedOperations);
-        LOG.info("Deserialized operations are valid");
-        LOG.info("Converting deserialized operations to logical operations");
-        LogicalPlan logicalPlan = deserializedToLogicalConverterManager.convert(deserializedOperations);
-        LOG.info("Logical Plan: " + logicalPlan);
-        LOG.info("Validating if all operations have corresponding number of inputs in Logical Plan");
-        inputsCountValidatorManager.validate(logicalPlan.getGraph());
-        LOG.info("Logical Plan is valid");
-        LOG.info("Converting logical operations to physical operations");
-        PhysicalPlan physicalPlan = logicalToPhysicalConverterManager.convert(logicalPlan, parameters.getTolerableErrorPercentage());
-        LOG.info("Physical Plan: " + physicalPlan);
-        LOG.info("Creating Invocation Plan");
-        InvocationPlan invocationPlan = invocationPlanner.createInvocationPlan(physicalPlan);
-        LOG.info("Created Invocation Plan: " + invocationPlan);
+        InvocationPlan invocationPlan = interactorCommons.createInvocationPlan(parameters);
         LOG.info("Invoking Invocation Plan");
         invokerManager.invoke(invocationPlan, parameters.getTolerableErrorPercentage());
         LOG.info("Operation Instrumentations after invocations: " + operationInstrumentations);

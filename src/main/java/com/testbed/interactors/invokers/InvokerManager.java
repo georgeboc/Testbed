@@ -1,6 +1,7 @@
 package com.testbed.interactors.invokers;
 
 import com.clearspring.analytics.util.Lists;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
@@ -22,10 +23,20 @@ public class InvokerManager {
     @Inject
     private ApplicationContext applicationContext;
 
-    public void invoke(final InvocationPlan invocationPlan, final double tolerableErrorPercentage) {
+    public Stopwatch invoke(final InvocationPlan invocationPlan, final double tolerableErrorPercentage) {
         Stream<Invokable> invokableStream = getInvokableStream(invocationPlan.getOperationInvocations());
         Stream<OperationInvocation> operationInvocationStream = invocationPlan.getOperationInvocations().stream();
         Stack<IntermediateDataset> intermediateDataset = new Stack<>();
+        Stopwatch stopWatch = Stopwatch.createStarted();
+        invokeOperations(tolerableErrorPercentage, invokableStream, operationInvocationStream, intermediateDataset);
+        stopWatch.stop();
+        return stopWatch;
+    }
+
+    private void invokeOperations(double tolerableErrorPercentage,
+                                  Stream<Invokable> invokableStream,
+                                  Stream<OperationInvocation> operationInvocationStream,
+                                  Stack<IntermediateDataset> intermediateDataset) {
         Streams.forEachPair(invokableStream,
                 operationInvocationStream,
                 (invokable, operationInvocation) -> invokeOperation(invokable,

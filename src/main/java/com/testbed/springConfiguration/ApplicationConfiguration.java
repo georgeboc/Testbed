@@ -16,6 +16,7 @@ import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.interactors.InstrumentedInvocationsInteractor;
 import com.testbed.interactors.Interactor;
+import com.testbed.interactors.InteractorCommons;
 import com.testbed.interactors.TimedInvocationsInteractor;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverterManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
@@ -39,22 +40,27 @@ public class ApplicationConfiguration {
     public static final String TIMED = "TIMED";
 
     @Bean
-    @Qualifier(INSTRUMENTED)
-    public Interactor instrumentedInvocationsInteractor(Deserializer<DeserializedOperations> operationsDeserializer,
-                                                        NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager,
-                                                        DeserializedToLogicalConverterManager deserializedToLogicalConverterManager,
-                                                        InputsCountValidatorManager inputsCountValidatorManager,
-                                                        LogicalToPhysicalConverterManager logicalToPhysicalConverterManager,
-                                                        InvocationPlanner invocationPlanner,
-                                                        InvokerManager invokerManager,
-                                                        List<OperationInstrumentation> operationInstrumentations,
-                                                        InvocationInstrumentationViewer invocationInstrumentationViewer) {
-        return new InstrumentedInvocationsInteractor(operationsDeserializer,
+    public InteractorCommons interactorCommons(Deserializer<DeserializedOperations> operationsDeserializer,
+                                               NotNullOnAllFieldsValidatorManager notNullOnAllFieldsValidatorManager,
+                                               DeserializedToLogicalConverterManager deserializedToLogicalConverterManager,
+                                               InputsCountValidatorManager inputsCountValidatorManager,
+                                               LogicalToPhysicalConverterManager logicalToPhysicalConverterManager,
+                                               InvocationPlanner invocationPlanner) {
+        return new InteractorCommons(operationsDeserializer,
                 notNullOnAllFieldsValidatorManager,
                 deserializedToLogicalConverterManager,
                 inputsCountValidatorManager,
                 logicalToPhysicalConverterManager,
-                invocationPlanner,
+                invocationPlanner);
+    }
+
+    @Bean
+    @Qualifier(INSTRUMENTED)
+    public Interactor instrumentedInvocationsInteractor(InteractorCommons interactorCommons,
+                                                        InvokerManager invokerManager,
+                                                        List<OperationInstrumentation> operationInstrumentations,
+                                                        InvocationInstrumentationViewer invocationInstrumentationViewer) {
+        return new InstrumentedInvocationsInteractor(interactorCommons,
                 invokerManager,
                 operationInstrumentations,
                 invocationInstrumentationViewer);
@@ -62,8 +68,8 @@ public class ApplicationConfiguration {
 
     @Bean
     @Qualifier(TIMED)
-    public Interactor timedInvocationsInteractor() {
-        return new TimedInvocationsInteractor();
+    public Interactor timedInvocationsInteractor(InteractorCommons interactorCommons, InvokerManager invokerManager) {
+        return new TimedInvocationsInteractor(interactorCommons, invokerManager);
     }
 
     @Bean
