@@ -11,6 +11,7 @@ import com.testbed.boundary.invocations.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.spark.UnionSparkOperation;
 import org.apache.spark.sql.SparkSession;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
@@ -26,42 +27,50 @@ public class SparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
     private static final String LOCAL = "local[*]";
 
-    @Bean(name = PHYSICAL_LOAD)
+    @Bean
+    @Qualifier(PHYSICAL_LOAD)
     public Invokable sparkLoadInvokable(SparkSession sparkSession) {
         return new LoadSparkOperation(sparkSession);
     }
 
-    @Bean(name = PHYSICAL_SELECT)
+    @Bean
+    @Qualifier(PHYSICAL_SELECT)
     public Invokable sparkSelectInvokable() {
         return new SelectSparkOperation();
     }
 
-    @Bean(name = PHYSICAL_PROJECT)
+    @Bean
+    @Qualifier(PHYSICAL_PROJECT)
     public Invokable sparkProjectInvokable() {
         return new ProjectSparkOperation();
     }
 
-    @Bean(name = PHYSICAL_JOIN)
+    @Bean
+    @Qualifier(PHYSICAL_JOIN)
     public Invokable sparkJoinInvokable() {
         return new JoinSparkOperation();
     }
 
-    @Bean(name = PHYSICAL_GROUP_BY)
+    @Bean
+    @Qualifier(PHYSICAL_GROUP_BY)
     public Invokable sparkGroupByInvokable() {
         return new GroupbySparkOperation();
     }
 
-    @Bean(name = PHYSICAL_AGGREGATE)
+    @Bean
+    @Qualifier(PHYSICAL_AGGREGATE)
     public Invokable sparkAggregateInvokable() {
         return new AggregateSparkOperation();
     }
 
-    @Bean(name = PHYSICAL_UNION)
+    @Bean
+    @Qualifier(PHYSICAL_UNION)
     public Invokable sparkUnionInvokable() {
         return new UnionSparkOperation();
     }
 
-    @Bean(name = PHYSICAL_SINK)
+    @Bean
+    @Qualifier(PHYSICAL_SINK)
     public Invokable sparkSinkInvokable(IntermediateDatasetInstrumentation intermediateDatasetInstrumentation) {
         return new SinkSparkOperation(intermediateDatasetInstrumentation);
     }

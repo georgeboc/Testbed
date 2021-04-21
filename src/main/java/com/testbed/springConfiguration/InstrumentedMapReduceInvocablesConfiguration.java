@@ -17,6 +17,7 @@ import com.testbed.boundary.invocations.mapReduce.UnionMapReduceOperation;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 
 import javax.inject.Inject;
@@ -35,52 +36,60 @@ public class InstrumentedMapReduceInvocablesConfiguration {
     @Inject
     private BeanFactory beanFactory;
 
-    @Bean(name = PHYSICAL_LOAD)
+    @Bean
+    @Qualifier(PHYSICAL_LOAD)
     public Invokable mapReduceLoadInvokable() {
         return beanFactory.getBean(OperationInstrumenter.class, new LoadMapReduceOperation());
     }
 
-    @Bean(name = PHYSICAL_SELECT)
+    @Bean
+    @Qualifier(PHYSICAL_SELECT)
     public Invokable mapReduceSelectInvokable(JobConfigurationCommons jobConfigurationCommons,
                                               ParquetSchemaReader parquetSchemaReader) {
         return beanFactory.getBean(OperationInstrumenter.class, new SelectMapReduceOperation(jobConfigurationCommons,
                 parquetSchemaReader));
     }
 
-    @Bean(name = PHYSICAL_PROJECT)
+    @Bean
+    @Qualifier(PHYSICAL_PROJECT)
     public Invokable mapReduceProjectInvokable(JobConfigurationCommons jobConfigurationCommons,
                                                ParquetSchemaReader parquetSchemaReader) {
         return beanFactory.getBean(OperationInstrumenter.class, new ProjectMapReduceOperation(jobConfigurationCommons,
                 parquetSchemaReader));
     }
 
-    @Bean(name = PHYSICAL_GROUP_BY)
+    @Bean
+    @Qualifier(PHYSICAL_GROUP_BY)
     public Invokable mapReduceGroupByInvokable(JobConfigurationCommons jobConfigurationCommons,
                                                ParquetSchemaReader parquetSchemaReader) {
         return beanFactory.getBean(OperationInstrumenter.class, new GroupByMapReduceOperation(jobConfigurationCommons,
                 parquetSchemaReader));
     }
 
-    @Bean(name = PHYSICAL_AGGREGATE)
+    @Bean
+    @Qualifier(PHYSICAL_AGGREGATE)
     public Invokable mapReduceAggregateInvokable(JobConfigurationCommons jobConfigurationCommons) {
         return beanFactory.getBean(OperationInstrumenter.class, new SumAggregateMapReduceOperation(jobConfigurationCommons));
     }
 
-    @Bean(name = PHYSICAL_JOIN)
+    @Bean
+    @Qualifier(PHYSICAL_JOIN)
     public Invokable mapReduceJoinInvokable(JobConfigurationCommons jobConfigurationCommons,
                                             ParquetSchemaReader parquetSchemaReader) {
         return beanFactory.getBean(OperationInstrumenter.class, new JoinMapReduceOperation(jobConfigurationCommons,
                 parquetSchemaReader));
     }
 
-    @Bean(name = PHYSICAL_UNION)
+    @Bean
+    @Qualifier(PHYSICAL_UNION)
     public Invokable mapReduceUnionInvokable(JobConfigurationCommons jobConfigurationCommons,
                                              ParquetSchemaReader parquetSchemaReader) {
         return beanFactory.getBean(OperationInstrumenter.class, new UnionMapReduceOperation(jobConfigurationCommons,
                 parquetSchemaReader));
     }
 
-    @Bean(name = PHYSICAL_SINK)
+    @Bean
+    @Qualifier(PHYSICAL_SINK)
     public Invokable mapReduceSinkInvokable(JobConfigurationCommons jobConfigurationCommons) {
         return beanFactory.getBean(OperationInstrumenter.class, new SinkDebugMapReduceOperation(jobConfigurationCommons));
     }
