@@ -8,19 +8,21 @@ import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.Int
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.SparkIntermediateDatasetInstrumentation;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 
 import static com.testbed.boundary.invocations.OperationsConstants.SINK;
 
 @RequiredArgsConstructor
 public class SinkSparkOperation implements Operation {
-    private final IntermediateDatasetInstrumentation intermediateDatasetInstrumentation;
     @Getter
     private final String name = SINK;
 
     @Override
     public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
-        intermediateDatasetInstrumentation.count(inputIntermediateDataset);
+        Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
+        inputDataset.count();
         return new NoIntermediateDataset();
     }
 }

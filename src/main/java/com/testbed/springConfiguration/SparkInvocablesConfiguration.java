@@ -71,8 +71,8 @@ public class SparkInvocablesConfiguration {
 
     @Bean
     @Qualifier(PHYSICAL_SINK)
-    public Invokable sparkSinkInvokable(IntermediateDatasetInstrumentation intermediateDatasetInstrumentation) {
-        return new SinkSparkOperation(intermediateDatasetInstrumentation);
+    public Invokable sparkSinkInvokable() {
+        return new SinkSparkOperation();
     }
 
     @Bean

@@ -1,5 +1,6 @@
 package com.testbed.interactors;
 
+import com.testbed.boundary.configurations.FrameworkConfiguration;
 import com.testbed.boundary.parameters.ParametersParserFactory;
 import com.testbed.entities.parameters.Parameters;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,13 @@ public class Application {
         Parameters parameters = ParametersParserFactory.getParametersParser().getParameters(arguments);
         LOG.info("Parameters parsed: " + parameters);
         LOG.info("Initializing application");
-        ApplicationContext context = new ClassPathXmlApplicationContext(parameters.getConfiguration().getConfigurationFile());
+        FrameworkConfiguration frameworkConfiguration = parameters.getFrameworkConfiguration();
+        ApplicationContext context = new ClassPathXmlApplicationContext(frameworkConfiguration.getConfigurationFile());
         LOG.info("Application successfully initialized");
         LOG.info("Creating selected interactor");
         Interactor interactor = BeanFactoryAnnotationUtils.qualifiedBeanOfType(context.getAutowireCapableBeanFactory(),
                 Interactor.class,
-                parameters.getConfiguration().toString());
+                parameters.getFrameworkConfiguration().getInteractorType());
         LOG.info("Executing selected interactor");
         interactor.execute(parameters);
         LOG.info("Interactor executed successfully");

@@ -35,8 +35,8 @@ import java.util.List;
 public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
-    private static final String INSTRUMENTED = "INSTRUMENTED";
-    private static final String TESTED = "TESTED";
+    public static final String INSTRUMENTED = "INSTRUMENTED";
+    public static final String TIMED = "TIMED";
 
     @Bean
     @Qualifier(INSTRUMENTED)
@@ -61,7 +61,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    @Qualifier(TESTED)
+    @Qualifier(TIMED)
     public Interactor timedInvocationsInteractor() {
         return new TimedInvocationsInteractor();
     }
