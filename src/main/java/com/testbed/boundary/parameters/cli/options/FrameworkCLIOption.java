@@ -1,7 +1,7 @@
 package com.testbed.boundary.parameters.cli.options;
 
 import com.testbed.boundary.configurations.FrameworkConfiguration;
-import com.testbed.entities.parameters.Parameters;
+import com.testbed.entities.parameters.InputParameters;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
@@ -24,8 +24,8 @@ public class FrameworkCLIOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, Parameters.ParametersBuilder parametersBuilder) {
+    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
         String parsedFrameworkConfiguration = commandLine.getOptionValue(FRAMEWORK_CONFIGURATION);
-        parametersBuilder.frameworkConfiguration(FrameworkConfiguration.valueOf(parsedFrameworkConfiguration));
+        inputParametersBuilder.frameworkConfiguration(FrameworkConfiguration.valueOf(parsedFrameworkConfiguration));
     }
 }

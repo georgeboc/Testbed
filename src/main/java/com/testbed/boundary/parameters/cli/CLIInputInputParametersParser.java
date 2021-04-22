@@ -1,8 +1,8 @@
 package com.testbed.boundary.parameters.cli;
 
-import com.testbed.boundary.parameters.ParametersParser;
+import com.testbed.boundary.parameters.InputParametersParser;
 import com.testbed.boundary.parameters.cli.options.CLIOption;
-import com.testbed.entities.parameters.Parameters;
+import com.testbed.entities.parameters.InputParameters;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -13,7 +13,7 @@ import org.apache.commons.cli.ParseException;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class CLIParametersParser implements ParametersParser {
+public class CLIInputInputParametersParser implements InputParametersParser {
     private static final String COMMAND_LINE_SYNTAX = "java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar [options]";
     private final List<CLIOption> cliOptions;
     private final Options options;
@@ -21,12 +21,12 @@ public class CLIParametersParser implements ParametersParser {
     private final HelpFormatter helpFormatter;
 
     @Override
-    public Parameters getParameters(String[] arguments) {
+    public InputParameters getParameters(String[] arguments) {
         cliOptions.forEach(cliOption -> options.addOption(cliOption.getOption()));
         CommandLine commandLine = tryParseArguments(arguments);
-        Parameters.ParametersBuilder parametersBuilder = Parameters.builder();
-        cliOptions.forEach(cliOption -> cliOption.addParameter(commandLine, parametersBuilder));
-        return parametersBuilder.build();
+        InputParameters.InputParametersBuilder inputParametersBuilder = InputParameters.builder();
+        cliOptions.forEach(cliOption -> cliOption.addParameter(commandLine, inputParametersBuilder));
+        return inputParametersBuilder.build();
     }
 
     private CommandLine tryParseArguments(String[] arguments) {

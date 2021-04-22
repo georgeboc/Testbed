@@ -1,6 +1,7 @@
 package com.testbed.springConfiguration;
 
 import com.clearspring.analytics.util.Lists;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.testbed.boundary.deserializers.AvroProfileDeserializer;
@@ -10,7 +11,8 @@ import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
-import com.testbed.boundary.serializers.CSVSerializer;
+import com.testbed.boundary.writers.SpreadsheetWriter;
+import com.testbed.boundary.writers.XLSXSpreadsheetWriter;
 import com.testbed.entities.operations.deserialized.DeserializedOperation;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.profiles.Profile;
@@ -25,19 +27,22 @@ import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
-import com.testbed.views.InvocationInstrumentationView;
+import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
 import java.util.List;
 
 @Configuration
 public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
+    private static final String OBJECT_MAPPER = "objectMapper";
     public static final String INSTRUMENTED = "INSTRUMENTED";
     public static final String TIMED = "TIMED";
+    private static final boolean DISABLED = false;
 
     @Bean
     public InteractorCommons interactorCommons(Deserializer<DeserializedOperations> operationsDeserializer,
@@ -59,11 +64,13 @@ public class ApplicationConfiguration {
     public Interactor instrumentedInvocationsInteractor(InteractorCommons interactorCommons,
                                                         InvokerManager invokerManager,
                                                         List<OperationInstrumentation> operationInstrumentations,
-                                                        InvocationInstrumentationViewer invocationInstrumentationViewer) {
+                                                        InvocationInstrumentationViewer invocationInstrumentationViewer,
+                                                        ObjectMapper objectMapper) {
         return new InstrumentedInvocationsInteractor(interactorCommons,
                 invokerManager,
                 operationInstrumentations,
-                invocationInstrumentationViewer);
+                invocationInstrumentationViewer,
+                objectMapper);
     }
 
     @Bean
@@ -102,15 +109,22 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public InvocationInstrumentationViewer invocationInstrumentationViewer(
-            CSVSerializer<InvocationInstrumentationView> invocationInstrumentationViewCSVSerializer,
+    public InvocationInstrumentationViewer invocationInstrumentationViewer(SpreadsheetWriter spreadsheetWriter,
             @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE) ObjectMapper objectMapper) {
-        return new InvocationInstrumentationViewer(invocationInstrumentationViewCSVSerializer, objectMapper);
+        return new InvocationInstrumentationViewer(spreadsheetWriter, objectMapper);
+    }
+
+    @Bean
+    @Qualifier(OBJECT_MAPPER)
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, DISABLED);
+        return objectMapper;
     }
 
     @Bean
     @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE)
-    public ObjectMapper objectMapper() {
+    public ObjectMapper objectMapperWithJavaTimeModule() {
         return JsonMapper.builder().build();
     }
 
@@ -120,8 +134,18 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public CSVSerializer<InvocationInstrumentationView> invocationInstrumentationViewCSVSerializer() {
-        return new CSVSerializer<>(InvocationInstrumentationView.class);
+    public SpreadsheetWriter spreadsheetWriter(FileSystem fileSystem) {
+        return new XLSXSpreadsheetWriter(fileSystem);
+    }
+
+    @Bean
+    public FileSystem fileSystem(org.apache.hadoop.conf.Configuration configuration) throws IOException {
+        return FileSystem.get(configuration);
+    }
+
+    @Bean
+    public org.apache.hadoop.conf.Configuration configuration() {
+        return new org.apache.hadoop.conf.Configuration();
     }
 
     @Bean

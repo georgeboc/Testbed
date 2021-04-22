@@ -1,6 +1,6 @@
 package com.testbed.boundary.parameters.cli.options;
 
-import com.testbed.entities.parameters.Parameters;
+import com.testbed.entities.parameters.InputParameters;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.lang3.StringUtils;
@@ -23,10 +23,10 @@ public class TolerableErrorPercentageCLIOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, Parameters.ParametersBuilder parametersBuilder) {
+    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
         String parsedTolerableErrorPercentage = commandLine.getOptionValue(TOLERABLE_ERROR_PERCENTAGE);
         String tolerableErrorPercentageString = StringUtils.defaultString(parsedTolerableErrorPercentage,
                 DEFAULT_TOLERABLE_ERROR_PERCENTAGE);
-        parametersBuilder.tolerableErrorPercentage(Double.parseDouble(tolerableErrorPercentageString));
+        inputParametersBuilder.tolerableErrorPercentage(Double.parseDouble(tolerableErrorPercentageString));
     }
 }

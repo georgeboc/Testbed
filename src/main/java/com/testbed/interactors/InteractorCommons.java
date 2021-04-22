@@ -5,7 +5,7 @@ import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import com.testbed.entities.operations.logical.LogicalPlan;
 import com.testbed.entities.operations.physical.PhysicalPlan;
-import com.testbed.entities.parameters.Parameters;
+import com.testbed.entities.parameters.InputParameters;
 import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLogicalConverterManager;
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
@@ -27,9 +27,9 @@ public class InteractorCommons {
 
     private final InvocationPlanner invocationPlanner;
 
-    public InvocationPlan createInvocationPlan(final Parameters parameters) {
-        LOG.info("Deserializing operations from pipeline whose filename is: " + parameters.getPipelineFileName());
-        DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(parameters.getPipelineFileName());
+    public InvocationPlan createInvocationPlan(final InputParameters inputParameters) {
+        LOG.info("Deserializing operations from pipeline whose filename is: " + inputParameters.getPipelineFileName());
+        DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(inputParameters.getPipelineFileName());
         LOG.info("Deserialized pipeline: " + deserializedOperations);
         LOG.info("Validating if deserialized operations have values for all fields");
         notNullOnAllFieldsValidatorManager.validate(deserializedOperations);
@@ -41,7 +41,7 @@ public class InteractorCommons {
         inputsCountValidatorManager.validate(logicalPlan.getGraph());
         LOG.info("Logical Plan is valid");
         LOG.info("Converting logical operations to physical operations");
-        PhysicalPlan physicalPlan = logicalToPhysicalConverterManager.convert(logicalPlan, parameters.getTolerableErrorPercentage());
+        PhysicalPlan physicalPlan = logicalToPhysicalConverterManager.convert(logicalPlan, inputParameters.getTolerableErrorPercentage());
         LOG.info("Physical Plan: " + physicalPlan);
         LOG.info("Creating Invocation Plan");
         InvocationPlan invocationPlan = invocationPlanner.createInvocationPlan(physicalPlan);

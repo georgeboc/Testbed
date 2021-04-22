@@ -1,6 +1,6 @@
 package com.testbed.boundary.parameters.cli.options;
 
-import com.testbed.entities.parameters.Parameters;
+import com.testbed.entities.parameters.InputParameters;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
@@ -20,7 +20,7 @@ public class PipelineCLIOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, Parameters.ParametersBuilder parametersBuilder) {
-        parametersBuilder.pipelineFileName(commandLine.getOptionValue(PIPELINE));
+    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
+        inputParametersBuilder.pipelineFileName(commandLine.getOptionValue(PIPELINE));
     }
 }

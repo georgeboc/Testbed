@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Parameters {
+public class InputParameters {
     private final String pipelineFileName;
     private final String outputPath;
-    private final String tabName;
+    private final String sheetName;
     private final double tolerableErrorPercentage;
     private final FrameworkConfiguration frameworkConfiguration;
 }

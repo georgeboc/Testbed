@@ -2,7 +2,7 @@ package com.testbed.interactors;
 
 import com.google.common.base.Stopwatch;
 import com.testbed.entities.invocations.InvocationPlan;
-import com.testbed.entities.parameters.Parameters;
+import com.testbed.entities.parameters.InputParameters;
 import com.testbed.interactors.invokers.InvokerManager;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,10 +18,10 @@ public class TimedInvocationsInteractor implements Interactor {
     private final InvokerManager invokerManager;
 
     @Override
-    public void execute(final Parameters parameters) {
-        InvocationPlan invocationPlan = interactorCommons.createInvocationPlan(parameters);
+    public void execute(final InputParameters inputParameters) {
+        InvocationPlan invocationPlan = interactorCommons.createInvocationPlan(inputParameters);
         LOG.info("Invoking Invocation Plan");
-        Stopwatch stopwatchedInvocations = invokerManager.invoke(invocationPlan, parameters.getTolerableErrorPercentage());
+        Stopwatch stopwatchedInvocations = invokerManager.invoke(invocationPlan, inputParameters.getTolerableErrorPercentage());
         LOG.info("Invocations finished in {} ns", stopwatchedInvocations.elapsed(TimeUnit.NANOSECONDS));
     }
 }

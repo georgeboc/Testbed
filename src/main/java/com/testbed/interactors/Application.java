@@ -1,8 +1,8 @@
 package com.testbed.interactors;
 
 import com.testbed.boundary.configurations.FrameworkConfiguration;
-import com.testbed.boundary.parameters.ParametersParserFactory;
-import com.testbed.entities.parameters.Parameters;
+import com.testbed.boundary.parameters.InputParametersParserFactory;
+import com.testbed.entities.parameters.InputParameters;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,18 +16,18 @@ public class Application {
 
     public void run(String[] arguments) throws Exception {
         LOG.info("Parsing parameters");
-        Parameters parameters = ParametersParserFactory.getParametersParser().getParameters(arguments);
-        LOG.info("Parameters parsed: " + parameters);
+        InputParameters inputParameters = InputParametersParserFactory.getParametersParser().getParameters(arguments);
+        LOG.info("Parameters parsed: " + inputParameters);
         LOG.info("Initializing application");
-        FrameworkConfiguration frameworkConfiguration = parameters.getFrameworkConfiguration();
+        FrameworkConfiguration frameworkConfiguration = inputParameters.getFrameworkConfiguration();
         ApplicationContext context = new ClassPathXmlApplicationContext(frameworkConfiguration.getConfigurationFile());
         LOG.info("Application successfully initialized");
         LOG.info("Creating selected interactor");
         Interactor interactor = BeanFactoryAnnotationUtils.qualifiedBeanOfType(context.getAutowireCapableBeanFactory(),
                 Interactor.class,
-                parameters.getFrameworkConfiguration().getInteractorType());
+                inputParameters.getFrameworkConfiguration().getInteractorType());
         LOG.info("Executing selected interactor");
-        interactor.execute(parameters);
+        interactor.execute(inputParameters);
         LOG.info("Interactor executed successfully");
         LOG.info("Application finished successfully");
     }

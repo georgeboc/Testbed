@@ -27,7 +27,7 @@ Where `[options]` are the following:
                                         InstrumentedSpark]
 -o,--output <arg>                       Output file path
 -p,--pipeline <arg>                     Pipeline file path
--t,--tab-name <arg>                     Tab name in output file path
+-s,--sheet-name <arg>                   Sheet name in output file path
 ```
 
 This section is extracted from usage, which can always be displayed when invoking
@@ -54,14 +54,14 @@ The pipeline refers to a JSON file with the following aspect:
 ]
 ```
 
-An example of invocation with parameters is the following:
+An example of invocation with inputParameters is the following:
 ```bash
 $ java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar \
 --tolerable-error-percentage 5.0 \
 --framework-configuration InstrumentedMapReduce \
 --pipeline pipelines/pipeline.json \
---output output/operation_instrumentations.csv \
---tab-name Dataset_5%
+--output output/operation_instrumentations.xlsx \
+--sheet-name Dataset_5%
 ```
 
 [comment]: # (TODO: Add link)
