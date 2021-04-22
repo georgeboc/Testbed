@@ -16,12 +16,12 @@ import static java.lang.Math.min;
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
 public class TimedInvocationsViewer {
-    private static final String FRAMEWORK_NAME = "Framework Name";
+    private static final String EMPTY = "";
     private static final String FIRST_INVOCATION_TIME = "First invocation time (ns)";
     private static final String SECOND_INVOCATION_TIME = "Second invocation time (ns)";
     private static final String THIRD_INVOCATION_TIME = "Third invocation time (ns)";
     private static final String MEDIAN_INVOCATION_TIME = "Median invocation time (ns)";
-    private static final String[] HEADERS = {FRAMEWORK_NAME,
+    private static final String[] HEADERS = {EMPTY,
             FIRST_INVOCATION_TIME, SECOND_INVOCATION_TIME, THIRD_INVOCATION_TIME, MEDIAN_INVOCATION_TIME};
     private static final int FIRST_COLUMN = 0;
     private static final int LATERAL_HEADER_COLUMN = 0;
@@ -31,7 +31,7 @@ public class TimedInvocationsViewer {
     private static final int MAPREDUCE_ROW = 1;
     private static final int SPARK_ROW = 2;
     private static final String TOP_HEADER_COLOR_NAME = "LIME";
-    private static final String LATERAL_HEADER_COLOR_NAME = "LIGHT_GREEN";
+    private static final String LATERAL_HEADER_COLOR_NAME = "LIME";
     private static final String FORMULA_FORMAT = "MEDIAN(VALUE(B%1$s),VALUE(C%1$s),VALUE(D%1$s))";
 
     private final SpreadsheetWriter spreadsheetWriter;
