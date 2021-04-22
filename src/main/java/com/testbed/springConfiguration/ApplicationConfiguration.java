@@ -26,7 +26,8 @@ import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
-import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
+import com.testbed.interactors.viewers.InstrumentatedInvocationsViewer;
+import com.testbed.interactors.viewers.TimedInvocationsViewer;
 import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -64,19 +65,22 @@ public class ApplicationConfiguration {
     public Interactor instrumentedInvocationsInteractor(InteractorCommons interactorCommons,
                                                         InvokerManager invokerManager,
                                                         List<OperationInstrumentation> operationInstrumentations,
-                                                        InvocationInstrumentationViewer invocationInstrumentationViewer,
+                                                        InstrumentatedInvocationsViewer instrumentatedInvocationsViewer,
                                                         ObjectMapper objectMapper) {
         return new InstrumentedInvocationsInteractor(interactorCommons,
                 invokerManager,
                 operationInstrumentations,
-                invocationInstrumentationViewer,
+                instrumentatedInvocationsViewer,
                 objectMapper);
     }
 
     @Bean
     @Qualifier(TIMED)
-    public Interactor timedInvocationsInteractor(InteractorCommons interactorCommons, InvokerManager invokerManager) {
-        return new TimedInvocationsInteractor(interactorCommons, invokerManager);
+    public Interactor timedInvocationsInteractor(InteractorCommons interactorCommons,
+                                                 InvokerManager invokerManager,
+                                                 TimedInvocationsViewer timedInvocationsViewer,
+                                                 @Qualifier(OBJECT_MAPPER) ObjectMapper objectMapper) {
+        return new TimedInvocationsInteractor(interactorCommons, invokerManager, timedInvocationsViewer, objectMapper);
     }
 
     @Bean
@@ -109,9 +113,14 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public InvocationInstrumentationViewer invocationInstrumentationViewer(SpreadsheetWriter spreadsheetWriter,
-            @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE) ObjectMapper objectMapper) {
-        return new InvocationInstrumentationViewer(spreadsheetWriter, objectMapper);
+    public InstrumentatedInvocationsViewer invocationInstrumentationViewer(SpreadsheetWriter spreadsheetWriter,
+                                                                           @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE) ObjectMapper objectMapper) {
+        return new InstrumentatedInvocationsViewer(spreadsheetWriter, objectMapper);
+    }
+
+    @Bean
+    public TimedInvocationsViewer timedInvocationsViewer(SpreadsheetWriter spreadsheetWriter) {
+        return new TimedInvocationsViewer(spreadsheetWriter);
     }
 
     @Bean

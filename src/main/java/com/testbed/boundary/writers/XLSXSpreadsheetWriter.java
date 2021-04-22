@@ -9,7 +9,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,30 +16,35 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
-    private static final int FIRST_ROW = 0;
-
     private final FileSystem fileSystem;
 
     @Override
-    public void addHeaders(OutputParameters outputParameters, List<String> headers, String colorName) {
+    public void write(OutputParameters outputParameters, Position position, String value) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
-        Row row = getOrCreateRow(sheet, FIRST_ROW);
+        Row row = getOrCreateRow(sheet, position.getRow());
+        Cell cell = row.createCell(position.getColumn());
+        cell.setCellValue(value);
+        sheet.autoSizeColumn(position.getColumn());
+        tryWriteWorkbook(outputParameters, workbook);
+    }
+
+    @Override
+    public void writeWithColor(OutputParameters outputParameters, Position position, String value, String colorName) {
+        Workbook workbook = tryGetWorkbook(outputParameters);
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setFillForegroundColor(IndexedColors.valueOf(colorName).getIndex());
         cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
-        for (int column = 0; column < headers.size(); ++column) {
-            Cell cell = row.createCell(column);
-            cell.setCellValue(headers.get(column));
-            cell.setCellStyle(cellStyle);
-            sheet.autoSizeColumn(column);
-        }
+        Sheet sheet = getOrCreateSheet(outputParameters, workbook);
+        Row row = getOrCreateRow(sheet, position.getRow());
+        Cell cell = row.createCell(position.getColumn());
+        cell.setCellValue(value);
+        cell.setCellStyle(cellStyle);
+        sheet.autoSizeColumn(position.getColumn());
         tryWriteWorkbook(outputParameters, workbook);
     }
 
@@ -56,53 +60,30 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public void write(OutputParameters outputParameters, Position position, String value) {
-        Workbook workbook = tryGetWorkbook(outputParameters);
-        Sheet sheet = getOrCreateSheet(outputParameters, workbook);
-        Row row = getOrCreateRow(sheet, position.getRow());
-        Cell cell = row.createCell(position.getColumn());
-        cell.setCellValue(value);
-        sheet.autoSizeColumn(position.getColumn());
-        tryWriteWorkbook(outputParameters, workbook);
-    }
-
-    @Override
     public boolean isEmpty(OutputParameters outputParameters, Position position) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
         Cell cell = row.getCell(position.getColumn());
-        return cell.getStringCellValue().isEmpty();
-    }
-
-    @Override
-    public int getFirstUnwrittenRow(OutputParameters outputParameters, int column) {
-        Stream<Integer> integerStream = IntStream.iterate(0, i -> i + 1).boxed();
-        Stream<Position> positionStream = integerStream.map(i -> Position.builder().row(i).column(column).build());
-        return getFirstUnwrittenPosition(outputParameters, positionStream).getRow();
+        return cell == null;
     }
 
     @Override
     public int getFirstUnwrittenColumn(OutputParameters outputParameters, int row) {
-        Stream<Integer> integerStream = IntStream.iterate(0, i -> i + 1).boxed();
-        Stream<Position> positionStream = integerStream.map(i -> Position.builder().row(row).column(i).build());
-        return getFirstUnwrittenPosition(outputParameters, positionStream).getColumn();
+        int i = 0;
+        while (!isEmpty(outputParameters, Position.builder().row(row).column(i).build())) {
+            ++i;
+        }
+        return i;
     }
 
     private Sheet getOrCreateSheet(OutputParameters outputParameters, Workbook workbook) {
-        Sheet sheet = workbook.getSheet(outputParameters.getSheetName());
-        if (sheet == null) {
-            return workbook.createSheet(outputParameters.getSheetName());
-        }
-        return sheet;
+        return Optional.ofNullable(workbook.getSheet(outputParameters.getSheetName()))
+                .orElseGet(() -> workbook.createSheet(outputParameters.getSheetName()));
     }
 
     private Row getOrCreateRow(Sheet sheet, int position) {
-        Row row = sheet.getRow(position);
-        if (row == null) {
-            return sheet.createRow(position);
-        }
-        return row;
+        return Optional.ofNullable(sheet.getRow(position)).orElseGet(() -> sheet.createRow(position));
     }
 
     private Workbook tryGetWorkbook(OutputParameters outputParameters) {
@@ -128,9 +109,5 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         FSDataOutputStream outputStream = fileSystem.create(new Path(outputParameters.getOutputPath()));
         workbook.write(outputStream);
         outputStream.close();
-    }
-
-    public Position getFirstUnwrittenPosition(OutputParameters outputParameters, Stream<Position> positionStream) {
-        return positionStream.dropWhile(position -> !isEmpty(outputParameters, position)).findFirst().get();
     }
 }

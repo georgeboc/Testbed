@@ -11,7 +11,6 @@ import com.testbed.views.InvocationInstrumentationView;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
@@ -22,12 +21,13 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
-public class InvocationInstrumentationViewer {
+public class InstrumentatedInvocationsViewer {
     private static final char UNDERSCORE = '_';
     private static final char SPACE = ' ';
+    private static final int FIRST_ROW = 0;
     private static final int SECOND_ROW = 1;
     private static final int FIRST_COLUMN = 0;
-    private static final String HEADERS_COLOR_NAME = "LIME";
+    private static final String HEADER_COLOR_NAME = "LIME";
 
     private final SpreadsheetWriter spreadsheetWriter;
     private final ObjectMapper objectMapper;
@@ -42,10 +42,19 @@ public class InvocationInstrumentationViewer {
     }
 
     private void writeViews(final OutputParameters outputParameters, final List<InvocationInstrumentationView> views) {
-        spreadsheetWriter.addHeaders(outputParameters, getHeaders(), HEADERS_COLOR_NAME);
+        writeHeaders(outputParameters);
         IntStream rowsSuccession = IntStream.iterate(SECOND_ROW, i -> i + 1);
         Streams.forEachPair(rowsSuccession.boxed(), views.stream(),
                 (row, view) -> writeView(outputParameters, view, row));
+    }
+
+    private void writeHeaders(OutputParameters outputParameters) {
+        IntStream columnsSuccession = IntStream.iterate(FIRST_COLUMN, i -> i + 1);
+        Stream<Position> positionStream = columnsSuccession.mapToObj(column -> Position.builder()
+                .column(column).row(FIRST_ROW).build());
+        List<String> headers = getHeaders();
+        Streams.forEachPair(positionStream, headers.stream(),
+                (position, header) -> spreadsheetWriter.writeWithColor(outputParameters, position, header, HEADER_COLOR_NAME));
     }
 
     private void writeView(OutputParameters outputParameters, InvocationInstrumentationView view, int row) {

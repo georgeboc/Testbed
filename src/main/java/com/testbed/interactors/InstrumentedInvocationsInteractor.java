@@ -6,7 +6,7 @@ import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.parameters.InputParameters;
 import com.testbed.entities.parameters.OutputParameters;
 import com.testbed.interactors.invokers.InvokerManager;
-import com.testbed.interactors.viewers.InvocationInstrumentationViewer;
+import com.testbed.interactors.viewers.InstrumentatedInvocationsViewer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class InstrumentedInvocationsInteractor implements Interactor {
     private final InteractorCommons interactorCommons;
     private final InvokerManager invokerManager;
     private final List<OperationInstrumentation> operationInstrumentations;
-    private final InvocationInstrumentationViewer invocationInstrumentationViewer;
+    private final InstrumentatedInvocationsViewer instrumentatedInvocationsViewer;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -32,6 +32,6 @@ public class InstrumentedInvocationsInteractor implements Interactor {
         LOG.info("Creating output parameters for viewer");
         OutputParameters outputParameters = objectMapper.convertValue(inputParameters, OutputParameters.class);
         LOG.info("Viewing Operation Instrumentations to " + inputParameters.getOutputPath());
-        invocationInstrumentationViewer.view(outputParameters, operationInstrumentations);
+        instrumentatedInvocationsViewer.view(outputParameters, operationInstrumentations);
     }
 }
