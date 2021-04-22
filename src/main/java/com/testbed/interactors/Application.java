@@ -17,7 +17,7 @@ public class Application {
     public void run(String[] arguments) throws Exception {
         LOG.info("Parsing parameters");
         InputParameters inputParameters = InputParametersParserFactory.getParametersParser().getParameters(arguments);
-        LOG.info("Parameters parsed: " + inputParameters);
+        LOG.info("Parameters parsed: {}", inputParameters);
         LOG.info("Initializing application");
         FrameworkConfiguration frameworkConfiguration = inputParameters.getFrameworkConfiguration();
         ApplicationContext context = new ClassPathXmlApplicationContext(frameworkConfiguration.getConfigurationFile());

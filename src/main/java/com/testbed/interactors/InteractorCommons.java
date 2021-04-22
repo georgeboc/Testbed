@@ -28,24 +28,24 @@ public class InteractorCommons {
     private final InvocationPlanner invocationPlanner;
 
     public InvocationPlan createInvocationPlan(final InputParameters inputParameters) {
-        LOG.info("Deserializing operations from pipeline whose filename is: " + inputParameters.getPipelineFileName());
+        LOG.info("Deserializing operations from pipeline whose filename is: {}", inputParameters.getPipelineFileName());
         DeserializedOperations deserializedOperations = operationsDeserializer.deserialize(inputParameters.getPipelineFileName());
-        LOG.info("Deserialized pipeline: " + deserializedOperations);
+        LOG.info("Deserialized pipeline: {}", deserializedOperations);
         LOG.info("Validating if deserialized operations have values for all fields");
         notNullOnAllFieldsValidatorManager.validate(deserializedOperations);
         LOG.info("Deserialized operations are valid");
         LOG.info("Converting deserialized operations to logical operations");
         LogicalPlan logicalPlan = deserializedToLogicalConverterManager.convert(deserializedOperations);
-        LOG.info("Logical Plan: " + logicalPlan);
+        LOG.info("Logical Plan: {}", logicalPlan);
         LOG.info("Validating if all operations have corresponding number of inputs in Logical Plan");
         inputsCountValidatorManager.validate(logicalPlan.getGraph());
         LOG.info("Logical Plan is valid");
         LOG.info("Converting logical operations to physical operations");
         PhysicalPlan physicalPlan = logicalToPhysicalConverterManager.convert(logicalPlan, inputParameters.getTolerableErrorPercentage());
-        LOG.info("Physical Plan: " + physicalPlan);
+        LOG.info("Physical Plan: {}", physicalPlan);
         LOG.info("Creating Invocation Plan");
         InvocationPlan invocationPlan = invocationPlanner.createInvocationPlan(physicalPlan);
-        LOG.info("Created Invocation Plan: " + invocationPlan);
+        LOG.info("Created Invocation Plan: {}", invocationPlan);
         return invocationPlan;
     }
 }

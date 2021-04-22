@@ -28,10 +28,10 @@ public class InstrumentedInvocationsInteractor implements Interactor {
         InvocationPlan invocationPlan = interactorCommons.createInvocationPlan(inputParameters);
         LOG.info("Invoking Invocation Plan");
         invokerManager.invoke(invocationPlan, inputParameters.getTolerableErrorPercentage());
-        LOG.info("Operation Instrumentations after invocations: " + operationInstrumentations);
+        LOG.info("Operation Instrumentations after invocations: {}", operationInstrumentations);
         LOG.info("Creating output parameters for viewer");
         OutputParameters outputParameters = objectMapper.convertValue(inputParameters, OutputParameters.class);
-        LOG.info("Viewing Operation Instrumentations to " + inputParameters.getOutputPath());
+        LOG.info("Viewing Operation Instrumentations to {}", inputParameters.getOutputPath());
         instrumentatedInvocationsViewer.view(outputParameters, operationInstrumentations);
     }
 }
