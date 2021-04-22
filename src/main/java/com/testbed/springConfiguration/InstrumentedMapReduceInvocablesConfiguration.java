@@ -111,11 +111,6 @@ public class InstrumentedMapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public Configuration configuration() {
-        return new Configuration();
-    }
-
-    @Bean
     public JobConfigurationCommons jobConfigurationCommons(Configuration configuration) {
         return new JobConfigurationCommons(configuration);
     }
