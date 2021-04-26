@@ -88,13 +88,19 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
 
     private Workbook tryGetWorkbook(OutputParameters outputParameters) {
         try {
-            FSDataInputStream inputStream = fileSystem.open(new Path(outputParameters.getOutputPath()));
-            return new HSSFWorkbook(inputStream);
+            return getWorkbook(outputParameters);
         } catch (FileNotFoundException fileNotFoundException) {
             return new HSSFWorkbook();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    private Workbook getWorkbook(OutputParameters outputParameters) throws IOException {
+        FSDataInputStream inputStream = fileSystem.open(new Path(outputParameters.getOutputPath()));
+        Workbook workbook = new HSSFWorkbook(inputStream);
+        inputStream.close();
+        return workbook;
     }
 
     private void tryWriteWorkbook(OutputParameters outputParameters, Workbook workbook) {

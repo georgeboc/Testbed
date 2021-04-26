@@ -48,8 +48,7 @@ public class CountMapReduce {
         }
     }
 
-    private long tryRunJob(final String inputPath) throws IOException,
-            InterruptedException, ClassNotFoundException {
+    private long tryRunJob(final String inputPath) throws IOException, InterruptedException, ClassNotFoundException {
         String outputPath = PATH_PREFIX + COUNT;
         Job job = jobConfigurationCommons.createMapperCombinerReducerJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
@@ -74,7 +73,9 @@ public class CountMapReduce {
     private String readLine(String filename) throws IOException {
         FSDataInputStream inputStream = fileSystem.open(new Path(filename));
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-        return bufferedReader.readLine();
+        String line = bufferedReader.readLine();
+        inputStream.close();
+        return line;
     }
 
     private static class CountMapper extends Mapper<LongWritable, Group, NullWritable, LongWritable> {

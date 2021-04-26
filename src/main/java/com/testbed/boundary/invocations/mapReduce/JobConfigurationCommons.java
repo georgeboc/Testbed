@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 public class JobConfigurationCommons {
-    public static final String PATH_PREFIX = "/tmp/mapReduceExecution/";
+    public static final String PATH_PREFIX = "mapReduceExecution/";
     public static final boolean VERBOSE = true;
     private static final boolean DELETE_RECURSIVELY = true;
     private static final String JOB_NAME = "LocalMapReduce";
