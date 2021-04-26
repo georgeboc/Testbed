@@ -10,8 +10,15 @@ import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @RequiredArgsConstructor
 public class Application {
+    static {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-hh_mm_ss-SS");
+        System.setProperty("current_timestamp", dateFormat.format(new Date()));
+    }
     private static final Logger LOG = LoggerFactory.getLogger(Application.class.getName());
 
     public void run(String[] arguments) throws Exception {
