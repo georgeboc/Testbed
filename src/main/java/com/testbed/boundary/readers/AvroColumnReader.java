@@ -1,57 +1,54 @@
 package com.testbed.boundary.readers;
 
 import com.google.common.collect.Streams;
-import com.testbed.entities.profiles.ColumnProfile;
+import com.testbed.boundary.utils.DirectoryUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.avro.file.DataFileReader;
+import org.apache.avro.file.FileReader;
+import org.apache.avro.file.SeekableInput;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
+import org.apache.avro.mapred.FsInput;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.Math.min;
 
+@RequiredArgsConstructor
 public class AvroColumnReader implements ColumnReader {
     private static final String VALUE = "Value";
+
+    private final Configuration configuration;
+    private final DirectoryUtils directoryUtils;
 
     @Override
     public String getValueFromSelectivityFactor(final double selectivityFactor,
                                                 final long columnDistinctRowsCount,
                                                 final String columnName,
                                                 final String directory) {
-        List<String> columnPartsPaths = tryGetFilesInDirectoryByPattern(directory, columnName);
-        int columnPartsCount = columnPartsPaths.size();
-        int columnPartId = (int) (columnPartsCount*selectivityFactor);
-        String columnPartPath = columnPartsPaths.get(min(columnPartId, columnPartsPaths.size() - 1));
-        DataFileReader<GenericRecord> dataFileReader = tryGetDataFileReaderFromFileName(columnPartPath);
-        long rowId = getRowId(selectivityFactor, columnDistinctRowsCount, columnPartsCount, columnPartId);
+        Pattern columnPartsPattern = Pattern.compile("count_value_stats_" + columnName + ".avro/part-.*\\.avro$");
+        List<String> columnPartsPaths = directoryUtils.tryGetFilesInDirectoryByPattern(directory, columnPartsPattern);
+        List<String> sortedColumnPartsPaths = columnPartsPaths.stream().sorted().collect(Collectors.toList());
+        int sortedColumnPartsCount = sortedColumnPartsPaths.size();
+        int sortedColumnPartId = (int) (sortedColumnPartsCount*selectivityFactor);
+        String sortedColumnPartPath = sortedColumnPartsPaths.get(min(sortedColumnPartId, sortedColumnPartsPaths.size() - 1));
+        FileReader<GenericRecord> dataFileReader = tryGetDataFileReaderFromFileName(sortedColumnPartPath);
+        long rowId = getRowId(selectivityFactor, columnDistinctRowsCount, sortedColumnPartsCount, sortedColumnPartId);
         return getGenericRecordByRowId(dataFileReader, rowId).get(VALUE).toString();
     }
 
-    private List<String> tryGetFilesInDirectoryByPattern(final String directory, final String columnName) {
-        Pattern columnPartsPattern = Pattern.compile("count_value_stats_" + columnName + ".avro/part-.*\\.avro$");
-        try (Stream<Path> paths = Files.walk(Paths.get(directory))) {
-            return paths.map(Path::toString)
-                    .filter(columnPartsPattern.asPredicate())
-                    .sorted()
-                    .collect(Collectors.toList());
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
+    private FileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
         final DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
         try {
-            return new DataFileReader<>(new File(filename), datumReader);
+            SeekableInput input = new FsInput(new Path(filename), configuration);
+            return DataFileReader.openReader(input, datumReader);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }

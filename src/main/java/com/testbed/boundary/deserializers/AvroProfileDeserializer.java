@@ -4,10 +4,17 @@ import com.google.common.collect.Streams;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.entities.profiles.ColumnProfile;
 import com.testbed.entities.profiles.Profile;
+import lombok.RequiredArgsConstructor;
 import org.apache.avro.file.DataFileReader;
+import org.apache.avro.file.FileReader;
+import org.apache.avro.file.SeekableInput;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
+import org.apache.avro.mapred.FsInput;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +27,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("UnstableApiUsage")
+@RequiredArgsConstructor
 public class  AvroProfileDeserializer implements Deserializer<Profile> {
     private static final String DISTINCT_ROWS_COUNT = "distinct_rows_count";
     private static final String TOTAL_ROWS_COUNT = "total_rows_count";
     private static final String IS_UNIQUE = "is_unique";
-    private static final String METADATA_FILENAME = "metadata.avro";
+
+    private final Configuration configuration;
+    private final DirectoryUtils directoryUtils;
 
     @Override
     public Profile deserialize(final String path) throws RuntimeException {
@@ -33,40 +43,40 @@ public class  AvroProfileDeserializer implements Deserializer<Profile> {
     }
 
     private Map<String, ColumnProfile> getColumnProfiles(final String path) {
-        Pattern columnFileNamePattern = Pattern.compile("count_value_stats_([^/])*\\.avro$");
-        List<String> columnFilePaths = DirectoryUtils.tryGetFilesInDirectoryByPattern(path, columnFileNamePattern);
-        Stream<String> columnNamesStream = getColumnNamesStream(columnFilePaths);
-        Stream<ColumnProfile> columnProfilesStream = getColumnProfileStream(columnFilePaths);
+        Pattern metadataPattern = Pattern.compile(".*metadata\\.avro$");
+        List<String> columnMetadataPaths = directoryUtils.tryGetFilesInDirectoryByPattern(path, metadataPattern);
+        Stream<String> columnNamesStream = getColumnNamesStream(columnMetadataPaths);
+        Stream<ColumnProfile> columnProfilesStream = getColumnProfileStream(columnMetadataPaths);
         return Streams.zip(columnNamesStream, columnProfilesStream, AbstractMap.SimpleEntry::new)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Stream<String> getColumnNamesStream(final List<String> columnProfileFileNames) {
-        Pattern columnFileNamePattern = Pattern.compile("count_value_stats_(.*)\\.avro");
-        return columnProfileFileNames.stream()
+    private Stream<String> getColumnNamesStream(final List<String> columnMetadataPaths) {
+        Pattern columnFileNamePattern = Pattern.compile("count_value_stats_(.*)\\.avro/");
+        return columnMetadataPaths.stream()
                 .map(columnFileNamePattern::matcher)
                 .filter(Matcher::find)
                 .map(matcher -> matcher.group(1))
                 .distinct();
     }
 
-    private Stream<ColumnProfile> getColumnProfileStream(final List<String> columnFilePaths) {
-        return columnFilePaths.stream()
-                .map(columnFilePath -> columnFilePath + '/' + METADATA_FILENAME)
+    private Stream<ColumnProfile> getColumnProfileStream(final List<String> columnMetadataPaths) {
+        return columnMetadataPaths.stream()
                 .map(this::tryGetDataFileReaderFromFileName)
                 .map(this::getColumnProfileFromDataFileReader);
     }
 
-    private DataFileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
+    private FileReader<GenericRecord> tryGetDataFileReaderFromFileName(final String filename) {
         DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
         try {
-            return new DataFileReader<>(new File(filename), datumReader);
+            SeekableInput input = new FsInput(new Path(filename), configuration);
+            return DataFileReader.openReader(input, datumReader);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    private ColumnProfile getColumnProfileFromDataFileReader(final DataFileReader<GenericRecord> dataFileReader) {
+    private ColumnProfile getColumnProfileFromDataFileReader(final FileReader<GenericRecord> dataFileReader) {
         GenericRecord genericRecord = dataFileReader.next();
         return ColumnProfile.builder()
                 .isUnique(Boolean.parseBoolean(genericRecord.get(IS_UNIQUE).toString()))

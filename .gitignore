@@ -5,7 +5,7 @@ demo*/**
 experimental/**
 input/**
 log/**
-mapReduceSwap/**
+mapReduceExecution/**
 output/**
 pipelines/**
 target

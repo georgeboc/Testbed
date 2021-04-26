@@ -14,8 +14,10 @@ import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SinkDebugMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SumAggregateMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.UnionMapReduceOperation;
+import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -101,13 +103,15 @@ public class InstrumentedMapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public CountMapReduce countMapReduce(JobConfigurationCommons jobConfigurationCommons) {
-        return new CountMapReduce(jobConfigurationCommons);
+    public CountMapReduce countMapReduce(DirectoryUtils directoryUtils,
+                                         FileSystem fileSystem,
+                                         JobConfigurationCommons jobConfigurationCommons) {
+        return new CountMapReduce(directoryUtils, fileSystem, jobConfigurationCommons);
     }
 
     @Bean
-    public ParquetSchemaReader parquetSchemaReader(Configuration configuration) {
-        return new ParquetSchemaReader(configuration);
+    public ParquetSchemaReader parquetSchemaReader(Configuration configuration, DirectoryUtils directoryUtils) {
+        return new ParquetSchemaReader(configuration, directoryUtils);
     }
 
     @Bean

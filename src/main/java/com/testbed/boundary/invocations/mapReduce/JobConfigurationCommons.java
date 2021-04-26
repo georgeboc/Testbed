@@ -22,7 +22,7 @@ public class JobConfigurationCommons {
     private final Configuration configuration;
 
     public Job createMapperOnlyJobWithUnaryInputs(final UnaryOperationJobConfiguration jobConfiguration) throws IOException {
-        cleanUpOldResults(jobConfiguration);
+        cleanUpOldResults(jobConfiguration.getOutputPath());
         Job job = createUnarySourceJob(jobConfiguration);
         job.setMapperClass(jobConfiguration.getMapperClass());
         job.setNumReduceTasks(ZERO_REDUCE_TASKS);
@@ -30,7 +30,7 @@ public class JobConfigurationCommons {
     }
 
     public Job createMapperReducerJobWithUnaryInputs(final UnaryOperationJobConfiguration jobConfiguration) throws IOException {
-        cleanUpOldResults(jobConfiguration);
+        cleanUpOldResults(jobConfiguration.getOutputPath());
         Job job = createUnarySourceJob(jobConfiguration);
         setMapperOutputClasses(jobConfiguration, job);
         job.setMapperClass(jobConfiguration.getMapperClass());
@@ -39,7 +39,7 @@ public class JobConfigurationCommons {
     }
 
     public Job createMapperReducerJobWithBinaryInputs(final BinaryOperationJobConfiguration jobConfiguration) throws IOException {
-        cleanUpOldResults(jobConfiguration);
+        cleanUpOldResults(jobConfiguration.getOutputPath());
         Job job = createBinarySourceJob(jobConfiguration);
         setMapperOutputClasses(jobConfiguration, job);
         job.setReducerClass(jobConfiguration.getReducerClass());
@@ -47,7 +47,7 @@ public class JobConfigurationCommons {
     }
 
     public Job createMapperCombinerReducerJobWithUnaryInputs(final UnaryOperationJobConfiguration jobConfiguration) throws IOException {
-        cleanUpOldResults(jobConfiguration);
+        cleanUpOldResults(jobConfiguration.getOutputPath());
         Job job = createUnarySourceJob(jobConfiguration);
         setMapperOutputClasses(jobConfiguration, job);
         job.setMapperClass(jobConfiguration.getMapperClass());
@@ -57,7 +57,7 @@ public class JobConfigurationCommons {
     }
 
     public Job createMapperCombinerReducerJobWithBinaryInputs(final BinaryOperationJobConfiguration jobConfiguration) throws IOException {
-        cleanUpOldResults(jobConfiguration);
+        cleanUpOldResults(jobConfiguration.getOutputPath());
         Job job = createBinarySourceJob(jobConfiguration);
         setMapperOutputClasses(jobConfiguration, job);
         job.setCombinerClass(jobConfiguration.getCombinerClass());
@@ -65,9 +65,9 @@ public class JobConfigurationCommons {
         return job;
     }
 
-    private void cleanUpOldResults(final OperationJobConfiguration jobConfiguration) throws IOException {
+    private void cleanUpOldResults(final String outputPath) throws IOException {
         FileSystem fileSystem = FileSystem.get(configuration);
-        fileSystem.delete(new Path(jobConfiguration.getOutputPath()), DELETE_RECURSIVELY);
+        fileSystem.delete(new Path(outputPath), DELETE_RECURSIVELY);
     }
 
     private void setMapperOutputClasses(OperationJobConfiguration jobConfiguration, Job job) {

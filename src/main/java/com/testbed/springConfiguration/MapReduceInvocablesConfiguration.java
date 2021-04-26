@@ -10,6 +10,7 @@ import com.testbed.boundary.invocations.mapReduce.SelectMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SinkMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.SumAggregateMapReduceOperation;
 import com.testbed.boundary.invocations.mapReduce.UnionMapReduceOperation;
+import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -81,8 +82,8 @@ public class MapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public ParquetSchemaReader parquetSchemaReader(Configuration configuration) {
-        return new ParquetSchemaReader(configuration);
+    public ParquetSchemaReader parquetSchemaReader(Configuration configuration, DirectoryUtils directoryUtils) {
+        return new ParquetSchemaReader(configuration, directoryUtils);
     }
 
     @Bean

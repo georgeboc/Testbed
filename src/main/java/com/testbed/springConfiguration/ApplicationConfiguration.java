@@ -11,6 +11,7 @@ import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
+import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.writers.SpreadsheetWriter;
 import com.testbed.boundary.writers.XLSXSpreadsheetWriter;
 import com.testbed.entities.operations.deserialized.DeserializedOperation;
@@ -138,13 +139,14 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public ColumnReader getColumnReader() {
-        return new AvroColumnReader();
+    public ColumnReader getColumnReader(org.apache.hadoop.conf.Configuration configuration,
+                                        DirectoryUtils directoryUtils) {
+        return new AvroColumnReader(configuration, directoryUtils);
     }
 
     @Bean
-    public SpreadsheetWriter spreadsheetWriter(FileSystem fileSystem) {
-        return new XLSXSpreadsheetWriter(fileSystem);
+    public DirectoryUtils directoryUtils(FileSystem fileSystem) {
+        return new DirectoryUtils(fileSystem);
     }
 
     @Bean
@@ -160,7 +162,13 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public Deserializer<Profile> profileDeserializer() {
-        return new AvroProfileDeserializer();
+    public SpreadsheetWriter spreadsheetWriter(FileSystem fileSystem) {
+        return new XLSXSpreadsheetWriter(fileSystem);
+    }
+
+    @Bean
+    public Deserializer<Profile> profileDeserializer(org.apache.hadoop.conf.Configuration configuration,
+                                                     DirectoryUtils directoryUtils) {
+        return new AvroProfileDeserializer(configuration, directoryUtils);
     }
 }

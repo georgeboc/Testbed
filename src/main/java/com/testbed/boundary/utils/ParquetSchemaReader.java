@@ -12,10 +12,12 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ParquetSchemaReader {
     private static final int FIRST = 0;
+
     private final Configuration configuration;
+    private final DirectoryUtils directoryUtils;
 
     public MessageType readSchema(String inputPath) {
-        Path parquetFilePath = new Path(DirectoryUtils.tryGetFilesInDirectoryByPattern(inputPath,
+        Path parquetFilePath = new Path(directoryUtils.tryGetFilesInDirectoryByPattern(inputPath,
                 Pattern.compile(".*part-.*parquet$")).get(FIRST));
         ParquetMetadata readFooter = tryReadFooter(parquetFilePath);
         return readFooter.getFileMetaData().getSchema();

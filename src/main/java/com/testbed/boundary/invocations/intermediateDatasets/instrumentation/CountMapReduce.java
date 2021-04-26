@@ -5,6 +5,12 @@ import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.invocations.mapReduce.UnaryOperationJobConfiguration;
 import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
 import lombok.RequiredArgsConstructor;
+import org.apache.avro.file.DataFileReader;
+import org.apache.avro.file.SeekableInput;
+import org.apache.avro.mapred.FsInput;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
@@ -17,6 +23,7 @@ import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -28,6 +35,9 @@ public class CountMapReduce {
     private static final String COUNT = "count";
     private static final int FIRST = 0;
     private static final String ZERO_COUNT = "0";
+
+    private final DirectoryUtils directoryUtils;
+    private final FileSystem fileSystem;
     private final JobConfigurationCommons jobConfigurationCommons;
 
     public long count(final String inputPath) {
@@ -56,13 +66,14 @@ public class CountMapReduce {
                 .build());
         job.setNumReduceTasks(1);
         job.waitForCompletion(VERBOSE);
-        String resultFilePath = DirectoryUtils.tryGetFilesInDirectoryByPattern(outputPath,
+        String resultFilePath = directoryUtils.tryGetFilesInDirectoryByPattern(outputPath,
                 Pattern.compile(".*part-r-\\d+$")).get(FIRST);
-        return Long.parseLong(Optional.ofNullable(readLine(new FileReader(resultFilePath))).orElse(ZERO_COUNT));
+        return Long.parseLong(Optional.ofNullable(readLine(resultFilePath)).orElse(ZERO_COUNT));
     }
 
-    private static String readLine(FileReader fileReader) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
+    private String readLine(String filename) throws IOException {
+        FSDataInputStream inputStream = fileSystem.open(new Path(filename));
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         return bufferedReader.readLine();
     }
 
