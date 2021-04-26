@@ -1,7 +1,6 @@
 package com.testbed.springConfiguration;
 
 import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.spark.AggregateSparkOperation;
 import com.testbed.boundary.invocations.spark.GroupbySparkOperation;
 import com.testbed.boundary.invocations.spark.JoinSparkOperation;
@@ -25,7 +24,7 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 
 public class SparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
-    private static final String LOCAL = "local[*]";
+    private static final String YARN = "yarn";
 
     @Bean
     @Qualifier(PHYSICAL_LOAD)
@@ -79,7 +78,7 @@ public class SparkInvocablesConfiguration {
     public SparkSession sparkSession() {
         return SparkSession.builder()
                 .appName(APP_NAME)
-                .master(LOCAL)
+                .master(YARN)
                 .getOrCreate();
     }
 }

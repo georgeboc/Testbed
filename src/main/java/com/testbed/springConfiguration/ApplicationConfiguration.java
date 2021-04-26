@@ -157,7 +157,7 @@ public class ApplicationConfiguration {
     @Bean
     public org.apache.hadoop.conf.Configuration configuration() {
         org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
-        configuration.set("mapreduce.framework.name", "local");
+        configuration.set("mapreduce.framework.name", "yarn");
         return configuration;
     }
 

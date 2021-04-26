@@ -30,7 +30,7 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 
 public class InstrumentedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
-    private static final String LOCAL = "local[*]";
+    private static final String YARN = "yarn";
 
     @Inject
     private BeanFactory beanFactory;
@@ -92,7 +92,7 @@ public class InstrumentedSparkInvocablesConfiguration {
     public SparkSession sparkSession() {
         return SparkSession.builder()
                 .appName(APP_NAME)
-                .master(LOCAL)
+                .master(YARN)
                 .getOrCreate();
     }
 }
