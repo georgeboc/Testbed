@@ -18,16 +18,22 @@ $ java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar [options]
 Where `[options]` are the following:
 
 ```
--e,--tolerable-error-percentage <arg>   Tolerable error percentage.
-                                        Default value is: 5.0
--f,--framework-configuration <arg>      Data Processing Framework
-                                        configuration. Available options
-                                        are: [TimedMapReduce, TimedSpark,
-                                        InstrumentedMapReduce,
-                                        InstrumentedSpark]
--o,--output <arg>                       Output file path
--p,--pipeline <arg>                     Pipeline file path
--s,--sheet-name <arg>                   Sheet name in output file path
+usage: java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar [options]
+ -f,--framework-configuration <arg>      Data Processing Framework
+                                         configuration. Available options
+                                         are: [TimedMapReduce, TimedSpark,
+                                         InstrumentedMapReduce,
+                                         InstrumentedSpark]
+ -l,--local                              If the flag is present, the
+                                         Testbed uses the local
+                                         environment for the frameworks.
+                                         Without this flag, the Testbed
+                                         uses the cluster environment.
+ -o,--output <arg>                       Output file path
+ -p,--pipeline <arg>                     Pipeline file path
+ -s,--sheet-name <arg>                   Sheet name in output file path
+ -t,--tolerable-error-percentage <arg>   Tolerable error percentage.
+                                         Default value is: 5.0
 ```
 
 This section is extracted from usage, which can always be displayed when invoking
@@ -61,7 +67,8 @@ $ java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar \
 --framework-configuration InstrumentedMapReduce \
 --pipeline pipelines/pipeline.json \
 --output output/operation_instrumentations.xlsx \
---sheet-name Dataset_5%
+--sheet-name Dataset_5% \
+--local
 ```
 
 [comment]: # (TODO: Add link)

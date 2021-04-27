@@ -12,4 +12,5 @@ public class InputParameters {
     private final String sheetName;
     private final double tolerableErrorPercentage;
     private final FrameworkConfiguration frameworkConfiguration;
+    private final boolean isLocalEnvironment;
 }

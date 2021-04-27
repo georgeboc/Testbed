@@ -16,11 +16,11 @@ import com.testbed.boundary.invocations.mapReduce.SumAggregateMapReduceOperation
 import com.testbed.boundary.invocations.mapReduce.UnionMapReduceOperation;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
 
@@ -33,7 +33,7 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_SINK;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_UNION;
 
-
+@Configuration
 public class InstrumentedMapReduceInvocablesConfiguration {
     @Inject
     private BeanFactory beanFactory;
@@ -110,12 +110,12 @@ public class InstrumentedMapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public ParquetSchemaReader parquetSchemaReader(Configuration configuration, DirectoryUtils directoryUtils) {
+    public ParquetSchemaReader parquetSchemaReader(org.apache.hadoop.conf.Configuration configuration, DirectoryUtils directoryUtils) {
         return new ParquetSchemaReader(configuration, directoryUtils);
     }
 
     @Bean
-    public JobConfigurationCommons jobConfigurationCommons(Configuration configuration) {
+    public JobConfigurationCommons jobConfigurationCommons(org.apache.hadoop.conf.Configuration configuration) {
         return new JobConfigurationCommons(configuration);
     }
 }

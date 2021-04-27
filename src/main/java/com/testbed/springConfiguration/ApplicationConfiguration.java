@@ -31,13 +31,16 @@ import com.testbed.interactors.viewers.InstrumentatedInvocationsViewer;
 import com.testbed.interactors.viewers.TimedInvocationsViewer;
 import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import java.io.IOException;
 import java.util.List;
 
 @Configuration
+@PropertySource("classpath:${environment_properties_filename}")
 public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
@@ -155,9 +158,9 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public org.apache.hadoop.conf.Configuration configuration() {
+    public org.apache.hadoop.conf.Configuration configuration(@Value("${clusterMode.mapReduce}") String mapReduceClusterMode) {
         org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
-        configuration.set("mapreduce.framework.name", "yarn");
+        configuration.set("mapreduce.framework.name", mapReduceClusterMode);
         return configuration;
     }
 

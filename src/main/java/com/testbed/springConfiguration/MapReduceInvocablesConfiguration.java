@@ -12,9 +12,9 @@ import com.testbed.boundary.invocations.mapReduce.SumAggregateMapReduceOperation
 import com.testbed.boundary.invocations.mapReduce.UnionMapReduceOperation;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
-import org.apache.hadoop.conf.Configuration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_GROUP_BY;
@@ -26,6 +26,7 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_UNION;
 
 
+@Configuration
 public class MapReduceInvocablesConfiguration {
 
     @Bean
@@ -82,12 +83,12 @@ public class MapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public ParquetSchemaReader parquetSchemaReader(Configuration configuration, DirectoryUtils directoryUtils) {
+    public ParquetSchemaReader parquetSchemaReader(org.apache.hadoop.conf.Configuration configuration, DirectoryUtils directoryUtils) {
         return new ParquetSchemaReader(configuration, directoryUtils);
     }
 
     @Bean
-    public JobConfigurationCommons jobConfigurationCommons(Configuration configuration) {
+    public JobConfigurationCommons jobConfigurationCommons(org.apache.hadoop.conf.Configuration configuration) {
         return new JobConfigurationCommons(configuration);
     }
 }

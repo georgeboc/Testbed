@@ -2,6 +2,7 @@ package com.testbed.boundary.parameters;
 
 import com.testbed.boundary.parameters.cli.CLIInputInputParametersParser;
 import com.testbed.boundary.parameters.cli.options.CLIOption;
+import com.testbed.boundary.parameters.cli.options.LocalCLIOption;
 import com.testbed.boundary.parameters.cli.options.FrameworkCLIOption;
 import com.testbed.boundary.parameters.cli.options.OutputCLIOption;
 import com.testbed.boundary.parameters.cli.options.PipelineCLIOption;
@@ -21,6 +22,7 @@ public class InputParametersParserFactory {
 
     private static List<CLIOption> getCLIOptions() {
         return Arrays.asList(new FrameworkCLIOption(),
+                new LocalCLIOption(),
                 new OutputCLIOption(),
                 new PipelineCLIOption(),
                 new SheetNameCLIOption(),

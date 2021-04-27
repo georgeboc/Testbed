@@ -15,7 +15,9 @@ import com.testbed.boundary.invocations.spark.UnionSparkOperation;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
 
@@ -28,9 +30,9 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_SINK;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_UNION;
 
+@Configuration
 public class InstrumentedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
-    private static final String YARN = "yarn";
 
     @Inject
     private BeanFactory beanFactory;
@@ -89,10 +91,10 @@ public class InstrumentedSparkInvocablesConfiguration {
     }
 
     @Bean
-    public SparkSession sparkSession() {
+    public SparkSession sparkSession(@Value("${clusterMode.spark}") String sparkClusterMode) {
         return SparkSession.builder()
                 .appName(APP_NAME)
-                .master(YARN)
+                .master(sparkClusterMode)
                 .getOrCreate();
     }
 }
