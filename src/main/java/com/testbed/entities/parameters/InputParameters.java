@@ -1,6 +1,6 @@
 package com.testbed.entities.parameters;
 
-import com.testbed.boundary.configurations.FrameworkConfiguration;
+import com.testbed.boundary.invocations.frameworks.FrameworkName;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +11,7 @@ public class InputParameters {
     private final String outputPath;
     private final String sheetName;
     private final double tolerableErrorPercentage;
-    private final FrameworkConfiguration frameworkConfiguration;
+    private final FrameworkName frameworkName;
+    private final boolean isInstrumented;
     private final boolean isLocalEnvironment;
 }

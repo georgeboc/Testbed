@@ -1,6 +1,7 @@
 package com.testbed.interactors.viewers;
 
 import com.google.common.collect.Streams;
+import com.testbed.boundary.invocations.frameworks.FrameworkName;
 import com.testbed.boundary.writers.Position;
 import com.testbed.boundary.writers.SpreadsheetWriter;
 import com.testbed.entities.parameters.OutputParameters;
@@ -37,11 +38,11 @@ public class TimedInvocationsViewer {
     private final SpreadsheetWriter spreadsheetWriter;
 
     public void view(final OutputParameters outputParameters,
-                     final String frameworkName,
+                     final FrameworkName frameworkName,
                      final long durationInNanoseconds) {
         writeTopHeaders(outputParameters);
         writeFrameworkName(outputParameters, frameworkName);
-        int frameworkRow = FrameworksPosition.valueOf(frameworkName).row;
+        int frameworkRow = FrameworksPosition.valueOf(frameworkName.name()).row;
         writeDurationInNanoseconds(outputParameters, frameworkRow, durationInNanoseconds);
         writeMedianFormula(outputParameters, frameworkRow);
     }
@@ -55,14 +56,14 @@ public class TimedInvocationsViewer {
     }
 
     private void writeFrameworkName(final OutputParameters outputParameters,
-                                    final String frameworkName) {
+                                    final FrameworkName frameworkName) {
         Position lateralHeaderPosition = Position.builder()
                 .column(LATERAL_HEADER_COLUMN)
-                .row(FrameworksPosition.valueOf(frameworkName).row)
+                .row(FrameworksPosition.valueOf(frameworkName.name()).row)
                 .build();
         spreadsheetWriter.writeWithColor(outputParameters,
                 lateralHeaderPosition,
-                frameworkName,
+                frameworkName.name(),
                 LATERAL_HEADER_COLOR_NAME);
     }
 

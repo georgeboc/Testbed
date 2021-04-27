@@ -19,16 +19,20 @@ Where `[options]` are the following:
 
 ```
 usage: java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar [options]
- -f,--framework-configuration <arg>      Data Processing Framework
-                                         configuration. Available options
-                                         are: [TimedMapReduce, TimedSpark,
-                                         InstrumentedMapReduce,
-                                         InstrumentedSpark]
+ -f,--framework-name <arg>               Data Processing Framework's name.
+                                         Available options are:
+                                         [MapReduce, Spark]
+ -i,--instrumented                       If this flag is present, the
+                                         Testbed will use the instrumented
+                                         invocations. Without this flag,
+                                         the Testbed will use the
+                                         invocations required to measure
+                                         time
  -l,--local                              If the flag is present, the
                                          Testbed uses the local
                                          environment for the frameworks.
                                          Without this flag, the Testbed
-                                         uses the cluster environment.
+                                         uses the cluster environment
  -o,--output <arg>                       Output file path
  -p,--pipeline <arg>                     Pipeline file path
  -s,--sheet-name <arg>                   Sheet name in output file path
@@ -64,7 +68,8 @@ An example of invocation with inputParameters is the following:
 ```bash
 $ java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar \
 --tolerable-error-percentage 5.0 \
---framework-configuration InstrumentedMapReduce \
+--framework-name MapReduce \
+--instrumented \
 --pipeline pipelines/pipeline.json \
 --output output/operation_instrumentations.xlsx \
 --sheet-name Dataset_5% \

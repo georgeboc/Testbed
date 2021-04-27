@@ -39,14 +39,15 @@ import org.springframework.context.annotation.PropertySource;
 import java.io.IOException;
 import java.util.List;
 
+import static com.testbed.interactors.InteractorName.INSTRUMENTED;
+import static com.testbed.interactors.InteractorName.TIMED;
+
 @Configuration
 @PropertySource("classpath:${environment_properties_filename}")
 public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
     private static final String OBJECT_MAPPER = "objectMapper";
-    public static final String INSTRUMENTED = "INSTRUMENTED";
-    public static final String TIMED = "TIMED";
     private static final boolean DISABLED = false;
 
     @Bean

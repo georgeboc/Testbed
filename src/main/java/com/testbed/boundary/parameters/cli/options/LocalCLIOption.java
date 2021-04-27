@@ -11,7 +11,7 @@ public class LocalCLIOption implements CLIOption {
     private static final String L = "l";
     private static final String LOCAL = "local";
     private static final String DESCRIPTION = "If the flag is present, the Testbed uses the local environment for " +
-            "the frameworks. Without this flag, the Testbed uses the cluster environment.";
+            "the frameworks. Without this flag, the Testbed uses the cluster environment";
 
     @Override
     public Option getOption() {

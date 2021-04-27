@@ -35,7 +35,7 @@ function execute_timed_experiment_with_MapReduce () {
     echo "Executing MapReduce timed experiment #$i"
     timeout 10m java -jar $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --framework-configuration TimedMapReduce \
+    --framework-name MapReduce \
     --pipeline $PIPELINE \
     --output $OUTPUT \
     --sheet-name $SHEET_NAME
@@ -45,7 +45,7 @@ function execute_timed_experiment_with_Spark () {
     echo "Executing Spark timed experiment #$i"
     timeout 10m java -jar $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --framework-configuration TimedSpark \
+    --framework-name Spark \
     --pipeline $PIPELINE \
     --output $OUTPUT \
     --sheet-name $SHEET_NAME
@@ -55,7 +55,8 @@ function execute_instrumented_experiment () {
     echo "Executing instrumented experiment #$i"
     timeout 10m java -jar $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --framework-configuration InstrumentedSpark \
+    --framework-name Spark \
+    --instrumented \
     --pipeline $PIPELINE \
     --output $OUTPUT \
     --sheet-name "$SHEET_NAME Instrumentation"

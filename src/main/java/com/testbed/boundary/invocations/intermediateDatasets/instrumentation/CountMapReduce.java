@@ -2,12 +2,9 @@ package com.testbed.boundary.invocations.intermediateDatasets.instrumentation;
 
 import com.google.common.collect.Streams;
 import com.testbed.boundary.utils.DirectoryUtils;
-import com.testbed.boundary.invocations.mapReduce.UnaryOperationJobConfiguration;
-import com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons;
+import com.testbed.boundary.invocations.frameworks.mapReduce.UnaryOperationJobConfiguration;
+import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
 import lombok.RequiredArgsConstructor;
-import org.apache.avro.file.DataFileReader;
-import org.apache.avro.file.SeekableInput;
-import org.apache.avro.mapred.FsInput;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -21,14 +18,13 @@ import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.PATH_PREFIX;
-import static com.testbed.boundary.invocations.mapReduce.JobConfigurationCommons.VERBOSE;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.PATH_PREFIX;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
 public class CountMapReduce {

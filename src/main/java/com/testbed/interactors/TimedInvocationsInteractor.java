@@ -33,7 +33,7 @@ public class TimedInvocationsInteractor implements Interactor {
         OutputParameters outputParameters = objectMapper.convertValue(inputParameters, OutputParameters.class);
         LOG.info("Viewing Invocation Time to {}", outputParameters.getOutputPath());
         timedInvocationsViewer.view(outputParameters,
-                inputParameters.getFrameworkConfiguration().getFrameworkName(),
+                inputParameters.getFrameworkName(),
                 durationInNanoseconds);
     }
 }

@@ -1,9 +1,6 @@
 package com.testbed.springConfiguration;
 
 import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.instrumentation.OperationInstrumenter;
-import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
-import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.SparkIntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.frameworks.spark.AggregateSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.GroupbySparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.JoinSparkOperation;
@@ -13,16 +10,13 @@ import com.testbed.boundary.invocations.frameworks.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.UnionSparkOperation;
 import org.apache.spark.sql.SparkSession;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.inject.Inject;
-
-import static com.testbed.springConfiguration.FrameworksConfigurationsConstants.INSTRUMENTED_SPARK;
+import static com.testbed.springConfiguration.FrameworksConfigurationsConstants.TIMED_SPARK;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_GROUP_BY;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_JOIN;
@@ -33,64 +27,56 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_UNION;
 
 @Configuration
-@Profile(INSTRUMENTED_SPARK)
-public class InstrumentedSparkInvocablesConfiguration {
+@Profile(TIMED_SPARK)
+public class TimedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
-
-    @Inject
-    private BeanFactory beanFactory;
 
     @Bean
     @Qualifier(PHYSICAL_LOAD)
     public Invokable sparkLoadInvokable(SparkSession sparkSession) {
-        return beanFactory.getBean(OperationInstrumenter.class, new LoadSparkOperation(sparkSession));
+        return new LoadSparkOperation(sparkSession);
     }
 
     @Bean
     @Qualifier(PHYSICAL_SELECT)
     public Invokable sparkSelectInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new SelectSparkOperation());
+        return new SelectSparkOperation();
     }
 
     @Bean
     @Qualifier(PHYSICAL_PROJECT)
     public Invokable sparkProjectInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new ProjectSparkOperation());
+        return new ProjectSparkOperation();
     }
 
     @Bean
     @Qualifier(PHYSICAL_JOIN)
     public Invokable sparkJoinInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new JoinSparkOperation());
+        return new JoinSparkOperation();
     }
 
     @Bean
     @Qualifier(PHYSICAL_GROUP_BY)
     public Invokable sparkGroupByInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new GroupbySparkOperation());
+        return new GroupbySparkOperation();
     }
 
     @Bean
     @Qualifier(PHYSICAL_AGGREGATE)
     public Invokable sparkAggregateInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new AggregateSparkOperation());
+        return new AggregateSparkOperation();
     }
 
     @Bean
     @Qualifier(PHYSICAL_UNION)
     public Invokable sparkUnionInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new UnionSparkOperation());
+        return new UnionSparkOperation();
     }
 
     @Bean
     @Qualifier(PHYSICAL_SINK)
     public Invokable sparkSinkInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new SinkSparkOperation());
-    }
-
-    @Bean
-    public IntermediateDatasetInstrumentation intermediateDatasetInstrumentation() {
-        return new SparkIntermediateDatasetInstrumentation();
+        return new SinkSparkOperation();
     }
 
     @Bean
