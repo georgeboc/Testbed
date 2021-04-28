@@ -30,6 +30,8 @@ import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorM
 import com.testbed.interactors.viewers.InstrumentatedInvocationsViewer;
 import com.testbed.interactors.viewers.TimedInvocationsViewer;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
+import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -165,6 +167,8 @@ public class ApplicationConfiguration {
     public org.apache.hadoop.conf.Configuration configuration(@Value("${clusterMode.mapReduce}") String mapReduceClusterMode) {
         org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
         configuration.set("mapreduce.framework.name", mapReduceClusterMode);
+        configuration.set("fs.hdfs.impl", DistributedFileSystem.class.getName());
+        configuration.set("fs.file.impl", LocalFileSystem.class.getName());
         return configuration;
     }
 
