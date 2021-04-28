@@ -27,7 +27,7 @@ function install_last_version {
 
 function clear_caches () {
   echo "Clearing JVM Cache"
-  sysctl -w vm.drop_caches=3 > /dev/null
+  sudo sysctl -w vm.drop_caches=3 > /dev/null
   sync && echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
 }
 
