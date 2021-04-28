@@ -37,6 +37,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static com.testbed.interactors.InteractorName.INSTRUMENTED;
@@ -154,8 +156,9 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public FileSystem fileSystem(org.apache.hadoop.conf.Configuration configuration) throws IOException {
-        return FileSystem.get(configuration);
+    public FileSystem fileSystem(@Value("${clusterMode.filesystemURI}") String filesystemURI,
+                                 org.apache.hadoop.conf.Configuration configuration) throws IOException, URISyntaxException {
+        return FileSystem.get(new URI(filesystemURI), configuration);
     }
 
     @Bean
