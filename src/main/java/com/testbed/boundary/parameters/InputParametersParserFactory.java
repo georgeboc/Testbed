@@ -9,7 +9,7 @@ import com.testbed.boundary.parameters.cli.options.OutputCLIOption;
 import com.testbed.boundary.parameters.cli.options.PipelineCLIOption;
 import com.testbed.boundary.parameters.cli.options.SheetNameCLIOption;
 import com.testbed.boundary.parameters.cli.options.TolerableErrorPercentageCLIOption;
-import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class InputParametersParserFactory {
     public static InputParametersParser getParametersParser() {
-        return new CLIInputInputParametersParser(getCLIOptions(), new Options(), new DefaultParser(), new HelpFormatter());
+        return new CLIInputInputParametersParser(getCLIOptions(), new Options(), new BasicParser(), new HelpFormatter());
     }
 
     private static List<CLIOption> getCLIOptions() {
