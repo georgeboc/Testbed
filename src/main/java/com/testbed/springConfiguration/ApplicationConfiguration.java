@@ -92,9 +92,24 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public Deserializer<DeserializedOperations> operationsDeserializer(
+    public Deserializer<DeserializedOperations> operationsDeserializer(FileSystem fileSystem,
             @Qualifier(OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN) ObjectMapper objectMapperWithDeserializedOperationMixin) {
-        return new JsonOperationsDeserializer(objectMapperWithDeserializedOperationMixin);
+        return new JsonOperationsDeserializer(fileSystem, objectMapperWithDeserializedOperationMixin);
+    }
+
+    @Bean
+    public FileSystem fileSystem(@Value("${clusterMode.filesystemURI}") String filesystemURI,
+                                 org.apache.hadoop.conf.Configuration configuration) throws IOException, URISyntaxException {
+        return FileSystem.get(new URI(filesystemURI), configuration);
+    }
+
+    @Bean
+    public org.apache.hadoop.conf.Configuration configuration(@Value("${clusterMode.mapReduce}") String mapReduceClusterMode) {
+        org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
+        configuration.set("mapreduce.framework.name", mapReduceClusterMode);
+        configuration.set("fs.hdfs.impl", DistributedFileSystem.class.getName());
+        configuration.set("fs.file.impl", LocalFileSystem.class.getName());
+        return configuration;
     }
 
     @Bean
@@ -148,21 +163,6 @@ public class ApplicationConfiguration {
     @Bean
     public DirectoryUtils directoryUtils(FileSystem fileSystem) {
         return new DirectoryUtils(fileSystem);
-    }
-
-    @Bean
-    public FileSystem fileSystem(@Value("${clusterMode.filesystemURI}") String filesystemURI,
-                                 org.apache.hadoop.conf.Configuration configuration) throws IOException, URISyntaxException {
-        return FileSystem.get(new URI(filesystemURI), configuration);
-    }
-
-    @Bean
-    public org.apache.hadoop.conf.Configuration configuration(@Value("${clusterMode.mapReduce}") String mapReduceClusterMode) {
-        org.apache.hadoop.conf.Configuration configuration = new org.apache.hadoop.conf.Configuration();
-        configuration.set("mapreduce.framework.name", mapReduceClusterMode);
-        configuration.set("fs.hdfs.impl", DistributedFileSystem.class.getName());
-        configuration.set("fs.file.impl", LocalFileSystem.class.getName());
-        return configuration;
     }
 
     @Bean

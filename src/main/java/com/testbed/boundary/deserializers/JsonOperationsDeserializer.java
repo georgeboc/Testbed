@@ -3,13 +3,17 @@ package com.testbed.boundary.deserializers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testbed.entities.operations.deserialized.DeserializedOperations;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 
 @RequiredArgsConstructor
 public class JsonOperationsDeserializer implements Deserializer<DeserializedOperations> {
+    private final FileSystem fileSystem;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -28,7 +32,8 @@ public class JsonOperationsDeserializer implements Deserializer<DeserializedOper
 
     private String tryReadFileContents(final String path) {
         try {
-            return Files.readString(Paths.get(path));
+            InputStream inputstream = fileSystem.open(new Path(path));
+            return IOUtils.toString(inputstream, Charset.defaultCharset());
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
