@@ -75,7 +75,7 @@ public class ApplicationConfiguration {
                                                         InvokerManager invokerManager,
                                                         List<OperationInstrumentation> operationInstrumentations,
                                                         InstrumentatedInvocationsViewer instrumentatedInvocationsViewer,
-                                                        ObjectMapper objectMapper) {
+                                                        @Qualifier(OBJECT_MAPPER) ObjectMapper objectMapper) {
         return new InstrumentedInvocationsInteractor(interactorCommons,
                 invokerManager,
                 operationInstrumentations,
