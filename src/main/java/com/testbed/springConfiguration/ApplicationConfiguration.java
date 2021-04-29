@@ -50,7 +50,6 @@ import static com.testbed.interactors.InteractorName.TIMED;
 @PropertySource("classpath:${environment_properties_filename}")
 public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
-    private static final String OBJECT_MAPPER_WITH_JAVA_TIME_MODULE = "objectMapperWithJavaTimeModule";
     private static final String OBJECT_MAPPER = "objectMapper";
     private static final boolean DISABLED = false;
 
@@ -123,7 +122,7 @@ public class ApplicationConfiguration {
 
     @Bean
     public InstrumentatedInvocationsViewer invocationInstrumentationViewer(SpreadsheetWriter spreadsheetWriter,
-                                                                           @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE) ObjectMapper objectMapper) {
+                                                                           @Qualifier(OBJECT_MAPPER) ObjectMapper objectMapper) {
         return new InstrumentatedInvocationsViewer(spreadsheetWriter, objectMapper);
     }
 
@@ -138,12 +137,6 @@ public class ApplicationConfiguration {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, DISABLED);
         return objectMapper;
-    }
-
-    @Bean
-    @Qualifier(OBJECT_MAPPER_WITH_JAVA_TIME_MODULE)
-    public ObjectMapper objectMapperWithJavaTimeModule() {
-        return JsonMapper.builder().build();
     }
 
     @Bean
