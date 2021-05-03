@@ -93,5 +93,5 @@ if [ "$1" == "!" ]
 then
   execute_experiments
 else
-  screen bash "$0"
+  screen bash "$0" !
 fi
