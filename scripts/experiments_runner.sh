@@ -1,4 +1,5 @@
 #! /bin/bash
+# Execute from Testbed root directory
 
 export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
@@ -38,7 +39,7 @@ function clear_caches () {
 
 function execute_timed_experiment_with_MapReduce () {
     echo "Executing MapReduce timed experiment #$i"
-    timeout 10m hadoop jar  \
+    timeout 10m hadoop jar $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --output $OUTPUT \
     --pipeline $PIPELINE \
