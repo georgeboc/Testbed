@@ -14,6 +14,7 @@ export GOOGLE_DRIVE_ACCOUNT=gdrive
 export GOOGLE_DRIVE_PATH=Testbed/output
 
 function execute_experiments {
+    output_cleanup
     install_last_version
     for i in {1..3}
     do
@@ -24,6 +25,11 @@ function execute_experiments {
     done
     execute_instrumented_experiment
     upload_results_to_google_drive
+}
+
+function output_cleanup () {
+  echo "Ensuring output is a new file"
+  hdfs dfs -rm $OUTPUT
 }
 
 function install_last_version {
@@ -83,4 +89,9 @@ function upload_results_to_google_drive () {
     rm "$OUTPUT_BASENAME"
 }
 
-execute_experiments
+if [ "$1" == "!" ]
+then
+  execute_experiments
+else
+  screen bash "$0"
+fi
