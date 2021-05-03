@@ -3,10 +3,14 @@
 export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
 
-export PIPELINE=pipelines/pipeline.json
-export OUTPUT=output/operation_instrumentations.xlsx
+export PIPELINE=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json
+export OUTPUT=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx
 export SHEET_NAME=Test
+export INSTRUMENTED_SHEET_NAME="$SHEET_NAME Instrumentation"
 export TOLERABLE_ERROR_PERCENTAGE=5
+
+export GOOGLE_DRIVE_ACCOUNT=gdrive
+export GOOGLE_DRIVE_PATH=Testbed/output
 
 function execute_experiments {
     install_last_version
@@ -18,6 +22,7 @@ function execute_experiments {
         execute_timed_experiment_with_Spark
     done
     execute_instrumented_experiment
+    upload_results_to_google_drive
 }
 
 function install_last_version {
@@ -33,17 +38,20 @@ function clear_caches () {
 
 function execute_timed_experiment_with_MapReduce () {
     echo "Executing MapReduce timed experiment #$i"
-    timeout 10m java -jar $JAR_PATH \
+    timeout 10m hadoop jar  \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --framework-name MapReduce \
-    --pipeline $PIPELINE \
     --output $OUTPUT \
+    --pipeline $PIPELINE \
+    --framework-name MapReduce \
     --sheet-name $SHEET_NAME
 }
 
 function execute_timed_experiment_with_Spark () {
     echo "Executing Spark timed experiment #$i"
-    timeout 10m java -jar $JAR_PATH \
+    timeout 10m spark-submit \
+    --master yarn \
+    --deploy-mode cluster \
+    $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
     --pipeline $PIPELINE \
@@ -53,13 +61,24 @@ function execute_timed_experiment_with_Spark () {
 
 function execute_instrumented_experiment () {
     echo "Executing instrumented experiment #$i"
-    timeout 10m java -jar $JAR_PATH \
+    timeout 10m spark-submit \
+    --master yarn \
+    --deploy-mode cluster \
+    $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
     --instrumented \
     --pipeline $PIPELINE \
     --output $OUTPUT \
-    --sheet-name "$SHEET_NAME Instrumentation"
+    --sheet-name "$INSTRUMENTED_SHEET_NAME"
+}
+
+function upload_results_to_google_drive () {
+    echo "Uploading results to google drive"
+    hdfs dfs -copyToLocal $OUTPUT .
+    OUTPUT_BASENAME=$(basename $OUTPUT)
+    rclone "$OUTPUT_BASENAME" $GOOGLE_DRIVE_ACCOUNT:$GOOGLE_DRIVE_PATH
+    rm "$OUTPUT_BASENAME"
 }
 
 execute_experiments

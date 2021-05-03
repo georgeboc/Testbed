@@ -34,6 +34,6 @@ public class Application {
                 InteractorName.getInteractor(inputParameters.isInstrumented()).name());
         log.info("Executing selected interactor");
         interactor.execute(inputParameters);
-        log.info("Interactor executed successfully");
+        log.info("Interactor finished execution");
     }
 }
