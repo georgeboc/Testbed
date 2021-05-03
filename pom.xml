@@ -219,13 +219,10 @@
                             </transformers>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.google</pattern>
-                                    <shadedPattern>shaded.guava</shadedPattern>
-                                    <includes>
-                                        <include>com.google.**</include>
-                                    </includes>
+                                    <pattern>com.google.common</pattern>
+                                    <shadedPattern>shaded.com.google.common</shadedPattern>
                                     <excludes>
-                                        <exclude>com.google.common.collect.Maps</exclude>
+                                        <exclude>com.google.common</exclude>
                                     </excludes>
                                 </relocation>
                             </relocations>
