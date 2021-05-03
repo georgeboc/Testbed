@@ -1,7 +1,9 @@
-package com.testbed.boundary.invocations.frameworks.mapReduce;
+package com.testbed.boundary.invocations.frameworks.mapReduce.sink;
 
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Operation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
+import com.testbed.boundary.invocations.frameworks.mapReduce.UnaryOperationJobConfiguration;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.NoIntermediateDataset;
 import com.testbed.entities.operations.physical.PhysicalSink;

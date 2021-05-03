@@ -1,34 +1,30 @@
-package com.testbed.boundary.invocations.frameworks.mapReduce;
+package com.testbed.boundary.invocations.frameworks.mapReduce.union;
 
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Operation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.BinaryOperationJobConfiguration;
+import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.ReferenceIntermediateDataset;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.entities.operations.physical.PhysicalUnion;
-import com.testbed.boundary.invocations.frameworks.mapReduce.MapReduceCommons.Row;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import org.apache.parquet.hadoop.example.ExampleOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.MessageTypeParser;
 
 import java.io.IOException;
 
 import static com.testbed.boundary.invocations.OperationsConstants.UNION;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.PATH_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.MapReduceCommons.RowsParser.parseRow;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.MapReduceCommons.tryWriteRow;
 
 @RequiredArgsConstructor
 public class UnionMapReduceOperation implements Operation {
@@ -67,10 +63,11 @@ public class UnionMapReduceOperation implements Operation {
                 .mapOutputValueClass(NullWritable.class)
                 .outputKeyClass(LongWritable.class)
                 .outputValueClass(Group.class)
-                .leftMapperClass(LeftSourceUnionMapper.class)
-                .rightMapperClass(RightSourceUnionMapper.class)
-                .combinerClass(UnionCombiner.class)
-                .reducerClass(UnionReducer.class)
+                .leftMapperClass(UnionJar.LeftSourceUnionMapper.class)
+                .rightMapperClass(UnionJar.RightSourceUnionMapper.class)
+                .combinerClass(UnionJar.UnionCombiner.class)
+                .reducerClass(UnionJar.UnionReducer.class)
+                .jar(UnionJar.class)
                 .build());
         MessageType leftInputSchema = parquetSchemaReader.readSchema(leftInputPath);
         ExampleOutputFormat.setSchema(job, leftInputSchema);
@@ -85,36 +82,5 @@ public class UnionMapReduceOperation implements Operation {
                 .getValue()
                 .get()
                 .toString();
-    }
-
-    private static class LeftSourceUnionMapper extends Mapper<LongWritable, Group, Text, NullWritable> {
-        @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-            context.write(new Text(value.toString()), NullWritable.get());
-        }
-    }
-
-    private static class RightSourceUnionMapper extends Mapper<LongWritable, Group, Text, NullWritable> {
-        @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-            context.write(new Text(value.toString()), NullWritable.get());
-        }
-    }
-
-    private static class UnionCombiner extends Reducer<Text, NullWritable, Text, NullWritable> {
-        @Override
-        public void reduce(Text key, Iterable<NullWritable> notUsed, Context context) throws IOException, InterruptedException {
-            context.write(key, NullWritable.get());
-        }
-    }
-
-    private static class UnionReducer extends Reducer<Text, NullWritable, LongWritable, Group> {
-        @Override
-        public void reduce(Text key, Iterable<NullWritable> notUsed, Context context) {
-            String unionSchemaString = context.getConfiguration().get(UNION_SCHEMA);
-            MessageType unionSchema = MessageTypeParser.parseMessageType(unionSchemaString);
-            Row row = parseRow(key.toString());
-            tryWriteRow(row, unionSchema, context);
-        }
     }
 }

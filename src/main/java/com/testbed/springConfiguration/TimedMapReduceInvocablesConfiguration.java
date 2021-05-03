@@ -1,15 +1,15 @@
 package com.testbed.springConfiguration;
 
 import com.testbed.boundary.invocations.Invokable;
-import com.testbed.boundary.invocations.frameworks.mapReduce.GroupByMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.groupBy.GroupByMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
-import com.testbed.boundary.invocations.frameworks.mapReduce.JoinMapReduceOperation;
-import com.testbed.boundary.invocations.frameworks.mapReduce.LoadMapReduceOperation;
-import com.testbed.boundary.invocations.frameworks.mapReduce.ProjectMapReduceOperation;
-import com.testbed.boundary.invocations.frameworks.mapReduce.SelectMapReduceOperation;
-import com.testbed.boundary.invocations.frameworks.mapReduce.SinkMapReduceOperation;
-import com.testbed.boundary.invocations.frameworks.mapReduce.SumAggregateMapReduceOperation;
-import com.testbed.boundary.invocations.frameworks.mapReduce.UnionMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.join.JoinMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.load.LoadMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.project.ProjectMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.select.SelectMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.sink.SinkMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.sumAggregator.SumAggregateMapReduceOperation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.union.UnionMapReduceOperation;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.springframework.beans.factory.annotation.Qualifier;

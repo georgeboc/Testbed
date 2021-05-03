@@ -1,7 +1,9 @@
-package com.testbed.boundary.invocations.frameworks.mapReduce;
+package com.testbed.boundary.invocations.frameworks.mapReduce.project;
 
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Operation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
+import com.testbed.boundary.invocations.frameworks.mapReduce.UnaryOperationJobConfiguration;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.ReferenceIntermediateDataset;
 import com.testbed.boundary.utils.ParquetSchemaReader;
@@ -10,18 +12,14 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.parquet.example.data.Group;
-import org.apache.parquet.example.data.simple.SimpleGroup;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import org.apache.parquet.hadoop.example.ExampleOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
-import org.apache.parquet.schema.GroupType;
 import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.Type;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +34,7 @@ import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigura
 public class ProjectMapReduceOperation implements Operation {
     private static final int FIRST = 0;
     private static final String PROJECTED_COLUMN_INDEXES = "projectedColumnIndexes";
+
     private final JobConfigurationCommons jobConfigurationCommons;
     private final ParquetSchemaReader parquetSchemaReader;
     @Getter
@@ -65,7 +64,8 @@ public class ProjectMapReduceOperation implements Operation {
                 .outputFormatClass(ExampleOutputFormat.class)
                 .outputKeyClass(LongWritable.class)
                 .outputValueClass(Group.class)
-                .mapperClass(ProjectMapper.class)
+                .mapperClass(ProjectJar.ProjectMapper.class)
+                .jar(ProjectJar.class)
                 .build());
         MessageType schema = parquetSchemaReader.readSchema(inputPath);
         MessageType projectedSchema = getProjectedSchema(physicalProject.getProjectedColumnNames(), schema);
@@ -91,38 +91,5 @@ public class ProjectMapReduceOperation implements Operation {
                 .map(schema::getFieldIndex)
                 .map(String::valueOf)
                 .toArray(String[]::new);
-    }
-
-    private static class ProjectMapper extends Mapper<LongWritable, Group, LongWritable, Group> {
-        private static final String PROJECTED_COLUMNS = "ProjectedColumns";
-        private static final int DEFAULT_POSITION = 0;
-
-        @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-            int[] projectedColumnIndexes = context.getConfiguration().getInts(PROJECTED_COLUMN_INDEXES);
-            GroupType originalGroupType = value.getType();
-            List<Type> projectedColumns = getProjectedColumns(projectedColumnIndexes, originalGroupType);
-            Group projectedGroup = createProjectedGroup(originalGroupType, projectedColumns);
-            writeProjectedColumnsToGroup(value, projectedColumns, projectedGroup);
-            context.write(key, projectedGroup);
-        }
-
-        private List<Type> getProjectedColumns(int[] projectedColumnIndexes, GroupType originalGroupType) {
-            return Arrays.stream(projectedColumnIndexes)
-                    .mapToObj(originalGroupType::getType)
-                    .collect(Collectors.toList());
-        }
-
-        private Group createProjectedGroup(GroupType originalGroupType, List<Type> projectedColumns) {
-            GroupType projectedGroupType = new GroupType(originalGroupType.getRepetition(), PROJECTED_COLUMNS, projectedColumns);
-            return new SimpleGroup(projectedGroupType);
-        }
-
-        private void writeProjectedColumnsToGroup(Group value, List<Type> projectedColumns, Group projectedGroup) {
-            projectedColumns.stream()
-                    .map(Type::getName)
-                    .forEach(projectedColumnName -> projectedGroup.append(projectedColumnName,
-                            value.getString(projectedColumnName, DEFAULT_POSITION)));
-        }
     }
 }

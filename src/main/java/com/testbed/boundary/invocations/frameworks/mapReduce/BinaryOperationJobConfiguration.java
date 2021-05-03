@@ -24,4 +24,5 @@ public class BinaryOperationJobConfiguration implements OperationJobConfiguratio
     private final Class<?> mapOutputValueClass;
     private final Class<?> outputKeyClass;
     private final Class<?> outputValueClass;
+    private final Class<?> jar;
 }

@@ -1,4 +1,4 @@
-package com.testbed.boundary.invocations.frameworks.mapReduce;
+package com.testbed.boundary.invocations.frameworks.mapReduce.load;
 
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Operation;

@@ -1,6 +1,6 @@
 #! /bin/bash
 
-export JAR_PATH=target/Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar
+export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
 
 export PIPELINE=pipelines/pipeline.json

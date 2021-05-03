@@ -80,6 +80,7 @@ public class JobConfigurationCommons {
         job.setInputFormatClass(jobConfiguration.getInputFormatClass());
         FileInputFormat.addInputPath(job, new Path(jobConfiguration.getInputPath()));
         setJobOutputClasses(jobConfiguration, job);
+        job.setJarByClass(jobConfiguration.getJar());
         return job;
     }
 
@@ -94,6 +95,7 @@ public class JobConfigurationCommons {
                 jobConfiguration.getRightInputFormatClass(),
                 jobConfiguration.getRightMapperClass());
         setJobOutputClasses(jobConfiguration, job);
+        job.setJarByClass(jobConfiguration.getJar());
         return job;
     }
 

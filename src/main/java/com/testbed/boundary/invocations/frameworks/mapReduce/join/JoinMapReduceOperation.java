@@ -1,44 +1,34 @@
-package com.testbed.boundary.invocations.frameworks.mapReduce;
+package com.testbed.boundary.invocations.frameworks.mapReduce.join;
 
-import com.clearspring.analytics.util.Lists;
 import com.google.common.collect.Streams;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Operation;
+import com.testbed.boundary.invocations.frameworks.mapReduce.BinaryOperationJobConfiguration;
+import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.ReferenceIntermediateDataset;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.entities.operations.physical.PhysicalJoin;
-import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections.ListUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 import org.apache.parquet.hadoop.example.ExampleOutputFormat;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.schema.MessageType;
-import org.apache.parquet.schema.MessageTypeParser;
 import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Type;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.testbed.boundary.invocations.OperationsConstants.JOIN;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.PATH_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.MapReduceCommons.RowsParser.addPrefixToRowsFieldName;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.MapReduceCommons.RowsParser.parseRow;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.MapReduceCommons.tryWriteRow;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.MapReduceCommons.Row;
 
 @RequiredArgsConstructor
 public class JoinMapReduceOperation implements Operation {
@@ -82,9 +72,10 @@ public class JoinMapReduceOperation implements Operation {
                 .mapOutputValueClass(Text.class)
                 .outputKeyClass(LongWritable.class)
                 .outputValueClass(Group.class)
-                .leftMapperClass(LeftSourceJoinMapper.class)
-                .rightMapperClass(RightSourceJoinMapper.class)
-                .reducerClass(JoinReducer.class)
+                .leftMapperClass(JoinJar.LeftSourceJoinMapper.class)
+                .rightMapperClass(JoinJar.RightSourceJoinMapper.class)
+                .reducerClass(JoinJar.JoinReducer.class)
+                .jar(JoinJar.class)
                 .build());
         MessageType leftInputSchema = parquetSchemaReader.readSchema(leftInputPath);
         MessageType rightInputSchema = parquetSchemaReader.readSchema(rightInputPath);
@@ -121,92 +112,5 @@ public class JoinMapReduceOperation implements Operation {
                         field.asPrimitiveType().getPrimitiveTypeName(),
                         fieldNamePrefix + field.getName()))
                 .collect(Collectors.toList());
-    }
-
-    private static class LeftSourceJoinMapper extends Mapper<LongWritable, Group, Text, Text> {
-        private static final int DEFAULT_POSITION = 0;
-        private static final int DEFAULT_VALUE = 0;
-        private static final String MAPPER_TYPE_AND_ROW_DELIMITER = ",";
-        private static final String LEFT_MAPPER = "leftMapper";
-
-        @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-            int leftSourceJoinColumnIndex = context.getConfiguration().getInt(LEFT_SOURCE_JOIN_COLUMN_INDEX, DEFAULT_VALUE);
-            String rowValue = value.getString(leftSourceJoinColumnIndex, DEFAULT_POSITION);
-            context.write(new Text(rowValue), new Text(LEFT_MAPPER + MAPPER_TYPE_AND_ROW_DELIMITER + value));
-        }
-    }
-
-    private static class RightSourceJoinMapper extends Mapper<LongWritable, Group, Text, Text> {
-        private static final int DEFAULT_POSITION = 0;
-        private static final int DEFAULT_VALUE = 0;
-        private static final String MAPPER_TYPE_AND_ROW_DELIMITER = ",";
-        private static final String RIGHT_MAPPER = "rightMapper";
-
-        @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-            int rightSourceJoinColumnIndex = context.getConfiguration().getInt(RIGHT_SOURCE_JOIN_COLUMN_INDEX, DEFAULT_VALUE);
-            String rowValue = value.getString(rightSourceJoinColumnIndex, DEFAULT_POSITION);
-            context.write(new Text(rowValue), new Text(RIGHT_MAPPER + MAPPER_TYPE_AND_ROW_DELIMITER + value));
-        }
-    }
-
-    private static class JoinReducer extends Reducer<Text, Text, LongWritable, Group> {
-        private static final String LEFT_MAPPER = "leftMapper";
-        private static final String MAPPER_TYPE_AND_ROW_DELIMITER = ",";
-        private static final int MAPPER_TYPE_POSITION = 0;
-        private static final int ROW_POSITION = 1;
-        private static final String LEFT_PREFIX = "Left";
-        private static final String RIGHT_PREFIX = "Right";
-
-        @Override
-        public void reduce(Text key, Iterable<Text> values, Context context) {
-            String joinSchemaString = context.getConfiguration().get(JOIN_SCHEMA);
-            MessageType joinSchema = MessageTypeParser.parseMessageType(joinSchemaString);
-            doJoin(values, joinSchema, context);
-        }
-
-        private void doJoin(Iterable<Text> rows, MessageType joinSchema, Context context) {
-            LeftRightRows leftRightRows = getLeftRightRows(rows);
-            Stream<Row> crossProductStream = getCrossProductStream(leftRightRows);
-            crossProductStream.forEach(row -> tryWriteRow(row, joinSchema, context));
-        }
-
-        private LeftRightRows getLeftRightRows(Iterable<Text> rows) {
-            List<Row> leftRows = Lists.newArrayList();
-            List<Row> rightRows = Lists.newArrayList();
-            Streams.stream(rows)
-                .map(mapperTypeAndRow -> mapperTypeAndRow.toString().split(MAPPER_TYPE_AND_ROW_DELIMITER))
-                .forEach(mapperTypeAndRow -> classifyByMapperType(mapperTypeAndRow, leftRows, rightRows));
-            return LeftRightRows.builder()
-                    .leftRows(leftRows)
-                    .rightRows(rightRows)
-                    .build();
-        }
-
-        private void classifyByMapperType(String[] mapperTypeAndRows, List<Row> leftRows, List<Row> rightRows) {
-            if (mapperTypeAndRows[MAPPER_TYPE_POSITION].equals(LEFT_MAPPER)) {
-                leftRows.add(addPrefixToRowsFieldName(parseRow(mapperTypeAndRows[ROW_POSITION]), LEFT_PREFIX));
-            } else {
-                rightRows.add(addPrefixToRowsFieldName(parseRow(mapperTypeAndRows[ROW_POSITION]), RIGHT_PREFIX));
-            }
-        }
-
-        private Stream<Row> getCrossProductStream(LeftRightRows leftRightRows) {
-            return leftRightRows.getLeftRows().stream()
-                    .flatMap(leftRow -> leftRightRows.getRightRows().stream()
-                        .map(rightRow -> uniteFields(leftRow, rightRow)));
-        }
-
-        private Row uniteFields(Row leftRow, Row rightRow) {
-            return new Row(ListUtils.union(leftRow.getFields(), rightRow.getFields()));
-        }
-
-        @Data
-        @Builder
-        private static class LeftRightRows {
-            private final List<MapReduceCommons.Row> leftRows;
-            private final List<MapReduceCommons.Row> rightRows;
-        }
     }
 }
