@@ -28,6 +28,7 @@ function execute_experiments {
 
 function install_last_version {
   echo "Installing Testbed's last version"
+  git pull
   sh $SCRIPTS_PATH/install.sh
 }
 
@@ -78,7 +79,7 @@ function upload_results_to_google_drive () {
     echo "Uploading results to google drive"
     hdfs dfs -copyToLocal $OUTPUT .
     OUTPUT_BASENAME=$(basename $OUTPUT)
-    rclone "$OUTPUT_BASENAME" $GOOGLE_DRIVE_ACCOUNT:$GOOGLE_DRIVE_PATH
+    rclone copy "$OUTPUT_BASENAME" $GOOGLE_DRIVE_ACCOUNT:$GOOGLE_DRIVE_PATH
     rm "$OUTPUT_BASENAME"
 }
 
