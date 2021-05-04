@@ -7,7 +7,7 @@ are installed:
 
 Then, run the following script:
 ```bash
-$ scripts/install.sh
+$ bash scripts/install.sh
 ```
 Afterwards, it will create a `target` folder, which holds the one-JAR with all dependencies.
 
@@ -81,7 +81,7 @@ This script executes each experiment for Spark and MapReduce 3 times and an addi
 The individual output of each experiment gets aggregated into a single output file.
 To execute this script, use the following command:
 ```bash
-$ scripts/experiments_runner.sh
+$ bash scripts/experiments_runner.sh
 ```
 
 [comment]: # (TODO: Add link)
