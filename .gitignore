@@ -1,11 +1,11 @@
 *.iml
 .idea/**
+.mapreduce_execution/**
 build/**
 demo*/**
 experimental/**
 input/**
 log/**
-mapreduce_execution/**
 output/**
 pipelines/**
 target
