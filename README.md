@@ -76,5 +76,13 @@ $ java -jar Testbed-1.0-SNAPSHOT-jar-with-dependencies.jar \
 --local
 ```
 
+To execute experiments, we have created the script `scripts/experiments_runner.sh`.
+This script executes each experiment for Spark and MapReduce 3 times and an additional time to instrument the execution.
+The individual output of each experiment gets aggregated into a single output file.
+To execute this script, use the following command:
+```bash
+$ scripts/experiments_runner.sh
+```
+
 [comment]: # (TODO: Add link)
 For more information, check the thesis associated to this project.
