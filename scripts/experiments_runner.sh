@@ -59,9 +59,9 @@ function execute_timed_experiment_with_Spark () {
     timeout 10m spark-submit \
     --master yarn \
     --deploy-mode cluster \
-    --conf spark.driver.memory="1536M" \
+    --conf spark.driver.memory="2526M" \
     --conf spark.driver.memoryOverhead="512M" \
-    --conf spark.executor.memory="1536M" \
+    --conf spark.executor.memory="2526M" \
     --conf spark.executor.memoryOverhead="512M" \
     --conf spark.driver.cores="1" \
     --conf spark.executor.cores="1" \
@@ -79,9 +79,9 @@ function execute_instrumented_experiment () {
     timeout 10m spark-submit \
     --master yarn \
     --deploy-mode cluster \
-    --conf spark.driver.memory="1536M" \
+    --conf spark.driver.memory="2526M" \
     --conf spark.driver.memoryOverhead="512M" \
-    --conf spark.executor.memory="1536M" \
+    --conf spark.executor.memory="2526M" \
     --conf spark.executor.memoryOverhead="512M" \
     --conf spark.driver.cores="1" \
     --conf spark.executor.cores="1" \
