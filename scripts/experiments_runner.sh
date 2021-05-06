@@ -59,13 +59,13 @@ function execute_timed_experiment_with_Spark () {
     timeout 10m spark-submit \
     --master yarn \
     --deploy-mode cluster \
-    --conf spark.driver.memory="2526M" \
-    --conf spark.driver.memoryOverhead="512M" \
-    --conf spark.executor.memory="2526M" \
-    --conf spark.executor.memoryOverhead="512M" \
-    --conf spark.driver.cores="1" \
-    --conf spark.executor.cores="1" \
-    --conf spark.executor.instances="23" \
+    --conf spark.driver.memory="22602M" \
+    --conf spark.driver.memoryOverhead="1702M" \
+    --conf spark.executor.memory="22602M" \
+    --conf spark.executor.memoryOverhead="1702M" \
+    --conf spark.driver.cores="8" \
+    --conf spark.executor.cores="8" \
+    --conf spark.executor.instances="3" \
     $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
@@ -79,13 +79,13 @@ function execute_instrumented_experiment () {
     timeout 10m spark-submit \
     --master yarn \
     --deploy-mode cluster \
-    --conf spark.driver.memory="2526M" \
-    --conf spark.driver.memoryOverhead="512M" \
-    --conf spark.executor.memory="2526M" \
-    --conf spark.executor.memoryOverhead="512M" \
-    --conf spark.driver.cores="1" \
-    --conf spark.executor.cores="1" \
-    --conf spark.executor.instances="23" \
+    --conf spark.driver.memory="22602M" \
+    --conf spark.driver.memoryOverhead="1702M" \
+    --conf spark.executor.memory="22602M" \
+    --conf spark.executor.memoryOverhead="1702M" \
+    --conf spark.driver.cores="8" \
+    --conf spark.executor.cores="8" \
+    --conf spark.executor.instances="3" \
     $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
