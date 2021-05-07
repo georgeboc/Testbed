@@ -2,7 +2,6 @@ package com.testbed.springConfiguration;
 
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumenter;
-import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.CountMapReduce;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.MapReduceIntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.groupBy.GroupByMapReduceOperation;
@@ -14,6 +13,7 @@ import com.testbed.boundary.invocations.frameworks.mapReduce.select.SelectMapRed
 import com.testbed.boundary.invocations.frameworks.mapReduce.sink.SinkDebugMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.sumAggregator.SumAggregateMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.union.UnionMapReduceOperation;
+import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.countMapReduce.CountMapReduceOperation;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import org.apache.hadoop.fs.FileSystem;
@@ -100,16 +100,16 @@ public class InstrumentedMapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public IntermediateDatasetInstrumentation intermediateDatasetInstrumentation(CountMapReduce countMapReduce,
+    public IntermediateDatasetInstrumentation intermediateDatasetInstrumentation(CountMapReduceOperation countMapReduceOperation,
                                                                                  ParquetSchemaReader parquetSchemaReader) {
-        return new MapReduceIntermediateDatasetInstrumentation(countMapReduce, parquetSchemaReader);
+        return new MapReduceIntermediateDatasetInstrumentation(countMapReduceOperation, parquetSchemaReader);
     }
 
     @Bean
-    public CountMapReduce countMapReduce(DirectoryUtils directoryUtils,
-                                         FileSystem fileSystem,
-                                         JobConfigurationCommons jobConfigurationCommons) {
-        return new CountMapReduce(directoryUtils, fileSystem, jobConfigurationCommons);
+    public CountMapReduceOperation countMapReduceOperation(DirectoryUtils directoryUtils,
+                                                           FileSystem fileSystem,
+                                                           JobConfigurationCommons jobConfigurationCommons) {
+        return new CountMapReduceOperation(directoryUtils, fileSystem, jobConfigurationCommons);
     }
 
     @Bean

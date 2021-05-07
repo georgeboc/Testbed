@@ -1,6 +1,7 @@
 package com.testbed.boundary.invocations.intermediateDatasets.instrumentation;
 
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
+import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.countMapReduce.CountMapReduceOperation;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import lombok.RequiredArgsConstructor;
 import org.apache.parquet.schema.MessageType;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class MapReduceIntermediateDatasetInstrumentation implements IntermediateDatasetInstrumentation {
-    private final CountMapReduce countMapReduce;
+    private final CountMapReduceOperation countMapReduceOperation;
     private final ParquetSchemaReader parquetSchemaReader;
 
     @Override
@@ -20,7 +21,7 @@ public class MapReduceIntermediateDatasetInstrumentation implements Intermediate
         if (intermediateDataset.getValue().isEmpty()) {
             return 0L;
         }
-        return countMapReduce.count(intermediateDataset.getValue().get().toString());
+        return countMapReduceOperation.count(intermediateDataset.getValue().get().toString());
     }
 
     @Override

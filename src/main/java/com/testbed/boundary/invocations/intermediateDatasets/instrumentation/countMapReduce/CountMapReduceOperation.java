@@ -1,9 +1,8 @@
-package com.testbed.boundary.invocations.intermediateDatasets.instrumentation;
+package com.testbed.boundary.invocations.intermediateDatasets.instrumentation.countMapReduce;
 
-import com.google.common.collect.Streams;
-import com.testbed.boundary.utils.DirectoryUtils;
-import com.testbed.boundary.invocations.frameworks.mapReduce.UnaryOperationJobConfiguration;
 import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
+import com.testbed.boundary.invocations.frameworks.mapReduce.UnaryOperationJobConfiguration;
+import com.testbed.boundary.utils.DirectoryUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -11,10 +10,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-import org.apache.parquet.example.data.Group;
 import org.apache.parquet.hadoop.example.ExampleInputFormat;
 
 import java.io.BufferedReader;
@@ -27,10 +23,11 @@ import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigura
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
-public class CountMapReduce {
+public class CountMapReduceOperation {
     private static final String COUNT = "count";
     private static final int FIRST = 0;
     private static final String ZERO_COUNT = "0";
+    private static final boolean IS_DELETABLE = true;
 
     private final DirectoryUtils directoryUtils;
     private final FileSystem fileSystem;
@@ -53,11 +50,12 @@ public class CountMapReduce {
                 .mapOutputValueClass(LongWritable.class)
                 .outputKeyClass(NullWritable.class)
                 .outputValueClass(LongWritable.class)
-                .mapperClass(CountMapper.class)
-                .combinerClass(CountReducer.class)
-                .reducerClass(CountReducer.class)
+                .mapperClass(CountJar.CountMapper.class)
+                .combinerClass(CountJar.CountReducer.class)
+                .reducerClass(CountJar.CountReducer.class)
                 .inputFormatClass(ExampleInputFormat.class)
                 .outputFormatClass(TextOutputFormat.class)
+                .jar(CountJar.class)
                 .build());
         job.setNumReduceTasks(1);
         job.waitForCompletion(VERBOSE);
@@ -72,20 +70,5 @@ public class CountMapReduce {
         String line = bufferedReader.readLine();
         inputStream.close();
         return line;
-    }
-
-    private static class CountMapper extends Mapper<LongWritable, Group, NullWritable, LongWritable> {
-        @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
-            context.write(NullWritable.get(), new LongWritable(1L));
-        }
-    }
-
-    private static class CountReducer extends Reducer<NullWritable, LongWritable, NullWritable, LongWritable> {
-        @Override
-        public void reduce(NullWritable nullWritable, Iterable<LongWritable> iterable, Context context) throws IOException, InterruptedException {
-            long sum = Streams.stream(iterable).map(LongWritable::get).reduce(Long::sum).orElse(0L);
-            context.write(nullWritable, new LongWritable(sum));
-        }
     }
 }
