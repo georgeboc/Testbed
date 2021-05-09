@@ -36,6 +36,8 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 @Profile(INSTRUMENTED_SPARK)
 public class InstrumentedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
+    private static final String SPARK_LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
+    private static final String SPARK_LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
 
     @Inject
     private BeanFactory beanFactory;
@@ -98,6 +100,7 @@ public class InstrumentedSparkInvocablesConfiguration {
         return SparkSession.builder()
                 .appName(APP_NAME)
                 .master(sparkClusterMode)
+                .config(SPARK_LOCAL_DIRECTORY_CONFIG, SPARK_LOCAL_DIRECTORY_PATH)
                 .getOrCreate();
     }
 }

@@ -30,6 +30,8 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 @Profile(TIMED_SPARK)
 public class TimedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
+    private static final String SPARK_LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
+    private static final String SPARK_LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
 
     @Bean
     @Qualifier(PHYSICAL_LOAD)
@@ -84,6 +86,7 @@ public class TimedSparkInvocablesConfiguration {
         return SparkSession.builder()
                 .appName(APP_NAME)
                 .master(sparkClusterMode)
+                .config(SPARK_LOCAL_DIRECTORY_CONFIG, SPARK_LOCAL_DIRECTORY_PATH)
                 .getOrCreate();
     }
 }
