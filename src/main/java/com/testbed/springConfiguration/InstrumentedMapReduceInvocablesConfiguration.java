@@ -1,6 +1,7 @@
 package com.testbed.springConfiguration;
 
 import com.testbed.boundary.invocations.Invokable;
+import com.testbed.boundary.invocations.frameworks.mapReduce.sink.SinkMapReduceOperation;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumenter;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.MapReduceIntermediateDatasetInstrumentation;
@@ -10,7 +11,6 @@ import com.testbed.boundary.invocations.frameworks.mapReduce.join.JoinMapReduceO
 import com.testbed.boundary.invocations.frameworks.mapReduce.load.LoadMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.project.ProjectMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.select.SelectMapReduceOperation;
-import com.testbed.boundary.invocations.frameworks.mapReduce.sink.SinkDebugMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.sumAggregator.SumAggregateMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.union.UnionMapReduceOperation;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.countMapReduce.CountMapReduceOperation;
@@ -95,8 +95,8 @@ public class InstrumentedMapReduceInvocablesConfiguration {
 
     @Bean
     @Qualifier(PHYSICAL_SINK)
-    public Invokable mapReduceSinkInvokable(JobConfigurationCommons jobConfigurationCommons) {
-        return beanFactory.getBean(OperationInstrumenter.class, new SinkDebugMapReduceOperation(jobConfigurationCommons));
+    public Invokable mapReduceSinkInvokable() {
+        return beanFactory.getBean(OperationInstrumenter.class, new SinkMapReduceOperation());
     }
 
     @Bean
