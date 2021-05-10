@@ -16,6 +16,9 @@ import com.testbed.boundary.invocations.frameworks.mapReduce.union.UnionMapReduc
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.countMapReduce.CountMapReduceOperation;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
+import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
+import com.testbed.interactors.monitors.NoMonitor;
 import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +27,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.inject.Inject;
+
+import java.util.Collections;
 
 import static com.testbed.springConfiguration.FrameworksConfigurationsConstants.INSTRUMENTED_MAPREDUCE;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
@@ -38,6 +43,8 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 @Configuration
 @Profile(INSTRUMENTED_MAPREDUCE)
 public class InstrumentedMapReduceInvocablesConfiguration {
+    private static final String NO_MONITOR = "noMonitor";
+
     @Inject
     private BeanFactory beanFactory;
 
@@ -120,5 +127,10 @@ public class InstrumentedMapReduceInvocablesConfiguration {
     @Bean
     public JobConfigurationCommons jobConfigurationCommons(org.apache.hadoop.conf.Configuration configuration) {
         return new JobConfigurationCommons(configuration);
+    }
+
+    @Bean
+    public MonitorComposer monitorComposer(NoMonitor noMonitor, MonitoringInformationCoalesce monitoringInformationCoalesce) {
+        return new MonitorComposer(noMonitor, Collections.emptyList(), monitoringInformationCoalesce);
     }
 }

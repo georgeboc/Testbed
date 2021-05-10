@@ -24,7 +24,7 @@ import org.apache.parquet.schema.Type;
 import java.io.IOException;
 
 import static com.testbed.boundary.invocations.OperationsConstants.AGGREGATE;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.PATH_PREFIX;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.MAPREDUCE_EXECUTION_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
@@ -54,7 +54,7 @@ public class SumAggregateMapReduceOperation implements Operation {
                 .getValue()
                 .get()
                 .toString();
-        String outputPath = PATH_PREFIX + physicalAggregate.getId();
+        String outputPath = MAPREDUCE_EXECUTION_PREFIX + physicalAggregate.getId();
         Job job = jobConfigurationCommons.createMapperCombinerReducerJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)

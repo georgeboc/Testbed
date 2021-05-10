@@ -12,10 +12,15 @@ import com.testbed.boundary.invocations.frameworks.mapReduce.sumAggregator.SumAg
 import com.testbed.boundary.invocations.frameworks.mapReduce.union.UnionMapReduceOperation;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
+import com.testbed.interactors.monitors.ChronometerMonitor;
+import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
+import java.util.Collections;
 
 import static com.testbed.springConfiguration.FrameworksConfigurationsConstants.TIMED_MAPREDUCE;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
@@ -86,12 +91,19 @@ public class TimedMapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public ParquetSchemaReader parquetSchemaReader(org.apache.hadoop.conf.Configuration configuration, DirectoryUtils directoryUtils) {
+    public ParquetSchemaReader parquetSchemaReader(org.apache.hadoop.conf.Configuration configuration,
+                                                   DirectoryUtils directoryUtils) {
         return new ParquetSchemaReader(configuration, directoryUtils);
     }
 
     @Bean
     public JobConfigurationCommons jobConfigurationCommons(org.apache.hadoop.conf.Configuration configuration) {
         return new JobConfigurationCommons(configuration);
+    }
+
+    @Bean
+    public MonitorComposer monitorComposer(ChronometerMonitor chronometerMonitor,
+                                           MonitoringInformationCoalesce monitoringInformationCoalesce) {
+        return new MonitorComposer(chronometerMonitor, Collections.emptyList(), monitoringInformationCoalesce);
     }
 }

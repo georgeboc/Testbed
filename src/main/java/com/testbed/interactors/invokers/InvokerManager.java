@@ -1,13 +1,14 @@
 package com.testbed.interactors.invokers;
 
 import com.clearspring.analytics.util.Lists;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
 import com.testbed.boundary.invocations.InvocationParameters;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.invocations.OperationInvocation;
+import com.testbed.interactors.monitors.Monitor;
+import com.testbed.interactors.monitors.MonitoringInformation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.BeanFactoryAnnotationUtils;
 import org.springframework.context.ApplicationContext;
@@ -20,17 +21,20 @@ import java.util.stream.Stream;
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
 public class InvokerManager {
+    private final Monitor monitor;
+
     @Inject
     private ApplicationContext applicationContext;
 
-    public Stopwatch invoke(final InvocationPlan invocationPlan, final double tolerableErrorPercentage) {
+    public MonitoringInformation invoke(final InvocationPlan invocationPlan, final double tolerableErrorPercentage) {
         Stream<Invokable> invokableStream = getInvokableStream(invocationPlan.getOperationInvocations());
         Stream<OperationInvocation> operationInvocationStream = invocationPlan.getOperationInvocations().stream();
         Stack<IntermediateDataset> intermediateDataset = new Stack<>();
-        Stopwatch stopWatch = Stopwatch.createStarted();
-        invokeOperations(tolerableErrorPercentage, invokableStream, operationInvocationStream, intermediateDataset);
-        stopWatch.stop();
-        return stopWatch;
+        return monitor.monitor(() -> invokeOperations(tolerableErrorPercentage,
+                invokableStream,
+                operationInvocationStream,
+                intermediateDataset),
+                invocationPlan);
     }
 
     private void invokeOperations(double tolerableErrorPercentage,

@@ -5,6 +5,7 @@ import com.testbed.boundary.invocations.frameworks.FrameworkName;
 import com.testbed.boundary.writers.Position;
 import com.testbed.boundary.writers.SpreadsheetWriter;
 import com.testbed.entities.parameters.OutputParameters;
+import com.testbed.interactors.monitors.MonitoringInformation;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
@@ -26,7 +27,6 @@ public class TimedInvocationsViewer {
             FIRST_INVOCATION_TIME, SECOND_INVOCATION_TIME, THIRD_INVOCATION_TIME, MEDIAN_INVOCATION_TIME};
     private static final int FIRST_COLUMN = 0;
     private static final int LATERAL_HEADER_COLUMN = 0;
-    private static final int THIRD_INVOCATION_COLUMN = 3;
     private static final int MEDIAN_COLUMN = 4;
     private static final int TOP_HEADERS_ROW = 0;
     private static final int MAPREDUCE_ROW = 1;
@@ -36,14 +36,15 @@ public class TimedInvocationsViewer {
     private static final String FORMULA_FORMAT = "MEDIAN(VALUE(B%1$s),VALUE(C%1$s),VALUE(D%1$s))";
 
     private final SpreadsheetWriter spreadsheetWriter;
+    private final MonitoringInformationViewer monitoringInformationViewer;
 
     public void view(final OutputParameters outputParameters,
                      final FrameworkName frameworkName,
-                     final long durationInNanoseconds) {
+                     final MonitoringInformation monitoringInformation) {
         writeTopHeaders(outputParameters);
         writeFrameworkName(outputParameters, frameworkName);
         int frameworkRow = FrameworksPosition.valueOf(frameworkName.name()).row;
-        writeDurationInNanoseconds(outputParameters, frameworkRow, durationInNanoseconds);
+        monitoringInformationViewer.view(outputParameters, monitoringInformation, frameworkRow);
         writeMedianFormula(outputParameters, frameworkRow);
     }
 
@@ -65,13 +66,6 @@ public class TimedInvocationsViewer {
                 lateralHeaderPosition,
                 frameworkName.name(),
                 LATERAL_HEADER_COLOR_NAME);
-    }
-
-    private void writeDurationInNanoseconds(OutputParameters outputParameters, int row, long durationInNanoseconds) {
-        int firstUnwrittenColumn = spreadsheetWriter.getFirstUnwrittenColumn(outputParameters, row);
-        int boundedFirstUnwrittenColumn = min(firstUnwrittenColumn, THIRD_INVOCATION_COLUMN);
-        Position position = Position.builder().row(row).column(boundedFirstUnwrittenColumn).build();
-        spreadsheetWriter.write(outputParameters, position, String.valueOf(durationInNanoseconds));
     }
 
     private void writeMedianFormula(OutputParameters outputParameters, int row) {

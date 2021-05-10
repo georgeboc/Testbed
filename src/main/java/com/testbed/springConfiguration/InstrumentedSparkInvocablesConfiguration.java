@@ -12,6 +12,10 @@ import com.testbed.boundary.invocations.frameworks.spark.ProjectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.UnionSparkOperation;
+import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
+import com.testbed.interactors.monitors.NoMonitor;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import javax.inject.Inject;
+
+import java.util.Collections;
 
 import static com.testbed.springConfiguration.FrameworksConfigurationsConstants.INSTRUMENTED_SPARK;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
@@ -86,8 +92,8 @@ public class InstrumentedSparkInvocablesConfiguration {
 
     @Bean
     @Qualifier(PHYSICAL_SINK)
-    public Invokable sparkSinkInvokable() {
-        return beanFactory.getBean(OperationInstrumenter.class, new SinkSparkOperation());
+    public Invokable sparkSinkInvokable(FileSystem fileSystem) {
+        return beanFactory.getBean(OperationInstrumenter.class, new SinkSparkOperation(fileSystem));
     }
 
     @Bean
@@ -102,5 +108,10 @@ public class InstrumentedSparkInvocablesConfiguration {
                 .master(sparkClusterMode)
                 .config(SPARK_LOCAL_DIRECTORY_CONFIG, SPARK_LOCAL_DIRECTORY_PATH)
                 .getOrCreate();
+    }
+
+    @Bean
+    public MonitorComposer monitorComposer(NoMonitor noMonitor, MonitoringInformationCoalesce monitoringInformationCoalesce) {
+        return new MonitorComposer(noMonitor, Collections.emptyList(), monitoringInformationCoalesce);
     }
 }

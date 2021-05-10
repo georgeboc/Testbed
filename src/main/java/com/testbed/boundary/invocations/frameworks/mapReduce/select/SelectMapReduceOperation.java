@@ -21,7 +21,7 @@ import org.apache.parquet.schema.MessageType;
 import java.io.IOException;
 
 import static com.testbed.boundary.invocations.OperationsConstants.SELECT;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.PATH_PREFIX;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.MAPREDUCE_EXECUTION_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class SelectMapReduceOperation implements Operation {
                 .getValue()
                 .get()
                 .toString();
-        String outputPath = PATH_PREFIX + physicalSelect.getId();
+        String outputPath = MAPREDUCE_EXECUTION_PREFIX + physicalSelect.getId();
         Job job = jobConfigurationCommons.createMapperOnlyJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)

@@ -1,6 +1,7 @@
 *.iml
 .idea/**
 .mapreduce_execution/**
+.spark_execution/**
 build/**
 demo*/**
 experimental/**

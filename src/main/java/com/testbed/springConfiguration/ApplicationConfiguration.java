@@ -3,7 +3,6 @@ package com.testbed.springConfiguration;
 import com.clearspring.analytics.util.Lists;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.testbed.boundary.deserializers.AvroProfileDeserializer;
 import com.testbed.boundary.deserializers.DeserializedOperationMixin;
 import com.testbed.boundary.deserializers.Deserializer;
@@ -25,9 +24,14 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
+import com.testbed.interactors.monitors.ChronometerMonitor;
+import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
+import com.testbed.interactors.monitors.NoMonitor;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InstrumentatedInvocationsViewer;
+import com.testbed.interactors.viewers.MonitoringInformationViewer;
 import com.testbed.interactors.viewers.TimedInvocationsViewer;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
@@ -126,8 +130,13 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public InvokerManager invokerManager() {
-        return new InvokerManager();
+    public InvokerManager invokerManager(MonitorComposer monitorComposer) {
+        return new InvokerManager(monitorComposer);
+    }
+
+    @Bean
+    public MonitoringInformationCoalesce monitoringInformationCoalesce() {
+        return new MonitoringInformationCoalesce();
     }
 
     @Bean
@@ -142,8 +151,9 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public TimedInvocationsViewer timedInvocationsViewer(SpreadsheetWriter spreadsheetWriter) {
-        return new TimedInvocationsViewer(spreadsheetWriter);
+    public TimedInvocationsViewer timedInvocationsViewer(SpreadsheetWriter spreadsheetWriter,
+                                                         MonitoringInformationViewer monitoringInformationViewer) {
+        return new TimedInvocationsViewer(spreadsheetWriter, monitoringInformationViewer);
     }
 
     @Bean
@@ -171,8 +181,23 @@ public class ApplicationConfiguration {
     }
 
     @Bean
+    public MonitoringInformationViewer monitoringInformationViewer(SpreadsheetWriter spreadsheetWriter) {
+        return new MonitoringInformationViewer(spreadsheetWriter);
+    }
+
+    @Bean
     public Deserializer<Profile> profileDeserializer(org.apache.hadoop.conf.Configuration configuration,
                                                      DirectoryUtils directoryUtils) {
         return new AvroProfileDeserializer(configuration, directoryUtils);
+    }
+
+    @Bean
+    public NoMonitor noMonitor() {
+        return new NoMonitor();
+    }
+
+    @Bean
+    public ChronometerMonitor chronometerMonitor() {
+        return new ChronometerMonitor();
     }
 }

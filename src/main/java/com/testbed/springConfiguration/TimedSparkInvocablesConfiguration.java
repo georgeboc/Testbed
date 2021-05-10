@@ -9,12 +9,18 @@ import com.testbed.boundary.invocations.frameworks.spark.ProjectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.UnionSparkOperation;
+import com.testbed.interactors.monitors.ChronometerMonitor;
+import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
+import java.util.Collections;
 
 import static com.testbed.springConfiguration.FrameworksConfigurationsConstants.TIMED_SPARK;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
@@ -77,8 +83,8 @@ public class TimedSparkInvocablesConfiguration {
 
     @Bean
     @Qualifier(PHYSICAL_SINK)
-    public Invokable sparkSinkInvokable() {
-        return new SinkSparkOperation();
+    public Invokable sparkSinkInvokable(FileSystem fileSystem) {
+        return new SinkSparkOperation(fileSystem);
     }
 
     @Bean
@@ -88,5 +94,11 @@ public class TimedSparkInvocablesConfiguration {
                 .master(sparkClusterMode)
                 .config(SPARK_LOCAL_DIRECTORY_CONFIG, SPARK_LOCAL_DIRECTORY_PATH)
                 .getOrCreate();
+    }
+
+    @Bean
+    public MonitorComposer monitorComposer(ChronometerMonitor chronometerMonitor,
+                                           MonitoringInformationCoalesce monitoringInformationCoalesce) {
+        return new MonitorComposer(chronometerMonitor, Collections.emptyList(), monitoringInformationCoalesce);
     }
 }
