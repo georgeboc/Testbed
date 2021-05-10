@@ -17,9 +17,9 @@ import static com.testbed.boundary.invocations.OperationsConstants.SINK;
 
 @RequiredArgsConstructor
 public class SinkSparkOperation implements Operation {
-    public static final String SPARK_EXECUTION_PREFIX = ".spark_execution/";
+    private static final String LOCAL_DIRECTORY_PREFIX = ".local_directory/";
     private static final String PARQUET = "parquet";
-    private static final boolean DELETE_RECURSIVELY = true;
+    private static final boolean RECURSIVELY = true;
 
     private final FileSystem fileSystem;
 
@@ -31,13 +31,13 @@ public class SinkSparkOperation implements Operation {
         IntermediateDataset inputIntermediateDataset = invocationParameters.getInputIntermediateDatasets().stream().findFirst().get();
         Dataset<Row> inputDataset = (Dataset<Row>) inputIntermediateDataset.getValue().get();
         tryDeleteSparkExecutionDirectory();
-        inputDataset.write().format(PARQUET).save(SPARK_EXECUTION_PREFIX + invocationParameters.getPhysicalOperation().getId());
+        inputDataset.write().format(PARQUET).save(LOCAL_DIRECTORY_PREFIX + invocationParameters.getPhysicalOperation().getId());
         return new NoIntermediateDataset();
     }
 
     private void tryDeleteSparkExecutionDirectory() {
         try {
-            fileSystem.delete(new Path(SPARK_EXECUTION_PREFIX), DELETE_RECURSIVELY);
+            fileSystem.delete(new Path(LOCAL_DIRECTORY_PREFIX), RECURSIVELY);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }

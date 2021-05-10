@@ -13,7 +13,6 @@ import com.testbed.boundary.invocations.frameworks.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.UnionSparkOperation;
 import com.testbed.interactors.monitors.MonitorComposer;
-import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import com.testbed.interactors.monitors.NoMonitor;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.sql.SparkSession;
@@ -42,8 +41,10 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 @Profile(INSTRUMENTED_SPARK)
 public class InstrumentedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
-    private static final String SPARK_LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
-    private static final String SPARK_LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
+    private static final String LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
+    private static final String LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
+    private static final String COMPRESSION_CODEC_CONFIG = "spark.sql.parquet.compression.codec";
+    private static final String UNCOMPRESSED = "uncompressed";
 
     @Inject
     private BeanFactory beanFactory;
@@ -106,12 +107,13 @@ public class InstrumentedSparkInvocablesConfiguration {
         return SparkSession.builder()
                 .appName(APP_NAME)
                 .master(sparkClusterMode)
-                .config(SPARK_LOCAL_DIRECTORY_CONFIG, SPARK_LOCAL_DIRECTORY_PATH)
+                .config(LOCAL_DIRECTORY_CONFIG, LOCAL_DIRECTORY_PATH)
+                .config(COMPRESSION_CODEC_CONFIG, UNCOMPRESSED)
                 .getOrCreate();
     }
 
     @Bean
-    public MonitorComposer monitorComposer(NoMonitor noMonitor, MonitoringInformationCoalesce monitoringInformationCoalesce) {
-        return new MonitorComposer(noMonitor, Collections.emptyList(), monitoringInformationCoalesce);
+    public MonitorComposer monitorComposer(NoMonitor noMonitor) {
+        return new MonitorComposer(Collections.singletonList(noMonitor));
     }
 }

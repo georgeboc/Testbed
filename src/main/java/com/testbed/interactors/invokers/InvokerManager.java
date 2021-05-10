@@ -16,6 +16,8 @@ import org.springframework.context.ApplicationContext;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -30,11 +32,20 @@ public class InvokerManager {
         Stream<Invokable> invokableStream = getInvokableStream(invocationPlan.getOperationInvocations());
         Stream<OperationInvocation> operationInvocationStream = invocationPlan.getOperationInvocations().stream();
         Stack<IntermediateDataset> intermediateDataset = new Stack<>();
-        return monitor.monitor(() -> invokeOperations(tolerableErrorPercentage,
+        return monitor.monitor(getInvokeOperationsCallable(tolerableErrorPercentage,
                 invokableStream,
                 operationInvocationStream,
-                intermediateDataset),
-                invocationPlan);
+                intermediateDataset), invocationPlan);
+    }
+
+    private Callable<MonitoringInformation> getInvokeOperationsCallable(double tolerableErrorPercentage,
+                                                                        Stream<Invokable> invokableStream,
+                                                                        Stream<OperationInvocation> operationInvocationStream,
+                                                                        Stack<IntermediateDataset> intermediateDataset) {
+        return Executors.callable(() -> invokeOperations(tolerableErrorPercentage,
+                invokableStream,
+                operationInvocationStream,
+                intermediateDataset), MonitoringInformation.createNew());
     }
 
     private void invokeOperations(double tolerableErrorPercentage,

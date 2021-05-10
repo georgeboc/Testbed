@@ -23,8 +23,13 @@ public class TimedInvocationsViewer {
     private static final String SECOND_INVOCATION_TIME = "Second invocation time (ns)";
     private static final String THIRD_INVOCATION_TIME = "Third invocation time (ns)";
     private static final String MEDIAN_INVOCATION_TIME = "Median invocation time (ns)";
+    private static final String INTERMEDIATE_RESULTS_USAGE_WITHOUT_REPLICATION =
+            "Intermediate results usage of distributed filesystem without replication (bytes)";
+    private static final String INTERMEDIATE_RESULTS_USAGE_WITH_REPLICATION =
+            "Intermediate results usage of distributed filesystem with replication (bytes)";
     private static final String[] HEADERS = {EMPTY,
-            FIRST_INVOCATION_TIME, SECOND_INVOCATION_TIME, THIRD_INVOCATION_TIME, MEDIAN_INVOCATION_TIME};
+            FIRST_INVOCATION_TIME, SECOND_INVOCATION_TIME, THIRD_INVOCATION_TIME, MEDIAN_INVOCATION_TIME,
+            INTERMEDIATE_RESULTS_USAGE_WITHOUT_REPLICATION, INTERMEDIATE_RESULTS_USAGE_WITH_REPLICATION};
     private static final int FIRST_COLUMN = 0;
     private static final int LATERAL_HEADER_COLUMN = 0;
     private static final int MEDIAN_COLUMN = 4;
@@ -53,7 +58,10 @@ public class TimedInvocationsViewer {
         Stream<Position> positionStream = columnsSuccession.mapToObj(column -> Position.builder()
                 .column(column).row(TOP_HEADERS_ROW).build());
         Streams.forEachPair(positionStream, Arrays.stream(HEADERS),
-                (position, header) -> spreadsheetWriter.writeWithColor(outputParameters, position, header, TOP_HEADER_COLOR_NAME));
+                (position, header) -> spreadsheetWriter.writeWithColor(outputParameters,
+                        position,
+                        header,
+                        TOP_HEADER_COLOR_NAME));
     }
 
     private void writeFrameworkName(final OutputParameters outputParameters,

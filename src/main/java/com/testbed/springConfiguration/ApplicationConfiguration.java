@@ -25,6 +25,7 @@ import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalCon
 import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.monitors.ChronometerMonitor;
+import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
 import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import com.testbed.interactors.monitors.NoMonitor;
@@ -197,7 +198,13 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public ChronometerMonitor chronometerMonitor() {
-        return new ChronometerMonitor();
+    public ChronometerMonitor chronometerMonitor(MonitoringInformationCoalesce monitoringInformationCoalesce) {
+        return new ChronometerMonitor(monitoringInformationCoalesce);
+    }
+
+    @Bean
+    public DistributedFileSystemMonitor distributedFileSystemMonitor(FileSystem fileSystem,
+                                                                     MonitoringInformationCoalesce monitoringInformationCoalesce) {
+        return new DistributedFileSystemMonitor(fileSystem, monitoringInformationCoalesce);
     }
 }

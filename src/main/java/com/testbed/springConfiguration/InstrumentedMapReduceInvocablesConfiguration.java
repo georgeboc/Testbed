@@ -17,7 +17,6 @@ import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.cou
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
 import com.testbed.interactors.monitors.MonitorComposer;
-import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import com.testbed.interactors.monitors.NoMonitor;
 import org.apache.hadoop.fs.FileSystem;
 import org.springframework.beans.factory.BeanFactory;
@@ -43,8 +42,6 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 @Configuration
 @Profile(INSTRUMENTED_MAPREDUCE)
 public class InstrumentedMapReduceInvocablesConfiguration {
-    private static final String NO_MONITOR = "noMonitor";
-
     @Inject
     private BeanFactory beanFactory;
 
@@ -130,7 +127,7 @@ public class InstrumentedMapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public MonitorComposer monitorComposer(NoMonitor noMonitor, MonitoringInformationCoalesce monitoringInformationCoalesce) {
-        return new MonitorComposer(noMonitor, Collections.emptyList(), monitoringInformationCoalesce);
+    public MonitorComposer monitorComposer(NoMonitor noMonitor) {
+        return new MonitorComposer(Collections.singletonList(noMonitor));
     }
 }

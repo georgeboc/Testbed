@@ -10,4 +10,5 @@ public class OperationInvocation {
     private final PhysicalOperation physicalOperation;
     private final int precedingPhysicalOperationsCount;
     private final int succeedingPhysicalOperationsCount;
+    private final boolean isLastOperationBeforeSink;
 }

@@ -13,9 +13,9 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 public class JobConfigurationCommons {
-    public static final String MAPREDUCE_EXECUTION_PREFIX = ".mapreduce_execution/";
+    public static final String LOCAL_DIRECTORY_PREFIX = ".local_directory/";
     public static final boolean VERBOSE = true;
-    private static final boolean DELETE_RECURSIVELY = true;
+    private static final boolean RECURSIVELY = true;
     private static final String JOB_NAME = "LocalMapReduce";
     private static final int ZERO_REDUCE_TASKS = 0;
 
@@ -67,7 +67,7 @@ public class JobConfigurationCommons {
 
     private void cleanUpOldResults(final String outputPath) throws IOException {
         FileSystem fileSystem = FileSystem.get(configuration);
-        fileSystem.delete(new Path(outputPath), DELETE_RECURSIVELY);
+        fileSystem.delete(new Path(outputPath), RECURSIVELY);
     }
 
     private void setMapperOutputClasses(OperationJobConfiguration jobConfiguration, Job job) {

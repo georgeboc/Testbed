@@ -7,6 +7,7 @@ import com.testbed.entities.invocations.InvocationPlan;
 import com.testbed.entities.invocations.OperationInvocation;
 import com.testbed.entities.operations.physical.PhysicalOperation;
 import com.testbed.entities.operations.physical.PhysicalPlan;
+import com.testbed.entities.operations.physical.PhysicalSink;
 
 import java.util.Collection;
 import java.util.List;
@@ -56,6 +57,8 @@ public class InvocationPlanner {
                 .physicalOperation(currentPhysicalOperation)
                 .precedingPhysicalOperationsCount(graph.inDegree(currentPhysicalOperation))
                 .succeedingPhysicalOperationsCount(graph.outDegree(currentPhysicalOperation))
+                .isLastOperationBeforeSink(graph.successors(currentPhysicalOperation).stream()
+                        .anyMatch(physicalOperation -> physicalOperation instanceof PhysicalSink))
                 .build();
     }
 

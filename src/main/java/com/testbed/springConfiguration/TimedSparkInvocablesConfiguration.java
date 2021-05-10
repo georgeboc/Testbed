@@ -10,8 +10,8 @@ import com.testbed.boundary.invocations.frameworks.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.UnionSparkOperation;
 import com.testbed.interactors.monitors.ChronometerMonitor;
+import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
-import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.util.Collections;
+import java.util.Arrays;
 
 import static com.testbed.springConfiguration.FrameworksConfigurationsConstants.TIMED_SPARK;
 import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_AGGREGATE;
@@ -36,8 +36,10 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 @Profile(TIMED_SPARK)
 public class TimedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
-    private static final String SPARK_LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
-    private static final String SPARK_LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
+    private static final String LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
+    private static final String LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
+    private static final String COMPRESSION_CODEC_CONFIG = "spark.sql.parquet.compression.codec";
+    private static final String UNCOMPRESSED = "uncompressed";
 
     @Bean
     @Qualifier(PHYSICAL_LOAD)
@@ -92,13 +94,16 @@ public class TimedSparkInvocablesConfiguration {
         return SparkSession.builder()
                 .appName(APP_NAME)
                 .master(sparkClusterMode)
-                .config(SPARK_LOCAL_DIRECTORY_CONFIG, SPARK_LOCAL_DIRECTORY_PATH)
+                .config(LOCAL_DIRECTORY_CONFIG, LOCAL_DIRECTORY_PATH)
+                .config(COMPRESSION_CODEC_CONFIG, UNCOMPRESSED)
                 .getOrCreate();
     }
 
     @Bean
     public MonitorComposer monitorComposer(ChronometerMonitor chronometerMonitor,
-                                           MonitoringInformationCoalesce monitoringInformationCoalesce) {
-        return new MonitorComposer(chronometerMonitor, Collections.emptyList(), monitoringInformationCoalesce);
+                                           DistributedFileSystemMonitor distributedFileSystemMonitor) {
+        // Leftmost monitor is the one that will get executed first. In this case, it is fundamental that the
+        // chronometer gets executed first to avoid to interfere in execution time.
+        return new MonitorComposer(Arrays.asList(chronometerMonitor, distributedFileSystemMonitor));
     }
 }
