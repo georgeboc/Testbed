@@ -1,10 +1,10 @@
 *.iml
 .idea/**
-.local_directory/**
 build/**
 demo*/**
 experimental/**
 input/**
+intermediate_datasets/**
 log/**
 output/**
 pipelines/**
