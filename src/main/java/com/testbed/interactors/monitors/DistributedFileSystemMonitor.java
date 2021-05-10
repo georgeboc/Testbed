@@ -1,8 +1,6 @@
 package com.testbed.interactors.monitors;
 
 import com.testbed.entities.invocations.InvocationPlan;
-import com.testbed.entities.invocations.OperationInvocation;
-import com.testbed.entities.operations.physical.PhysicalSink;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
@@ -15,7 +13,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class DistributedFileSystemMonitor implements Monitor {
-    private static final String LOCAL_DIRECTORY = ".local_directory/";
+    private static final String INTERMEDIATE_DATASETS_DIRECTORY_PREFIX = "intermediate_datasets/";
     private static final boolean RECURSIVELY = true;
     private static final String DISTRIBUTED_FILESYSTEM_SIZE_WITH_REPLICATION = "distributedFileSystemSizeWithReplication";
     private static final String DISTRIBUTED_FILESYSTEM_SIZE_WITHOUT_REPLICATION = "distributedFileSystemSizeWithoutReplication";
@@ -26,7 +24,7 @@ public class DistributedFileSystemMonitor implements Monitor {
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable,
                                          InvocationPlan invocationPlan) {
-        tryDeleteDirectory(LOCAL_DIRECTORY);
+        tryDeleteDirectory(INTERMEDIATE_DATASETS_DIRECTORY_PREFIX);
         MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(callable);
         List<String> directoriesToExclude = getDirectoriesToExclude(invocationPlan);
         directoriesToExclude.forEach(this::tryDeleteDirectory);
@@ -45,7 +43,7 @@ public class DistributedFileSystemMonitor implements Monitor {
         return invocationPlan.getOperationInvocations().stream()
                 .filter(operationInvocation -> operationInvocation.isLastOperationBeforeSink() ||
                         operationInvocation.getSucceedingPhysicalOperationsCount() == 0)
-                .map(operationInvocation -> LOCAL_DIRECTORY + operationInvocation.getPhysicalOperation().getId())
+                .map(operationInvocation -> INTERMEDIATE_DATASETS_DIRECTORY_PREFIX + operationInvocation.getPhysicalOperation().getId())
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +59,7 @@ public class DistributedFileSystemMonitor implements Monitor {
 
     private ContentSummary tryGetContentSummary() {
         try {
-            return fileSystem.getContentSummary(new Path(LOCAL_DIRECTORY));
+            return fileSystem.getContentSummary(new Path(INTERMEDIATE_DATASETS_DIRECTORY_PREFIX));
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }

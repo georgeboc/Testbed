@@ -19,7 +19,7 @@ import java.io.InputStreamReader;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.LOCAL_DIRECTORY_PREFIX;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.INTERMEDIATE_DATASETS_DIRECTORY_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
@@ -42,7 +42,7 @@ public class CountMapReduceOperation {
     }
 
     private long tryRunJob(final String inputPath) throws IOException, InterruptedException, ClassNotFoundException {
-        String outputPath = LOCAL_DIRECTORY_PREFIX + COUNT;
+        String outputPath = INTERMEDIATE_DATASETS_DIRECTORY_PREFIX + COUNT;
         Job job = jobConfigurationCommons.createMapperCombinerReducerJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)

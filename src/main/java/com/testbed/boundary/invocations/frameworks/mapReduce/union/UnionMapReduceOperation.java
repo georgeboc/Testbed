@@ -23,7 +23,7 @@ import org.apache.parquet.schema.MessageType;
 import java.io.IOException;
 
 import static com.testbed.boundary.invocations.OperationsConstants.UNION;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.LOCAL_DIRECTORY_PREFIX;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.INTERMEDIATE_DATASETS_DIRECTORY_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class UnionMapReduceOperation implements Operation {
         PhysicalUnion physicalUnion = (PhysicalUnion) invocationParameters.getPhysicalOperation();
         String leftInputPath = getInputPath(invocationParameters, LEFT_POSITION);
         String rightInputPath = getInputPath(invocationParameters, RIGHT_POSITION);
-        String outputPath = LOCAL_DIRECTORY_PREFIX + physicalUnion.getId();
+        String outputPath = INTERMEDIATE_DATASETS_DIRECTORY_PREFIX + physicalUnion.getId();
         Job job = jobConfigurationCommons.createMapperCombinerReducerJobWithBinaryInputs(BinaryOperationJobConfiguration.builder()
                 .leftInputPath(leftInputPath)
                 .rightInputPath(rightInputPath)

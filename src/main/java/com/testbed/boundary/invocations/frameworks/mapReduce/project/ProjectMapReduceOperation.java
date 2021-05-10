@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.testbed.boundary.invocations.OperationsConstants.PROJECT;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.LOCAL_DIRECTORY_PREFIX;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.INTERMEDIATE_DATASETS_DIRECTORY_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
@@ -56,7 +56,7 @@ public class ProjectMapReduceOperation implements Operation {
                 .getValue()
                 .get()
                 .toString();
-        String outputPath = LOCAL_DIRECTORY_PREFIX + physicalProject.getId();
+        String outputPath = INTERMEDIATE_DATASETS_DIRECTORY_PREFIX + physicalProject.getId();
         Job job = jobConfigurationCommons.createMapperOnlyJobWithUnaryInputs(UnaryOperationJobConfiguration.builder()
                 .inputPath(inputPath)
                 .outputPath(outputPath)

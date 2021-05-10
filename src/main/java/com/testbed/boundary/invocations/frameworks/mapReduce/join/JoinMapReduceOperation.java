@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.testbed.boundary.invocations.OperationsConstants.JOIN;
-import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.LOCAL_DIRECTORY_PREFIX;
+import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.INTERMEDIATE_DATASETS_DIRECTORY_PREFIX;
 import static com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons.VERBOSE;
 
 @RequiredArgsConstructor
@@ -60,7 +60,7 @@ public class JoinMapReduceOperation implements Operation {
         PhysicalJoin physicalJoin = (PhysicalJoin) invocationParameters.getPhysicalOperation();
         String leftInputPath = getInputPath(invocationParameters, LEFT_POSITION);
         String rightInputPath = getInputPath(invocationParameters, RIGHT_POSITION);
-        String outputPath = LOCAL_DIRECTORY_PREFIX + physicalJoin.getId();
+        String outputPath = INTERMEDIATE_DATASETS_DIRECTORY_PREFIX + physicalJoin.getId();
         Job job = jobConfigurationCommons.createMapperReducerJobWithBinaryInputs(BinaryOperationJobConfiguration.builder()
                 .leftInputPath(leftInputPath)
                 .rightInputPath(rightInputPath)

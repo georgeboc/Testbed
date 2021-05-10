@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 public class JobConfigurationCommons {
-    public static final String LOCAL_DIRECTORY_PREFIX = ".local_directory/";
+    public static final String INTERMEDIATE_DATASETS_DIRECTORY_PREFIX = "intermediate_datasets/";
     public static final boolean VERBOSE = true;
     private static final boolean RECURSIVELY = true;
     private static final String JOB_NAME = "LocalMapReduce";
