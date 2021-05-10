@@ -44,7 +44,7 @@ public class InstrumentedSparkInvocablesConfiguration {
     private static final String LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
     private static final String LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
     private static final String COMPRESSION_CODEC_CONFIG = "spark.sql.parquet.compression.codec";
-    private static final String UNCOMPRESSED = "uncompressed";
+    private static final String NONE = "none";
 
     @Inject
     private BeanFactory beanFactory;
@@ -108,7 +108,7 @@ public class InstrumentedSparkInvocablesConfiguration {
                 .appName(APP_NAME)
                 .master(sparkClusterMode)
                 .config(LOCAL_DIRECTORY_CONFIG, LOCAL_DIRECTORY_PATH)
-                .config(COMPRESSION_CODEC_CONFIG, UNCOMPRESSED)
+                .config(COMPRESSION_CODEC_CONFIG, NONE)
                 .getOrCreate();
     }
 
