@@ -8,6 +8,8 @@ import com.testbed.boundary.deserializers.DeserializedOperationMixin;
 import com.testbed.boundary.deserializers.Deserializer;
 import com.testbed.boundary.deserializers.JsonOperationsDeserializer;
 import com.testbed.boundary.invocations.instrumentation.OperationInstrumentation;
+import com.testbed.boundary.metrics.MetricsQuery;
+import com.testbed.boundary.metrics.prometheus.PrometheusMetricsQuery;
 import com.testbed.boundary.readers.AvroColumnReader;
 import com.testbed.boundary.readers.ColumnReader;
 import com.testbed.boundary.utils.DirectoryUtils;
@@ -26,6 +28,8 @@ import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.monitors.ChronometerMonitor;
 import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
+import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
+import com.testbed.interactors.monitors.Monitor;
 import com.testbed.interactors.monitors.MonitorComposer;
 import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import com.testbed.interactors.monitors.NoMonitor;
@@ -42,6 +46,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 
 import java.io.IOException;
 import java.net.URI;
@@ -52,7 +57,10 @@ import static com.testbed.interactors.InteractorName.INSTRUMENTED;
 import static com.testbed.interactors.InteractorName.TIMED;
 
 @Configuration
-@PropertySource("classpath:${environment_properties_filename}")
+@PropertySources({
+        @PropertySource("classpath:application.properties"),
+        @PropertySource("classpath:${environment_properties_filename}")
+})
 public class ApplicationConfiguration {
     private static final String OBJECT_MAPPER_WITH_DESERIALIZED_OPERATION_MIXIN = "objectMapperWithDeserializedOperationMixin";
     private static final String OBJECT_MAPPER = "objectMapper";
@@ -193,6 +201,11 @@ public class ApplicationConfiguration {
     }
 
     @Bean
+    public MetricsQuery prometheusMetricsQuery(@Value("${prometheus.api.baseUrl}") String baseUrl) {
+        return new PrometheusMetricsQuery(baseUrl);
+    }
+
+    @Bean
     public NoMonitor noMonitor() {
         return new NoMonitor();
     }
@@ -200,6 +213,11 @@ public class ApplicationConfiguration {
     @Bean
     public ChronometerMonitor chronometerMonitor(MonitoringInformationCoalesce monitoringInformationCoalesce) {
         return new ChronometerMonitor(monitoringInformationCoalesce);
+    }
+
+    @Bean
+    public ExecutionInstantsMonitor executionInstantsMonitor(MonitoringInformationCoalesce monitoringInformationCoalesce) {
+        return new ExecutionInstantsMonitor(monitoringInformationCoalesce);
     }
 
     @Bean

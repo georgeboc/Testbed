@@ -3,6 +3,7 @@ package com.testbed.interactors.monitors;
 import com.google.common.base.Stopwatch;
 import com.testbed.entities.invocations.InvocationPlan;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -13,11 +14,12 @@ public class ChronometerMonitor implements Monitor {
 
     private final MonitoringInformationCoalesce monitoringInformationCoalesce;
 
+    @SneakyThrows
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable,
                                          InvocationPlan invocationPlan) {
         Stopwatch stopWatch = Stopwatch.createStarted();
-        MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(callable);
+        MonitoringInformation callableMonitoringInformation = callable.call();
         stopWatch.stop();
         return monitoringInformationCoalesce.coalesce(callableMonitoringInformation, getMonitoringInformation(stopWatch));
     }

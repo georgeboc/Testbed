@@ -2,6 +2,7 @@ package com.testbed.interactors.monitors;
 
 import com.testbed.entities.invocations.InvocationPlan;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -21,11 +22,12 @@ public class DistributedFileSystemMonitor implements Monitor {
     private final FileSystem fileSystem;
     private final MonitoringInformationCoalesce monitoringInformationCoalesce;
 
+    @SneakyThrows
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable,
                                          InvocationPlan invocationPlan) {
         tryDeleteDirectory(INTERMEDIATE_DATASETS_DIRECTORY_PREFIX);
-        MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(callable);
+        MonitoringInformation callableMonitoringInformation = callable.call();
         List<String> directoriesToExclude = getDirectoriesToExclude(invocationPlan);
         directoriesToExclude.forEach(this::tryDeleteDirectory);
         return monitoringInformationCoalesce.coalesce(callableMonitoringInformation, getMonitoringInformation());

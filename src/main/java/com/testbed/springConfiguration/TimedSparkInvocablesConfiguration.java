@@ -9,9 +9,13 @@ import com.testbed.boundary.invocations.frameworks.spark.ProjectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SelectSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.SinkSparkOperation;
 import com.testbed.boundary.invocations.frameworks.spark.UnionSparkOperation;
+import com.testbed.boundary.metrics.MetricsQuery;
 import com.testbed.interactors.monitors.ChronometerMonitor;
 import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
+import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
+import com.testbed.interactors.monitors.LocalFileSystemMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -100,10 +104,22 @@ public class TimedSparkInvocablesConfiguration {
     }
 
     @Bean
+    public LocalFileSystemMonitor localFileSystemMonitor(MonitoringInformationCoalesce monitoringInformationCoalesce,
+                                                         MetricsQuery metricsQuery,
+                                                         @Value("${localFileSystemDevice.spark}") String deviceName) {
+        return new LocalFileSystemMonitor(monitoringInformationCoalesce, metricsQuery, deviceName);
+    }
+
+    @Bean
     public MonitorComposer monitorComposer(ChronometerMonitor chronometerMonitor,
-                                           DistributedFileSystemMonitor distributedFileSystemMonitor) {
+                                           ExecutionInstantsMonitor executionInstantsMonitor,
+                                           DistributedFileSystemMonitor distributedFileSystemMonitor,
+                                           LocalFileSystemMonitor localFileSystemMonitor) {
         // Leftmost monitor is the one that will get executed first. In this case, it is fundamental that the
         // chronometer gets executed first to avoid to interfere in execution time.
-        return new MonitorComposer(Arrays.asList(chronometerMonitor, distributedFileSystemMonitor));
+        return new MonitorComposer(Arrays.asList(chronometerMonitor,
+                executionInstantsMonitor,
+                distributedFileSystemMonitor,
+                localFileSystemMonitor));
     }
 }

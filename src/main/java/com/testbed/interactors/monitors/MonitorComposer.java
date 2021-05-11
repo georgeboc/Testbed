@@ -19,12 +19,20 @@ public class MonitorComposer implements Monitor {
                 .map(monitor -> getFunction(monitor, invocationPlan))
                 .reduce(Function::andThen)
                 .map(function -> function.apply(callable))
-                .map(MonitorCommons::tryCall)
+                .map(this::tryCall)
                 .orElseGet(MonitoringInformation::createNew);
     }
 
     private Function<Callable<MonitoringInformation>, Callable<MonitoringInformation>> getFunction(Monitor monitor,
                                                                                                    InvocationPlan invocationPlan) {
         return callable -> () -> monitor.monitor(callable, invocationPlan);
+    }
+
+    private MonitoringInformation tryCall(Callable<MonitoringInformation> callable) {
+        try {
+            return callable.call();
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
     }
 }
