@@ -42,7 +42,7 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 public class InstrumentedSparkInvocablesConfiguration {
     private static final String APP_NAME = "Testbed";
     private static final String LOCAL_DIRECTORY_CONFIG = "spark.local.dir";
-    private static final String LOCAL_DIRECTORY_PATH = "/tmp/.spark_local_directory";
+    private static final String LOCAL_DIRECTORY_PATH = "/tmp/spark_local_directory";
     private static final String COMPRESSION_CODEC_CONFIG = "spark.sql.parquet.compression.codec";
     private static final String NONE = "none";
 
