@@ -37,10 +37,10 @@ function execute_timed_experiment_with_MapReduce () {
     echo "Executing MapReduce timed experiment #$i"
     timeout 10m hadoop jar $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --output $OUTPUT \
-    --pipeline $PIPELINE \
+    --output "$OUTPUT" \
+    --pipeline "$PIPELINE" \
     --framework-name MapReduce \
-    --sheet-name $SHEET_NAME
+    --sheet-name "$SHEET_NAME"
 }
 
 function execute_timed_experiment_with_Spark () {
@@ -58,9 +58,9 @@ function execute_timed_experiment_with_Spark () {
     $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
-    --pipeline $PIPELINE \
-    --output $OUTPUT \
-    --sheet-name $SHEET_NAME
+    --pipeline "$PIPELINE" \
+    --output "$OUTPUT" \
+    --sheet-name "$SHEET_NAME"
 }
 
 function execute_instrumented_experiment () {
@@ -79,15 +79,15 @@ function execute_instrumented_experiment () {
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
     --instrumented \
-    --pipeline $PIPELINE \
-    --output $OUTPUT \
+    --pipeline "$PIPELINE" \
+    --output "$OUTPUT" \
     --sheet-name "$INSTRUMENTED_SHEET_NAME"
 }
 
 function upload_results_to_google_drive () {
     echo "Uploading results to google drive"
-    hdfs dfs -copyToLocal $OUTPUT .
-    OUTPUT_BASENAME=$(basename $OUTPUT)
+    hdfs dfs -copyToLocal "$OUTPUT" .
+    OUTPUT_BASENAME=$(basename "$OUTPUT")
     rclone copy "$OUTPUT_BASENAME" $GOOGLE_DRIVE_ACCOUNT:$GOOGLE_DRIVE_PATH
     rm "$OUTPUT_BASENAME"
 }
