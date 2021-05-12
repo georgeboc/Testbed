@@ -11,7 +11,7 @@ export INSTRUMENTED_SHEET_NAME="${INSTRUMENTED_SHEET_NAME:="$SHEET_NAME Instrume
 export TOLERABLE_ERROR_PERCENTAGE=5
 
 export GOOGLE_DRIVE_ACCOUNT=gdrive
-export GOOGLE_DRIVE_PATH=Testbed/output
+export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 
 function execute_experiments () {
     clear_output
