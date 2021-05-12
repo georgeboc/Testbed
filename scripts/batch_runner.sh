@@ -11,11 +11,10 @@ function install_last_version {
 }
 
 function execute_batch () {
-  PIPELINE=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json \
-  OUTPUT=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx \
-  SHEET_NAME=New \
-  INSTRUMENTED_SHEET_NAME="New Instrumented" \
-  $($EXPERIMENTS_RUNNER_SCRIPT_PATH)
+  PIPELINE=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json
+  OUTPUT=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx
+  SHEET_NAME=New
+  $($EXPERIMENTS_RUNNER_SCRIPT_PATH) $PIPELINE $OUTPUT $SHEET_NAME
 }
 
 install_last_version

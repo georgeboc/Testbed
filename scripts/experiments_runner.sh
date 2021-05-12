@@ -4,10 +4,10 @@
 export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
 
-export PIPELINE="${PIPELINE:=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json}"
-export OUTPUT="${OUTPUT:=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx}"
-export SHEET_NAME="${SHEET_NAME:=Test}"
-export INSTRUMENTED_SHEET_NAME="${INSTRUMENTED_SHEET_NAME:="$SHEET_NAME Instrumentation"}"
+export PIPELINE=$1
+export OUTPUT=$2
+export SHEET_NAME=$3
+export INSTRUMENTED_SHEET_NAME="$SHEET_NAME Pipeline Instrumentation"
 export TOLERABLE_ERROR_PERCENTAGE=5
 
 export GOOGLE_DRIVE_ACCOUNT=gdrive
