@@ -3,25 +3,33 @@ package com.testbed.interactors.monitors;
 import com.testbed.entities.invocations.InvocationPlan;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 @RequiredArgsConstructor
-public class CPUIoWaitTimeMonitor implements Monitor {
+public class MaxMemoryUtilizationMonitor implements Monitor {
     private static final String MONITOR_NAME_PREFIX = "node";
-    private static final String MONITOR_NAME_SUFFIX = "CpuTimeIoWaitModeInSeconds";
-    private static final String QUERY = "sum by (instance) (node_cpu_seconds_total{mode='iowait'})";
+    private static final String MONITOR_NAME_SUFFIX = "MaxMemoryUtilizationInBytes";
+    private static final String QUERY = "node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + " +
+            "node_memory_Cached_bytes + node_memory_Buffers_bytes)";
 
-    private final InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator;
+    private final RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator;
+
 
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
-        return instantMetricsDifferencesCalculator.calculate(InstantMetricsDifferencesCalculatorParameters.builder()
+        return rangeMetricsAggregateCalculator.calculate(RangeMetricsAggregateCalculatorParameters.builder()
                 .monitorNameParameters(MonitorNameParameters.builder()
                         .monitorNamePrefix(MONITOR_NAME_PREFIX)
                         .monitorNameSuffix(MONITOR_NAME_SUFFIX)
                         .build())
+                .aggregationFunction(this::getMax)
                 .callable(callable)
                 .query(QUERY)
                 .build());
+    }
+
+    private Long getMax(List<Long> values) {
+        return values.stream().reduce(Math::max).get();
     }
 }

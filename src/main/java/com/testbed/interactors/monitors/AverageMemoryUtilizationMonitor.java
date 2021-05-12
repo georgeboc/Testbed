@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 @RequiredArgsConstructor
-public class MinMemoryUtilizationMonitor implements Monitor {
+public class AverageMemoryUtilizationMonitor implements Monitor {
     private static final String MONITOR_NAME_PREFIX = "node";
-    private static final String MONITOR_NAME_SUFFIX = "MinMemoryUtilizationInBytes";
+    private static final String MONITOR_NAME_SUFFIX = "AverageMemoryUtilizationInBytes";
     private static final String QUERY = "node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + " +
             "node_memory_Cached_bytes + node_memory_Buffers_bytes)";
 
@@ -23,13 +23,13 @@ public class MinMemoryUtilizationMonitor implements Monitor {
                         .monitorNamePrefix(MONITOR_NAME_PREFIX)
                         .monitorNameSuffix(MONITOR_NAME_SUFFIX)
                         .build())
-                .aggregationFunction(this::getMin)
+                .aggregationFunction(this::getAverage)
                 .callable(callable)
                 .query(QUERY)
                 .build());
     }
 
-    private Long getMin(List<Long> values) {
-        return values.stream().reduce(Math::min).get();
+    private Long getAverage(List<Long> values) {
+        return (long) ((double) values.stream().reduce(Math::max).get()/values.size());
     }
 }

@@ -26,6 +26,7 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
+import com.testbed.interactors.monitors.AverageMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.CPUIoWaitTimeMonitor;
 import com.testbed.interactors.monitors.CPUSystemTimeMonitor;
 import com.testbed.interactors.monitors.CPUTotalTimeMonitor;
@@ -34,9 +35,11 @@ import com.testbed.interactors.monitors.ChronometerMonitor;
 import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
 import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
+import com.testbed.interactors.monitors.MaxMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
 import com.testbed.interactors.monitors.NoMonitor;
+import com.testbed.interactors.monitors.RangeMetricsAggregateCalculator;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
 import com.testbed.interactors.viewers.InstrumentatedInvocationsViewer;
@@ -51,6 +54,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.w3c.dom.ranges.Range;
 
 import java.io.IOException;
 import java.net.URI;
@@ -245,8 +249,23 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public MinMemoryUtilizationMonitor minMemoryUtilizationMonitor(MetricsQuery metricsQuery) {
-        return new MinMemoryUtilizationMonitor(metricsQuery);
+    public MinMemoryUtilizationMonitor minMemoryUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
+        return new MinMemoryUtilizationMonitor(rangeMetricsAggregateCalculator);
+    }
+
+    @Bean
+    public MaxMemoryUtilizationMonitor maxMemoryUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
+        return new MaxMemoryUtilizationMonitor(rangeMetricsAggregateCalculator);
+    }
+
+    @Bean
+    public AverageMemoryUtilizationMonitor averageMemoryUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
+        return new AverageMemoryUtilizationMonitor(rangeMetricsAggregateCalculator);
+    }
+
+    @Bean
+    public RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator(MetricsQuery metricsQuery) {
+        return new RangeMetricsAggregateCalculator(metricsQuery);
     }
 
     @Bean

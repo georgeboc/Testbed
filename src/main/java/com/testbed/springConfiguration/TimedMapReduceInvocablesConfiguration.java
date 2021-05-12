@@ -1,5 +1,6 @@
 package com.testbed.springConfiguration;
 
+import com.jcraft.jsch.MAC;
 import com.testbed.boundary.invocations.Invokable;
 import com.testbed.boundary.invocations.frameworks.mapReduce.groupBy.GroupByMapReduceOperation;
 import com.testbed.boundary.invocations.frameworks.mapReduce.JobConfigurationCommons;
@@ -13,6 +14,7 @@ import com.testbed.boundary.invocations.frameworks.mapReduce.union.UnionMapReduc
 import com.testbed.boundary.metrics.MetricsQuery;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
+import com.testbed.interactors.monitors.AverageMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.CPUIoWaitTimeMonitor;
 import com.testbed.interactors.monitors.CPUSystemTimeMonitor;
 import com.testbed.interactors.monitors.CPUTotalTimeMonitor;
@@ -23,6 +25,7 @@ import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
 import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
 import com.testbed.interactors.monitors.LocalFileSystemReadBytesMonitor;
 import com.testbed.interactors.monitors.LocalFileSystemWrittenBytesMonitor;
+import com.testbed.interactors.monitors.MaxMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -133,7 +136,9 @@ public class TimedMapReduceInvocablesConfiguration {
                                            CPUSystemTimeMonitor cpuSystemTimeMonitor,
                                            CPUTotalTimeMonitor cpuTotalTimeMonitor,
                                            CPUUserTimeMonitor cpuUserTimeMonitor,
-                                           MinMemoryUtilizationMonitor minMemoryUtilizationMonitor) {
+                                           MinMemoryUtilizationMonitor minMemoryUtilizationMonitor,
+                                           MaxMemoryUtilizationMonitor maxMemoryUtilizationMonitor,
+                                           AverageMemoryUtilizationMonitor averageMemoryUtilizationMonitor) {
         // Leftmost monitor is the one that will get executed first. In this case, it is fundamental that the
         // chronometer gets executed first to avoid to interfere in execution time.
         return new MonitorComposer(Arrays.asList(chronometerMonitor,
@@ -145,6 +150,8 @@ public class TimedMapReduceInvocablesConfiguration {
                 cpuSystemTimeMonitor,
                 cpuTotalTimeMonitor,
                 cpuUserTimeMonitor,
-                minMemoryUtilizationMonitor));
+                minMemoryUtilizationMonitor,
+                maxMemoryUtilizationMonitor,
+                averageMemoryUtilizationMonitor));
     }
 }
