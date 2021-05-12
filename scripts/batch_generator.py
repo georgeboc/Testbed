@@ -9,13 +9,6 @@ SCRIPTS_TEMPLATES = f"{SCRIPTS}/templates"
 SCRIPTS = "scripts"
 PIPELINES = "pipelines"
 
-DATASETS_MAPPING = {
-    "Ad_click_on_taobao_512m": "little (512M)",
-    "Ad_click_on_taobao_1g": "little (1G)",
-    "Obama_visitor_logs_1g": "medium (1G)",
-    "Thunderbird_30g": "big (30G)"
-}
-
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/select_pipeline.json.template"
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
@@ -104,7 +97,7 @@ def get_sheet_name(pipeline_filename):
     pattern = r'(.*)_percent_(.*).json'
     match = re.search(pattern, unparsed_sheet_name)
     percentage, dataset_name = match.groups()
-    return f"{DATASETS_MAPPING[dataset_name]} {percentage}%SF"
+    return f"{dataset_name.replace('_', ' ')} | {percentage} %SF"
 
 if __name__ == "__main__":
     main()
