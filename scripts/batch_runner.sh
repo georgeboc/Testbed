@@ -1,7 +1,7 @@
 #! /bin/bash
 # Execute from Testbed root directory
 
-export EXPERIMENTS_RUNNER_SCRIPT_PATH="/bin/bash experiments_runner.sh"
+export EXPERIMENTS_RUNNER_SCRIPT_PATH="/bin/bash scripts/experiments_runner.sh"
 
 PIPELINE=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json \
 OUTPUT=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx \
