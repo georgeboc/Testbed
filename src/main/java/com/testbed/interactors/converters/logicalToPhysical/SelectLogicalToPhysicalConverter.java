@@ -8,13 +8,18 @@ import com.testbed.entities.operations.physical.PhysicalSelect;
 import com.testbed.entities.profiles.ColumnProfile;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.entities.profiles.ProfileEstimation;
+import com.testbed.interactors.TimedInvocationsInteractor;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.testbed.interactors.converters.ConvertersCommons.checkIfErrorIsTolerable;
 import static java.lang.Math.abs;
 
 @RequiredArgsConstructor
 public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConverter {
+    private static final Logger LOG = LoggerFactory.getLogger(SelectLogicalToPhysicalConverter.class.getName());
+
     private final ColumnReader columnReader;
 
     @Override
@@ -22,6 +27,8 @@ public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConver
         Profile profile = profileEstimation.getProfile();
         LogicalSelect logicalSelect = (LogicalSelect) profileEstimation.getLogicalOperation();
         if (!profile.getColumns().containsKey(logicalSelect.getColumnName())) {
+            LOG.error("Profile columns are: {} but logicalSelect.getColumnName() is: {}",
+                    profile.getColumns(), logicalSelect.getColumnName());
             throw new ColumnNotFoundException(logicalSelect.getColumnName());
         }
         ColumnProfile columnProfile = profile.getColumns().get(logicalSelect.getColumnName());
