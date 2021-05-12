@@ -13,10 +13,7 @@ function install_last_version {
 }
 
 function execute_batch () {
-  PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/select_pipeline-90_percent_Thunderbird_30g.json"
-  OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/select_pipeline.xlsx"
-  SHEET_NAME="Ad_click_on_taobao_512m | 80% Selectivity Factor"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH \"$PIPELINE\" \"$OUTPUT\" \"$SHEET_NAME\""
+{{batches}}
 }
 
 if [ -z $DISABLE_INSTALL_LAST_VERSION ] 
