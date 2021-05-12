@@ -10,7 +10,7 @@ import lombok.Getter;
 import static com.testbed.boundary.invocations.OperationsConstants.LOAD;
 
 public class LoadMapReduceOperation implements Operation {
-    private static final String PARSED_DATASET_FILENAME = "parsed_dataset.parquet";
+    private static final String PARSED_DATASET_FILENAME = "parsed_dataset";
     @Getter
     private final String name = LOAD;
 

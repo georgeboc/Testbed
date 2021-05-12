@@ -15,7 +15,7 @@ import static com.testbed.boundary.invocations.OperationsConstants.LOAD;
 
 @RequiredArgsConstructor
 public class LoadSparkOperation implements Operation {
-    private static final String PARSED_DATASET_FILENAME = "parsed_dataset.parquet";
+    private static final String PARSED_DATASET_FILENAME = "parsed_dataset";
     private final SparkSession sparkSession;
     @Getter
     private final String name = LOAD;

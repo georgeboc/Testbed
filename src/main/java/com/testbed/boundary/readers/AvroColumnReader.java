@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 @RequiredArgsConstructor
@@ -33,12 +34,12 @@ public class AvroColumnReader implements ColumnReader {
                                                 final long columnDistinctRowsCount,
                                                 final String columnName,
                                                 final String directory) {
-        Pattern columnPartsPattern = Pattern.compile("count_value_stats_" + columnName + ".avro/part-.*\\.avro$");
+        Pattern columnPartsPattern = Pattern.compile("count_value_stats_" + columnName + "/part-.*\\.avro$");
         List<String> columnPartsPaths = directoryUtils.tryGetFilesInDirectoryByPattern(directory, columnPartsPattern);
         List<String> sortedColumnPartsPaths = columnPartsPaths.stream().sorted().collect(Collectors.toList());
         int sortedColumnPartsCount = sortedColumnPartsPaths.size();
         int sortedColumnPartId = (int) (sortedColumnPartsCount*selectivityFactor);
-        String sortedColumnPartPath = sortedColumnPartsPaths.get(min(sortedColumnPartId, sortedColumnPartsPaths.size() - 1));
+        String sortedColumnPartPath = sortedColumnPartsPaths.get(max(min(sortedColumnPartId, sortedColumnPartsPaths.size() - 1), 0));
         FileReader<GenericRecord> dataFileReader = tryGetDataFileReaderFromFileName(sortedColumnPartPath);
         long rowId = getRowId(selectivityFactor, columnDistinctRowsCount, sortedColumnPartsCount, sortedColumnPartId);
         return getGenericRecordByRowId(dataFileReader, rowId).get(VALUE).toString();

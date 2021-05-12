@@ -50,7 +50,7 @@ public class  AvroProfileDeserializer implements Deserializer<Profile> {
     }
 
     private Stream<String> getColumnNamesStream(final List<String> columnMetadataPaths) {
-        Pattern columnFileNamePattern = Pattern.compile("count_value_stats_(.*)\\.avro/");
+        Pattern columnFileNamePattern = Pattern.compile("count_value_stats_(.*)/");
         return columnMetadataPaths.stream()
                 .map(columnFileNamePattern::matcher)
                 .filter(Matcher::find)
