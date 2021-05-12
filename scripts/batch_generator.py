@@ -11,7 +11,7 @@ PIPELINES = "pipelines"
 PIPELINE_TEMPLATE = f"{SCRIPTS}/select_pipeline.json.template"
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS}/batch_runner.sh.template"
 
-OUTPUT_FILENAME_FORMAT = f"{PIPELINES}/select_pipeline-\\{{selectivity_factor_percentage\\}}_percent_\\{{dataset_name\\}}.json"
+OUTPUT_FILENAME_FORMAT = "{{pipelines_directory}}/select_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS_GENERATED}/select_batch_runner.sh"
 
 SELECTIVITY_FACTOR_PERCENTAGES = [1, 3, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
@@ -40,7 +40,8 @@ def create_pipelines(column_name, dataset_name):
                                                                  column_name=column_name)
         print("Pipeline content:", pipeline_content)
         filename = Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
-                                                           selectivity_factor_percentage=selectivity_factor_percentage)
+                                                           selectivity_factor_percentage=selectivity_factor_percentage,
+                                                           pipelines_directory=PIPELINES)
         print("Filename generated:", filename)
         write_file_contents(filename, pipeline_content)
 
@@ -84,7 +85,8 @@ def get_pipeline_filenames(dataset_names):
     pipeline_filenames = []
     for dataset_name in dataset_names:
         pipeline_filenames.extend([Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
-                                                        selectivity_factor_percentage=selectivity_factor_percentage)
+                                                                           selectivity_factor_percentage=selectivity_factor_percentage,
+                                                                           pipelines_directory=PIPELINES)
                 for selectivity_factor_percentage in SELECTIVITY_FACTOR_PERCENTAGES])
     return pipeline_filenames
 
