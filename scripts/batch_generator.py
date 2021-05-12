@@ -4,11 +4,15 @@
 import re
 from jinja2 import Template
 
-PIPELINE_TEMPLATE = "select_pipeline.json.template"
-BATCH_RUNNER_TEMPLATE = "batch_runner.sh.template"
+SCRIPTS = "scripts"
+SCRIPTS_GENERATED = "scripts/generated"
+PIPELINES = "pipelines"
 
-OUTPUT_FILENAME_FORMAT = "select_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
-OUTPUT_BATCH_RUNNER_FILENAME = "select_batch_runner.sh"
+PIPELINE_TEMPLATE = f"{SCRIPTS}/select_pipeline.json.template"
+BATCH_RUNNER_TEMPLATE = f"{SCRIPTS}/batch_runner.sh.template"
+
+OUTPUT_FILENAME_FORMAT = f"{PIPELINES}/select_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
+OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS_GENERATED}/select_batch_runner.sh"
 
 SELECTIVITY_FACTOR_PERCENTAGES = [1, 3, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
