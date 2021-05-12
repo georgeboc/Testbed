@@ -4,17 +4,18 @@
 export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
 
-export PIPELINE=$1
-export OUTPUT=$2
-export SHEET_NAME=$3
+export PIPELINE=$2
+export OUTPUT=$3
+export SHEET_NAME=$4
 export INSTRUMENTED_SHEET_NAME="$SHEET_NAME Pipeline Instrumentation"
 export TOLERABLE_ERROR_PERCENTAGE=5
 
 export GOOGLE_DRIVE_ACCOUNT=gdrive
 export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 
+echo "Parameters read: $PIPELINE, $OUTPUT, $SHEET_NAME"
+
 function execute_experiments () {
-    clear_output
     for i in {1..3}
     do
         clear_caches
@@ -24,11 +25,6 @@ function execute_experiments () {
     done
     execute_instrumented_experiment
     upload_results_to_google_drive
-}
-
-function clear_output () {
-  echo "Ensuring output is a new file"
-  hdfs dfs -rm $OUTPUT
 }
 
 function clear_caches () {
@@ -100,5 +96,5 @@ if [ "$1" == "!" ]
 then
   execute_experiments
 else
-  screen bash "$0" !
+  screen bash "$0" ! "$@"
 fi
