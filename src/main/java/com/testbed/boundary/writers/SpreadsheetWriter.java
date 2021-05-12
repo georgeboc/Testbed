@@ -7,5 +7,6 @@ public interface SpreadsheetWriter {
     void write(final OutputParameters outputParameters, final Position position, final String value);
     void writeWithColor(final OutputParameters outputParameters, final Position position, final String value, final String colorName);
     boolean isEmpty(final OutputParameters outputParameters, final Position position);
-    int getFirstUnwrittenColumn(OutputParameters outputParameters, int row);
+    int getFirstUnwrittenColumn(OutputParameters outputParameters, int row, int columnOffset);
+    void makeMergedRegion(final OutputParameters outputParameters, final Position startPosition, final Position endPosition);
 }

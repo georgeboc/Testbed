@@ -13,6 +13,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -69,12 +70,28 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public int getFirstUnwrittenColumn(OutputParameters outputParameters, int row) {
-        int i = 0;
+    public int getFirstUnwrittenColumn(OutputParameters outputParameters, int row, int columnOffset) {
+        int i = columnOffset;
         while (!isEmpty(outputParameters, Position.builder().row(row).column(i).build())) {
             ++i;
         }
         return i;
+    }
+
+    @Override
+    public void makeMergedRegion(OutputParameters outputParameters, Position startPosition, Position endPosition) {
+        Workbook workbook = tryGetWorkbook(outputParameters);
+        Sheet sheet = getOrCreateSheet(outputParameters, workbook);
+        sheet.addMergedRegion(new CellRangeAddress(startPosition.getRow(),
+                endPosition.getRow(),
+                startPosition.getColumn(),
+                endPosition.getColumn()));
+        Row row = sheet.getRow(startPosition.getRow());
+        Cell cell = row.getCell(startPosition.getColumn());
+        CellStyle cellStyle = cell.getCellStyle();
+        cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+        cell.setCellStyle(cellStyle);
+        tryWriteWorkbook(outputParameters, workbook);
     }
 
     private Sheet getOrCreateSheet(OutputParameters outputParameters, Workbook workbook) {

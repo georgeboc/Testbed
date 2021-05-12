@@ -18,27 +18,24 @@ import static java.lang.Math.min;
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
 public class TimedInvocationsViewer {
-    private static final String EMPTY = "";
-    private static final String FIRST_INVOCATION_TIME = "First invocation time (ns)";
-    private static final String SECOND_INVOCATION_TIME = "Second invocation time (ns)";
-    private static final String THIRD_INVOCATION_TIME = "Third invocation time (ns)";
-    private static final String MEDIAN_INVOCATION_TIME = "Median invocation time (ns)";
-    private static final String INTERMEDIATE_DATASETS_USAGE_WITHOUT_REPLICATION =
-            "Intermediate datasets usage of distributed filesystem without replication (bytes)";
-    private static final String INTERMEDIATE_DATASETS_USAGE_WITH_REPLICATION =
-            "Intermediate datasets usage of distributed filesystem with replication (bytes)";
-    private static final String[] HEADERS = {EMPTY,
-            FIRST_INVOCATION_TIME, SECOND_INVOCATION_TIME, THIRD_INVOCATION_TIME, MEDIAN_INVOCATION_TIME,
-            INTERMEDIATE_DATASETS_USAGE_WITHOUT_REPLICATION, INTERMEDIATE_DATASETS_USAGE_WITH_REPLICATION};
+    private static final String EMPTY = " ";
+    private static final String[] FRAMEWORKS_HEADERS = {EMPTY,
+            FrameworkName.Spark.name(), EMPTY, EMPTY, EMPTY,
+            FrameworkName.MapReduce.name(), EMPTY, EMPTY, EMPTY};
+    private static final String FIRST_INVOCATION = "First Invocation";
+    private static final String SECOND_INVOCATION = "Second Invocation";
+    private static final String THIRD_INVOCATION = "Third Invocation";
+    private static final String MEDIAN = "Median";
+    private static final String[] INVOCATIONS_HEADERS = {EMPTY, FIRST_INVOCATION, SECOND_INVOCATION, THIRD_INVOCATION,
+    MEDIAN, FIRST_INVOCATION, SECOND_INVOCATION, THIRD_INVOCATION, MEDIAN};
     private static final int FIRST_COLUMN = 0;
-    private static final int LATERAL_HEADER_COLUMN = 0;
-    private static final int MEDIAN_COLUMN = 4;
-    private static final int TOP_HEADERS_ROW = 0;
-    private static final int MAPREDUCE_ROW = 1;
-    private static final int SPARK_ROW = 2;
+    private static final int FIRST_ROW_TOP_HEADERS = 0;
+    private static final int SECOND_ROW_TOP_HEADERS = 1;
+    private static final int SPARK_FIRST_COLUMN = EMPTY.length();
+    private static final int SPARK_LAST_COLUMN = SPARK_FIRST_COLUMN + EMPTY.length()*3;
+    private static final int MAPREDUCE_FIRST_COLUMN = SPARK_LAST_COLUMN + 1;
+    private static final int MAPREDUCE_LAST_COLUMN = MAPREDUCE_FIRST_COLUMN + EMPTY.length()*3;
     private static final String TOP_HEADER_COLOR_NAME = "LIME";
-    private static final String LATERAL_HEADER_COLOR_NAME = "LIME";
-    private static final String FORMULA_FORMAT = "MEDIAN(VALUE(B%1$s),VALUE(C%1$s),VALUE(D%1$s))";
 
     private final SpreadsheetWriter spreadsheetWriter;
     private final MonitoringInformationViewer monitoringInformationViewer;
@@ -47,48 +44,37 @@ public class TimedInvocationsViewer {
                      final FrameworkName frameworkName,
                      final MonitoringInformation monitoringInformation) {
         writeTopHeaders(outputParameters);
-        writeFrameworkName(outputParameters, frameworkName);
-        int frameworkRow = FrameworksPosition.valueOf(frameworkName.name()).row;
-        monitoringInformationViewer.view(outputParameters, monitoringInformation, frameworkRow);
-        writeMedianFormula(outputParameters, frameworkRow);
+        int frameworkColumn = FrameworksPosition.valueOf(frameworkName.name()).column;
+        monitoringInformationViewer.view(outputParameters, monitoringInformation, frameworkColumn);
     }
 
     private void writeTopHeaders(final OutputParameters outputParameters) {
-        IntStream columnsSuccession = IntStream.iterate(FIRST_COLUMN, i -> i + 1);
-        Stream<Position> positionStream = columnsSuccession.mapToObj(column -> Position.builder()
-                .column(column).row(TOP_HEADERS_ROW).build());
-        Streams.forEachPair(positionStream, Arrays.stream(HEADERS),
+        writeTopHeaders(outputParameters, FRAMEWORKS_HEADERS, FIRST_ROW_TOP_HEADERS);
+        Position sparkFirstPosition = Position.builder().column(SPARK_FIRST_COLUMN).row(FIRST_ROW_TOP_HEADERS).build();
+        Position sparkLastPosition = Position.builder().column(SPARK_LAST_COLUMN).row(FIRST_ROW_TOP_HEADERS).build();
+        spreadsheetWriter.makeMergedRegion(outputParameters, sparkFirstPosition, sparkLastPosition);
+        Position mapReduceFirstPosition = Position.builder().column(MAPREDUCE_FIRST_COLUMN).row(FIRST_ROW_TOP_HEADERS).build();
+        Position mapReduceLastPosition = Position.builder().column(MAPREDUCE_LAST_COLUMN).row(FIRST_ROW_TOP_HEADERS).build();
+        spreadsheetWriter.makeMergedRegion(outputParameters, mapReduceFirstPosition, mapReduceLastPosition);
+        writeTopHeaders(outputParameters, INVOCATIONS_HEADERS, SECOND_ROW_TOP_HEADERS);
+    }
+
+    private void writeTopHeaders(final OutputParameters outputParameters, String[] headers, int row) {
+        Stream<Position> positionStream = IntStream.iterate(FIRST_COLUMN, i -> i + 1)
+                .mapToObj(column -> Position.builder().column(column).row(row).build());
+        Streams.forEachPair(positionStream, Arrays.stream(headers),
                 (position, header) -> spreadsheetWriter.writeWithColor(outputParameters,
                         position,
                         header,
                         TOP_HEADER_COLOR_NAME));
     }
 
-    private void writeFrameworkName(final OutputParameters outputParameters,
-                                    final FrameworkName frameworkName) {
-        Position lateralHeaderPosition = Position.builder()
-                .column(LATERAL_HEADER_COLUMN)
-                .row(FrameworksPosition.valueOf(frameworkName.name()).row)
-                .build();
-        spreadsheetWriter.writeWithColor(outputParameters,
-                lateralHeaderPosition,
-                frameworkName.name(),
-                LATERAL_HEADER_COLOR_NAME);
-    }
-
-    private void writeMedianFormula(OutputParameters outputParameters, int row) {
-        Position position = Position.builder().row(row).column(MEDIAN_COLUMN).build();
-        int spreadsheetRow = row + 1;
-        String formula = String.format(FORMULA_FORMAT, spreadsheetRow);
-        spreadsheetWriter.addFormula(outputParameters, position, formula);
-    }
-
     @RequiredArgsConstructor
     @ToString
     private enum FrameworksPosition {
-        MapReduce(MAPREDUCE_ROW),
-        Spark(SPARK_ROW);
+        Spark(SPARK_FIRST_COLUMN),
+        MapReduce(MAPREDUCE_FIRST_COLUMN);
 
-        private final int row;
+        private final int column;
     }
 }

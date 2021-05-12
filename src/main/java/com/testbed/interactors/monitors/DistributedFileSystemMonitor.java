@@ -16,8 +16,10 @@ import java.util.stream.Collectors;
 public class DistributedFileSystemMonitor implements Monitor {
     private static final String INTERMEDIATE_DATASETS_DIRECTORY_PREFIX = "intermediate_datasets/";
     private static final boolean RECURSIVELY = true;
-    private static final String DISTRIBUTED_FILESYSTEM_SIZE_WITH_REPLICATION = "distributedFileSystemSizeWithReplication";
-    private static final String DISTRIBUTED_FILESYSTEM_SIZE_WITHOUT_REPLICATION = "distributedFileSystemSizeWithoutReplication";
+    private static final String DISTRIBUTED_FILESYSTEM_WRITTEN_BYTES_WITH_REPLICATION =
+            "distributedFileSystemWrittenBytesWithReplication";
+    private static final String DISTRIBUTED_FILESYSTEM_WRITTEN_BYTES_WITHOUT_REPLICATION =
+            "distributedFileSystemWrittenBytes (=#ReadBytes)WithoutReplication";
 
     private final FileSystem fileSystem;
     private final MonitoringInformationCoalesce monitoringInformationCoalesce;
@@ -52,9 +54,9 @@ public class DistributedFileSystemMonitor implements Monitor {
     private MonitoringInformation getMonitoringInformation() {
         MonitoringInformation monitoringInformation = MonitoringInformation.createNew();
         ContentSummary contentSummary = tryGetContentSummary();
-        monitoringInformation.getResult().put(DISTRIBUTED_FILESYSTEM_SIZE_WITH_REPLICATION,
+        monitoringInformation.getResult().put(DISTRIBUTED_FILESYSTEM_WRITTEN_BYTES_WITH_REPLICATION,
                 String.valueOf(contentSummary.getSpaceConsumed()));
-        monitoringInformation.getResult().put(DISTRIBUTED_FILESYSTEM_SIZE_WITHOUT_REPLICATION,
+        monitoringInformation.getResult().put(DISTRIBUTED_FILESYSTEM_WRITTEN_BYTES_WITHOUT_REPLICATION,
                 String.valueOf(contentSummary.getLength()));
         return monitoringInformation;
     }

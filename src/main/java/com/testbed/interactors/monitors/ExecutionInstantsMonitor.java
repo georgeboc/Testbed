@@ -9,8 +9,8 @@ import java.util.concurrent.Callable;
 
 @RequiredArgsConstructor
 public class ExecutionInstantsMonitor implements Monitor {
-    private static final String INITIAL_INSTANT = "initialInstantInNanoseconds";
-    private static final String FINAL_INSTANT = "finalInstantInNanoseconds";
+    private static final String INITIAL_INSTANT = "initialInstant";
+    private static final String FINAL_INSTANT = "finalInstant";
 
     private final MonitoringInformationCoalesce monitoringInformationCoalesce;
 

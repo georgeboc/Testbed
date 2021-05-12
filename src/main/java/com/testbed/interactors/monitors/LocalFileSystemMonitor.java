@@ -14,7 +14,9 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class LocalFileSystemMonitor implements Monitor {
-    private static final String MONITOR_PREFIX = "localFileSystemOnNode";
+    private static final String MONITOR_PREFIX = "Node";
+    private static final String WRITES_MONITOR_SUFFIX = "LocalFileSystemWrittenBytes";
+    private static final String READS_MONITOR_SUFFIX = "LocalFileSystemReadBytes";
 
     private final MonitoringInformationCoalesce monitoringInformationCoalesce;
     private final MetricsQuery metricsQuery;
@@ -23,32 +25,42 @@ public class LocalFileSystemMonitor implements Monitor {
     @SneakyThrows
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
-        String query = String.format("node_disk_written_bytes_total{device='%s'}", deviceName);
-        Map<String, InstantMetric> initialInstantMetricByHostname = metricsQuery.getInstantMetricByHostname(query);
+        String writesQuery = String.format("node_disk_written_bytes_total{device='%s'}", deviceName);
+        String readsQuery = String.format("node_disk_read_bytes_total{device='%s'}", deviceName);
+        Map<String, InstantMetric> initialInstantMetricByHostnameWrites = metricsQuery.getInstantMetricByHostname(writesQuery);
+        Map<String, InstantMetric> initialInstantMetricByHostnameReads = metricsQuery.getInstantMetricByHostname(readsQuery);
         MonitoringInformation callableMonitoringInformation = callable.call();
-        Map<String, InstantMetric> finalInstantMetricByHostname = metricsQuery.getInstantMetricByHostname(query);
+        Map<String, InstantMetric> finalInstantMetricByHostnameWrites = metricsQuery.getInstantMetricByHostname(writesQuery);
+        Map<String, InstantMetric> finalInstantMetricByHostnameReads = metricsQuery.getInstantMetricByHostname(readsQuery);
+        Map<String, String> differences = getDifferencesByHostname(WRITES_MONITOR_SUFFIX,
+                initialInstantMetricByHostnameWrites,
+                finalInstantMetricByHostnameWrites);
+        differences.putAll(getDifferencesByHostname(READS_MONITOR_SUFFIX,
+                initialInstantMetricByHostnameReads,
+                finalInstantMetricByHostnameReads));
         return monitoringInformationCoalesce.coalesce(callableMonitoringInformation,
-                getMonitoringInformation(initialInstantMetricByHostname, finalInstantMetricByHostname));
+                new MonitoringInformation(differences));
     }
 
-    private MonitoringInformation getMonitoringInformation(Map<String, InstantMetric> initialInstantMetricByHost,
-                                                           Map<String, InstantMetric> finalInstantMetricByHost) {
-        Map<String, String> differencesByHostname = initialInstantMetricByHost.entrySet().stream()
-                .map(entry -> getDifferenceEntry(finalInstantMetricByHost, entry))
+    private Map<String, String> getDifferencesByHostname(String monitorSuffix,
+                                                         Map<String, InstantMetric> initialInstantMetricByHost,
+                                                         Map<String, InstantMetric> finalInstantMetricByHost) {
+        return initialInstantMetricByHost.entrySet().stream()
+                .map(entry -> getDifferenceEntry(monitorSuffix, finalInstantMetricByHost, entry))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        return new MonitoringInformation(differencesByHostname);
     }
 
-    private Map.Entry<String, String> getDifferenceEntry(Map<String, InstantMetric> finalInstantMetricByHostname,
-                                    Map.Entry<String, InstantMetric> initialInstantMetricEntry) {
+    private Map.Entry<String, String> getDifferenceEntry(String monitorSuffix,
+            Map<String, InstantMetric> finalInstantMetricByHostname,
+            Map.Entry<String, InstantMetric> initialInstantMetricEntry) {
         String hostname = initialInstantMetricEntry.getKey();
         InstantMetric initialInstantMetric = initialInstantMetricEntry.getValue();
         InstantMetric finalInstantMetric = finalInstantMetricByHostname.get(hostname);
         long difference = finalInstantMetric.getValue() - initialInstantMetric.getValue();
-        return new AbstractMap.SimpleEntry<>(getMonitorName(hostname), String.valueOf(difference));
+        return new AbstractMap.SimpleEntry<>(getMonitorName(monitorSuffix, hostname), String.valueOf(difference));
     }
 
-    private String getMonitorName(String hostname) {
-        return MONITOR_PREFIX + WordUtils.capitalizeFully(hostname);
+    private String getMonitorName(String monitorSuffix, String hostname) {
+        return MONITOR_PREFIX + WordUtils.capitalizeFully(hostname) + monitorSuffix;
     }
 }
