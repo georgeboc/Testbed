@@ -28,7 +28,7 @@ BATCH_ENTRY = """
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
   OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
   SHEET_NAME="{{sheet_name}}"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH $PIPELINE $OUTPUT $SHEET_NAME"
+  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH $PIPELINE $OUTPUT \"$SHEET_NAME\""
   
 """
 
@@ -104,7 +104,7 @@ def get_sheet_name(pipeline_filename):
     pattern = r'(.*)_percent_(.*).json'
     match = re.search(pattern, unparsed_sheet_name)
     percentage, dataset_name = match.groups()
-    return f"\"{DATASETS_MAPPING[dataset_name]} {percentage}%SF\""
+    return f"{DATASETS_MAPPING[dataset_name]} {percentage}%SF"
 
 if __name__ == "__main__":
     main()
