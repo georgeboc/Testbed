@@ -1,7 +1,7 @@
 #! /bin/bash
 # Execute from Testbed root directory
 
-export DISABLE_INSTALL_LAST_VERSION=$1
+export DISABLE_INSTALL_LAST_VERSION=$2
 
 export SCRIPTS_PATH=scripts
 export EXPERIMENTS_RUNNER_SCRIPT_PATH="/bin/bash $SCRIPTS_PATH/experiments_runner.sh"
@@ -16,14 +16,17 @@ function execute_batch () {
 {{batches}}
 }
 
-if [ -z $DISABLE_INSTALL_LAST_VERSION ] 
-then
-  install_last_version
-fi
+function main () {
+  if [ $DISABLE_INSTALL_LAST_VERSION != "--disable-install-last-version" ]
+  then
+    install_last_version
+  fi
+  execute_batch
+}
 
 if [ "$1" == "!" ]
 then
-  execute_batch
+  main
 else
   screen bash "$0" ! "$@"
 fi
