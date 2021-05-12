@@ -177,6 +177,11 @@
             <version>2.10.0</version>
         </dependency>
         <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.9</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
             <version>3.2.4</version>
@@ -257,6 +262,13 @@
                                     <shadedPattern>shaded.okio</shadedPattern>
                                     <excludes>
                                         <exclude>okio</exclude>
+                                    </excludes>
+                                </relocation>
+                                <relocation>
+                                    <pattern>okhttp3</pattern>
+                                    <shadedPattern>shaded.okhttp3</shadedPattern>
+                                    <excludes>
+                                        <exclude>okhttp3</exclude>
                                     </excludes>
                                 </relocation>
                             </relocations>
