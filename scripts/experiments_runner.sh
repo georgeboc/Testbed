@@ -14,7 +14,7 @@ export GOOGLE_DRIVE_ACCOUNT=gdrive
 export GOOGLE_DRIVE_PATH=Testbed/output
 
 function execute_experiments {
-    output_cleanup
+    clear_output
     install_last_version
     for i in {1..3}
     do
@@ -27,7 +27,7 @@ function execute_experiments {
     upload_results_to_google_drive
 }
 
-function output_cleanup () {
+function clear_output () {
   echo "Ensuring output is a new file"
   hdfs dfs -rm $OUTPUT
 }
@@ -59,13 +59,13 @@ function execute_timed_experiment_with_Spark () {
     timeout 10m spark-submit \
     --master yarn \
     --deploy-mode cluster \
-    --conf spark.driver.memory="22602M" \
-    --conf spark.driver.memoryOverhead="1702M" \
-    --conf spark.executor.memory="22602M" \
-    --conf spark.executor.memoryOverhead="1702M" \
+    --conf spark.driver.memory="11301M" \
+    --conf spark.driver.memoryOverhead="851M" \
+    --conf spark.executor.memory="11301M" \
+    --conf spark.executor.memoryOverhead="851M" \
     --conf spark.driver.cores="8" \
     --conf spark.executor.cores="8" \
-    --conf spark.executor.instances="3" \
+    --conf spark.executor.instances="5" \
     $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
@@ -79,13 +79,13 @@ function execute_instrumented_experiment () {
     timeout 10m spark-submit \
     --master yarn \
     --deploy-mode cluster \
-    --conf spark.driver.memory="22602M" \
-    --conf spark.driver.memoryOverhead="1702M" \
-    --conf spark.executor.memory="22602M" \
-    --conf spark.executor.memoryOverhead="1702M" \
+    --conf spark.driver.memory="11301M" \
+    --conf spark.driver.memoryOverhead="851M" \
+    --conf spark.executor.memory="11301M" \
+    --conf spark.executor.memoryOverhead="851M" \
     --conf spark.driver.cores="8" \
     --conf spark.executor.cores="8" \
-    --conf spark.executor.instances="3" \
+    --conf spark.executor.instances="5" \
     $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --framework-name Spark \
