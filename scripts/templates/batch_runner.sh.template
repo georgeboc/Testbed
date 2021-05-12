@@ -1,9 +1,7 @@
 #! /bin/bash
 # Execute from Testbed root directory
 
-if [ -z "$STY" ]; then exec screen -S batch_runner /bin/bash "$0"; fi
-
-export DISABLE_INSTALL_LAST_VERSION=$1
+export DISABLE_INSTALL_LAST_VERSION=$2
 
 export SCRIPTS_PATH=scripts
 export EXPERIMENTS_RUNNER_SCRIPT_PATH="/bin/bash $SCRIPTS_PATH/experiments_runner.sh"
@@ -26,4 +24,9 @@ function main () {
   execute_batch
 }
 
-main
+if [ "$1" == "!" ]
+then
+  main
+else
+  screen bash "$0" ! "$@"
+fi

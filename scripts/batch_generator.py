@@ -28,7 +28,7 @@ BATCH_ENTRY = """
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
   OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
   SHEET_NAME="{{sheet_name}}"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH $PIPELINE $OUTPUT \"$SHEET_NAME\""
+  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME'"
   
 """
 
