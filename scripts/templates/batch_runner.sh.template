@@ -17,7 +17,7 @@ function execute_batch () {
 }
 
 function main () {
-  if [ $DISABLE_INSTALL_LAST_VERSION != "--disable-install-last-version" ]
+  if [ "$DISABLE_INSTALL_LAST_VERSION" != "--disable-install-last-version" ]
   then
     install_last_version
   fi
