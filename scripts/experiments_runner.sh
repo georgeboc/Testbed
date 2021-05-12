@@ -4,9 +4,9 @@
 export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
 
-export PIPELINE=$2
-export OUTPUT=$3
-export SHEET_NAME=$4
+export PIPELINE=$1
+export OUTPUT=$2
+export SHEET_NAME=$3
 export INSTRUMENTED_SHEET_NAME="$SHEET_NAME Pipeline Instrumentation"
 export TOLERABLE_ERROR_PERCENTAGE=5
 
@@ -92,9 +92,4 @@ function upload_results_to_google_drive () {
     rm "$OUTPUT_BASENAME"
 }
 
-if [ "$1" == "!" ]
-then
-  execute_experiments
-else
-  screen bash "$0" ! "$@"
-fi
+execute_experiments

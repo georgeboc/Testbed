@@ -20,4 +20,10 @@ if [ -z $DISABLE_INSTALL_LAST_VERSION ]
 then
   install_last_version
 fi
-execute_batch
+
+if [ "$1" == "!" ]
+then
+  execute_batch
+else
+  screen bash "$0" ! "$@"
+fi
