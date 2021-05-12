@@ -4,16 +4,16 @@
 export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
 
-export PIPELINE=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json
-export OUTPUT=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx
-export SHEET_NAME=Test
-export INSTRUMENTED_SHEET_NAME="$SHEET_NAME Instrumentation"
+export PIPELINE="${PIPELINE:=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json}"
+export OUTPUT="${OUTPUT:=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx}"
+export SHEET_NAME="${SHEET_NAME:=Test}"
+export INSTRUMENTED_SHEET_NAME="${INSTRUMENTED_SHEET_NAME:="$SHEET_NAME Instrumentation"}"
 export TOLERABLE_ERROR_PERCENTAGE=5
 
 export GOOGLE_DRIVE_ACCOUNT=gdrive
 export GOOGLE_DRIVE_PATH=Testbed/output
 
-function execute_experiments {
+function execute_experiments () {
     clear_output
     install_last_version
     for i in {1..3}
