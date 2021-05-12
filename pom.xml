@@ -245,6 +245,13 @@
                                         <exclude>com.google.common</exclude>
                                     </excludes>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.google.gson</pattern>
+                                    <shadedPattern>shaded.com.google.gson</shadedPattern>
+                                    <excludes>
+                                        <exclude>com.google.gson</exclude>
+                                    </excludes>
+                                </relocation>
                             </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
