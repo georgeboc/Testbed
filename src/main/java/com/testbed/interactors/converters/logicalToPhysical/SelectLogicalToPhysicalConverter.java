@@ -27,8 +27,7 @@ public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConver
         Profile profile = profileEstimation.getProfile();
         LogicalSelect logicalSelect = (LogicalSelect) profileEstimation.getLogicalOperation();
         if (!profile.getColumns().containsKey(logicalSelect.getColumnName())) {
-            LOG.error("Profile columns are: {} but logicalSelect.getColumnName() is: {}",
-                    profile.getColumns(), logicalSelect.getColumnName());
+            LOG.error("Profile is: {} but logicalSelect.getColumnName() is: {}", profile, logicalSelect.getColumnName());
             throw new ColumnNotFoundException(logicalSelect.getColumnName());
         }
         ColumnProfile columnProfile = profile.getColumns().get(logicalSelect.getColumnName());
