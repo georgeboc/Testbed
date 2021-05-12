@@ -252,6 +252,13 @@
                                         <exclude>com.google.gson</exclude>
                                     </excludes>
                                 </relocation>
+                                <relocation>
+                                    <pattern>okio</pattern>
+                                    <shadedPattern>shaded.okio</shadedPattern>
+                                    <excludes>
+                                        <exclude>okio</exclude>
+                                    </excludes>
+                                </relocation>
                             </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
