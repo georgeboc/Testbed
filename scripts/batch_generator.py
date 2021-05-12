@@ -19,7 +19,7 @@ SELECTIVITY_FACTOR_PERCENTAGES = [1, 3, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 1
 
 BATCH_ENTRY = """  
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
-  OUTPUT="hdfs://dtim:27000/user/bochileanu/output/{{output_filename}}"
+  OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
   SHEET_NAME="{{sheet_name}}"
   bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH $PIPELINE $OUTPUT $SHEET_NAME"
   
