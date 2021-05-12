@@ -1,13 +1,11 @@
 package com.testbed.boundary.metrics.prometheus.schemas;
 
-import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class Result {
+public class RangeResult {
     private Metric metric;
-    @SerializedName("value")
-    private List<String> values;
+    private List<List<String>> values;
 }

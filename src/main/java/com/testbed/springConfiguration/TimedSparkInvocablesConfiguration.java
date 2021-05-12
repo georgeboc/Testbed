@@ -20,6 +20,7 @@ import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
 import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
 import com.testbed.interactors.monitors.LocalFileSystemReadBytesMonitor;
 import com.testbed.interactors.monitors.LocalFileSystemWrittenBytesMonitor;
+import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.sql.SparkSession;
@@ -129,7 +130,8 @@ public class TimedSparkInvocablesConfiguration {
                                            CPUIoWaitTimeMonitor cpuIoWaitTimeMonitor,
                                            CPUSystemTimeMonitor cpuSystemTimeMonitor,
                                            CPUTotalTimeMonitor cpuTotalTimeMonitor,
-                                           CPUUserTimeMonitor cpuUserTimeMonitor) {
+                                           CPUUserTimeMonitor cpuUserTimeMonitor,
+                                           MinMemoryUtilizationMonitor minMemoryUtilizationMonitor) {
         // Leftmost monitor is the one that will get executed first. In this case, it is fundamental that the
         // chronometer gets executed first to avoid to interfere in execution time.
         return new MonitorComposer(Arrays.asList(chronometerMonitor,
@@ -140,6 +142,7 @@ public class TimedSparkInvocablesConfiguration {
                 cpuIoWaitTimeMonitor,
                 cpuSystemTimeMonitor,
                 cpuTotalTimeMonitor,
-                cpuUserTimeMonitor));
+                cpuUserTimeMonitor,
+                minMemoryUtilizationMonitor));
     }
 }

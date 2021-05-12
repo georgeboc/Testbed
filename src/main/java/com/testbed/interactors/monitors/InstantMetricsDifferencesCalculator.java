@@ -22,9 +22,9 @@ public class InstantMetricsDifferencesCalculator {
                                            String query,
                                            String monitorNamePrefix,
                                            String monitorNameSuffix) {
-        Map<String, InstantMetric> initialInstantMetricByHostname = metricsQuery.getInstantMetricByHostname(query);
+        Map<String, InstantMetric> initialInstantMetricByHostname = metricsQuery.getInstantQueryByHostname(query);
         MonitoringInformation callableMonitoringInformation = callable.call();
-        Map<String, InstantMetric> finalInstantMetricByHostname = metricsQuery.getInstantMetricByHostname(query);
+        Map<String, InstantMetric> finalInstantMetricByHostname = metricsQuery.getInstantQueryByHostname(query);
         return coalesce(callableMonitoringInformation,
                 getMonitorInformation(monitorNamePrefix,
                         monitorNameSuffix,

@@ -4,9 +4,8 @@ import lombok.Data;
 
 import java.util.List;
 
-
 @Data
-public class InstantData {
-    private String resultType;
-    private List<InstantResult> result;
+public class InstantResult {
+    private Metric metric;
+    private List<String> value;
 }

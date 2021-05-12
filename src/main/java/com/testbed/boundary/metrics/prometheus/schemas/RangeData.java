@@ -4,9 +4,8 @@ import lombok.Data;
 
 import java.util.List;
 
-
 @Data
-public class InstantData {
+public class RangeData {
     private String resultType;
-    private List<InstantResult> result;
+    private List<RangeResult> result;
 }

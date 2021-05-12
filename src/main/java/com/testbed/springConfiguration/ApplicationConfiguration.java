@@ -34,6 +34,7 @@ import com.testbed.interactors.monitors.ChronometerMonitor;
 import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
 import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
+import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
 import com.testbed.interactors.monitors.NoMonitor;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
@@ -241,6 +242,11 @@ public class ApplicationConfiguration {
     @Bean
     public CPUUserTimeMonitor cpuUserTimeMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
         return new CPUUserTimeMonitor(instantMetricsDifferencesCalculator);
+    }
+
+    @Bean
+    public MinMemoryUtilizationMonitor minMemoryUtilizationMonitor(MetricsQuery metricsQuery) {
+        return new MinMemoryUtilizationMonitor(metricsQuery);
     }
 
     @Bean

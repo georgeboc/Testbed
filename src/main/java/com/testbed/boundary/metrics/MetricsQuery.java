@@ -1,9 +1,9 @@
 package com.testbed.boundary.metrics;
 
-import java.io.IOException;
-import java.util.List;
+import java.time.Instant;
 import java.util.Map;
 
 public interface MetricsQuery {
-    Map<String, InstantMetric> getInstantMetricByHostname(String query) throws IOException;
+    Map<String, InstantMetric> getInstantQueryByHostname(String query);
+    Map<String, RangeMetric> getRangeQueryByHostname(String query, Instant start, Instant end, double stepInSeconds);
 }
