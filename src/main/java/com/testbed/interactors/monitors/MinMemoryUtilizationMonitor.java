@@ -23,13 +23,9 @@ public class MinMemoryUtilizationMonitor implements Monitor {
                         .monitorNamePrefix(MONITOR_NAME_PREFIX)
                         .monitorNameSuffix(MONITOR_NAME_SUFFIX)
                         .build())
-                .aggregationFunction(this::getMin)
+                .aggregationFunction(MonitorCommons::getMin)
                 .callable(callable)
                 .query(QUERY)
                 .build());
-    }
-
-    private Long getMin(List<Long> values) {
-        return values.stream().reduce(Math::min).get();
     }
 }

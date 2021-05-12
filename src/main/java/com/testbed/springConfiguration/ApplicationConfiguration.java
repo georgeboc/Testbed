@@ -27,6 +27,7 @@ import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalCon
 import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
 import com.testbed.interactors.monitors.AverageMemoryUtilizationMonitor;
+import com.testbed.interactors.monitors.AverageSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.CPUIoWaitTimeMonitor;
 import com.testbed.interactors.monitors.CPUSystemTimeMonitor;
 import com.testbed.interactors.monitors.CPUTotalTimeMonitor;
@@ -36,7 +37,9 @@ import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
 import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
 import com.testbed.interactors.monitors.MaxMemoryUtilizationMonitor;
+import com.testbed.interactors.monitors.MaxSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
+import com.testbed.interactors.monitors.MinSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
 import com.testbed.interactors.monitors.NoMonitor;
 import com.testbed.interactors.monitors.RangeMetricsAggregateCalculator;
@@ -261,6 +264,21 @@ public class ApplicationConfiguration {
     @Bean
     public AverageMemoryUtilizationMonitor averageMemoryUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
         return new AverageMemoryUtilizationMonitor(rangeMetricsAggregateCalculator);
+    }
+
+    @Bean
+    public MinSwapUtilizationMonitor minSwapUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
+        return new MinSwapUtilizationMonitor(rangeMetricsAggregateCalculator);
+    }
+
+    @Bean
+    public MaxSwapUtilizationMonitor maxSwapUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
+        return new MaxSwapUtilizationMonitor(rangeMetricsAggregateCalculator);
+    }
+
+    @Bean
+    public AverageSwapUtilizationMonitor averageSwapUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
+        return new AverageSwapUtilizationMonitor(rangeMetricsAggregateCalculator);
     }
 
     @Bean

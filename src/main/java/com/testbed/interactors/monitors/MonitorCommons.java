@@ -3,6 +3,7 @@ package com.testbed.interactors.monitors;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.WordUtils;
 
+import java.util.List;
 import java.util.Map;
 
 public class MonitorCommons {
@@ -16,5 +17,17 @@ public class MonitorCommons {
     public static String getMonitorName(MonitorNameParameters monitorNameParameters, String hostname) {
         return monitorNameParameters.getMonitorNamePrefix() + WordUtils.capitalizeFully(hostname) +
                 monitorNameParameters.getMonitorNameSuffix();
+    }
+
+    public static Long getMin(List<Long> values) {
+        return values.stream().reduce(Math::min).get();
+    }
+
+    public static Long getMax(List<Long> values) {
+        return values.stream().reduce(Math::max).get();
+    }
+
+    public static Long getAverage(List<Long> values) {
+        return (long) ((double) values.stream().reduce(Math::max).get()/values.size());
     }
 }

@@ -23,13 +23,9 @@ public class AverageMemoryUtilizationMonitor implements Monitor {
                         .monitorNamePrefix(MONITOR_NAME_PREFIX)
                         .monitorNameSuffix(MONITOR_NAME_SUFFIX)
                         .build())
-                .aggregationFunction(this::getAverage)
+                .aggregationFunction(MonitorCommons::getAverage)
                 .callable(callable)
                 .query(QUERY)
                 .build());
-    }
-
-    private Long getAverage(List<Long> values) {
-        return (long) ((double) values.stream().reduce(Math::max).get()/values.size());
     }
 }
