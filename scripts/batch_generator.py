@@ -9,6 +9,13 @@ SCRIPTS_TEMPLATES = f"{SCRIPTS}/templates"
 SCRIPTS = "scripts"
 PIPELINES = "pipelines"
 
+DATASETS_MAPPING = {
+    "Ad_click_on_taobao_512m": "little (512M)",
+    "Ad_click_on_taobao_1g": "little (1G)",
+    "Obama_visitor_logs_1g": "medium (1G)",
+    "Thunderbird_30g": "big (30G)"
+}
+
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/select_pipeline.json.template"
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
@@ -21,7 +28,8 @@ BATCH_ENTRY = """
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
   OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
   SHEET_NAME="{{sheet_name}}"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME'"
+  INSTRUMENTED_SHEET_NAME="{{instrumented_sheet_name}}"
+  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME' '$INSTRUMENTED_SHEET_NAME'"
   
 """
 
@@ -76,10 +84,14 @@ def create_bash_runner(dataset_names):
         sheet_name = get_sheet_name(pipeline_filename)
         batch_entry = Template(BATCH_ENTRY).render(pipeline_filename=pipeline_filename,
                                                    output_filename=output_filename,
-                                                   sheet_name=sheet_name)
+                                                   sheet_name=sheet_name,
+                                                   instrumented_sheet_name=get_instrumented_sheet_name(sheet_name))
         batches += batch_entry
     batch_runner_content = Template(read_file_contents(BATCH_RUNNER_TEMPLATE)).render(batches=batches)
     write_file_contents(OUTPUT_BATCH_RUNNER_FILENAME, batch_runner_content)
+
+def get_instrumented_sheet_name(sheet_name):
+    return f"{sheet_name} Ins."
 
 def get_pipeline_filenames(dataset_names):
     pipeline_filenames = []
@@ -97,7 +109,7 @@ def get_sheet_name(pipeline_filename):
     pattern = r'(.*)_percent_(.*).json'
     match = re.search(pattern, unparsed_sheet_name)
     percentage, dataset_name = match.groups()
-    return f"{dataset_name.replace('_', ' ')} | {percentage}% SF"
+    return f"{DATASETS_MAPPING[dataset_name]} | {percentage}% SF"
 
 if __name__ == "__main__":
     main()

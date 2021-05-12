@@ -7,13 +7,13 @@ export SCRIPTS_PATH=scripts
 export PIPELINE="$1"
 export OUTPUT="$2"
 export SHEET_NAME="$3"
-export INSTRUMENTED_SHEET_NAME="$SHEET_NAME Pipeline Instrumentation"
+export INSTRUMENTED_SHEET_NAME="$4"
 export TOLERABLE_ERROR_PERCENTAGE=5
 
 export GOOGLE_DRIVE_ACCOUNT=gdrive
 export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 
-echo "Parameters read: $PIPELINE, $OUTPUT, $SHEET_NAME"
+echo "Parameters read: $PIPELINE, $OUTPUT, $SHEET_NAME, $INSTRUMENTED_SHEET_NAME"
 
 function execute_experiments () {
     for i in {1..3}
