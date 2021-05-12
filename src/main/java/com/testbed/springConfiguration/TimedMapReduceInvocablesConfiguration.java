@@ -13,12 +13,17 @@ import com.testbed.boundary.invocations.frameworks.mapReduce.union.UnionMapReduc
 import com.testbed.boundary.metrics.MetricsQuery;
 import com.testbed.boundary.utils.DirectoryUtils;
 import com.testbed.boundary.utils.ParquetSchemaReader;
+import com.testbed.interactors.monitors.CPUIoWaitTimeMonitor;
+import com.testbed.interactors.monitors.CPUSystemTimeMonitor;
+import com.testbed.interactors.monitors.CPUTotalTimeMonitor;
+import com.testbed.interactors.monitors.CPUUserTimeMonitor;
 import com.testbed.interactors.monitors.ChronometerMonitor;
 import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
-import com.testbed.interactors.monitors.LocalFileSystemMonitor;
+import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
+import com.testbed.interactors.monitors.LocalFileSystemReadBytesMonitor;
+import com.testbed.interactors.monitors.LocalFileSystemWrittenBytesMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
-import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -106,22 +111,37 @@ public class TimedMapReduceInvocablesConfiguration {
     }
 
     @Bean
-    public LocalFileSystemMonitor localFileSystemMonitor(MonitoringInformationCoalesce monitoringInformationCoalesce,
-                                                         MetricsQuery metricsQuery,
-                                                         @Value("${localFileSystemDevice.mapReduce}") String deviceName) {
-        return new LocalFileSystemMonitor(monitoringInformationCoalesce, metricsQuery, deviceName);
+    public LocalFileSystemWrittenBytesMonitor localFileSystemWrittenBytesMonitor(@Value("${localFileSystemDevice.mapReduce}") String deviceName,
+                                                                                 InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new LocalFileSystemWrittenBytesMonitor(instantMetricsDifferencesCalculator, deviceName);
+    }
+
+    @Bean
+    public LocalFileSystemReadBytesMonitor localFileSystemReadBytesMonitor(@Value("${localFileSystemDevice.mapReduce}") String deviceName,
+                                                                              InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new LocalFileSystemReadBytesMonitor(instantMetricsDifferencesCalculator, deviceName);
     }
 
     @Bean
     public MonitorComposer monitorComposer(ChronometerMonitor chronometerMonitor,
                                            ExecutionInstantsMonitor executionInstantsMonitor,
                                            DistributedFileSystemMonitor distributedFileSystemMonitor,
-                                           LocalFileSystemMonitor localFileSystemMonitor) {
+                                           LocalFileSystemWrittenBytesMonitor localFileSystemWrittenBytesMonitor,
+                                           LocalFileSystemReadBytesMonitor localFileSystemReadBytesMonitor,
+                                           CPUIoWaitTimeMonitor cpuIoWaitTimeMonitor,
+                                           CPUSystemTimeMonitor cpuSystemTimeMonitor,
+                                           CPUTotalTimeMonitor cpuTotalTimeMonitor,
+                                           CPUUserTimeMonitor cpuUserTimeMonitor) {
         // Leftmost monitor is the one that will get executed first. In this case, it is fundamental that the
         // chronometer gets executed first to avoid to interfere in execution time.
         return new MonitorComposer(Arrays.asList(chronometerMonitor,
                 executionInstantsMonitor,
                 distributedFileSystemMonitor,
-                localFileSystemMonitor));
+                localFileSystemWrittenBytesMonitor,
+                localFileSystemReadBytesMonitor,
+                cpuIoWaitTimeMonitor,
+                cpuSystemTimeMonitor,
+                cpuTotalTimeMonitor,
+                cpuUserTimeMonitor));
     }
 }

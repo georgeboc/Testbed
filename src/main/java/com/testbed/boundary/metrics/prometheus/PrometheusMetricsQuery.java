@@ -60,7 +60,7 @@ public class PrometheusMetricsQuery implements MetricsQuery {
     private Map.Entry<String, InstantMetric> getInstantMetricByHostname(Result result) {
         List<String> values = result.getValues();
         long timestamp = (long) Double.parseDouble(values.get(TIMESTAMP_POSITION));
-        long value = Long.parseLong(values.get(VALUE_POSITION));
+        long value = (long) Double.parseDouble(values.get(VALUE_POSITION));
         InstantMetric instantMetric = InstantMetric.builder()
                 .instant(Instant.ofEpochMilli(timestamp))
                 .value(value)

@@ -8,20 +8,19 @@ import lombok.SneakyThrows;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static com.testbed.interactors.monitors.MonitorCommons.coalesce;
+
 @RequiredArgsConstructor
 public class ChronometerMonitor implements Monitor {
     private static final String INVOCATION_TIME_IN_NANOSECONDS = "invocationTimeInNanoseconds";
 
-    private final MonitoringInformationCoalesce monitoringInformationCoalesce;
-
     @SneakyThrows
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable,
-                                         InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
         Stopwatch stopWatch = Stopwatch.createStarted();
         MonitoringInformation callableMonitoringInformation = callable.call();
         stopWatch.stop();
-        return monitoringInformationCoalesce.coalesce(callableMonitoringInformation, getMonitoringInformation(stopWatch));
+        return coalesce(callableMonitoringInformation, getMonitoringInformation(stopWatch));
     }
 
     private MonitoringInformation getMonitoringInformation(Stopwatch stopWatch) {

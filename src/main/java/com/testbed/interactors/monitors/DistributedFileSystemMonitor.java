@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import static com.testbed.interactors.monitors.MonitorCommons.coalesce;
+
 @RequiredArgsConstructor
 public class DistributedFileSystemMonitor implements Monitor {
     private static final String INTERMEDIATE_DATASETS_DIRECTORY_PREFIX = "intermediate_datasets/";
@@ -22,17 +24,17 @@ public class DistributedFileSystemMonitor implements Monitor {
             "distributedFileSystemWrittenBytes (=#ReadBytes)WithoutReplication";
 
     private final FileSystem fileSystem;
-    private final MonitoringInformationCoalesce monitoringInformationCoalesce;
 
     @SneakyThrows
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable,
-                                         InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
         tryDeleteDirectory(INTERMEDIATE_DATASETS_DIRECTORY_PREFIX);
+
         MonitoringInformation callableMonitoringInformation = callable.call();
+
         List<String> directoriesToExclude = getDirectoriesToExclude(invocationPlan);
         directoriesToExclude.forEach(this::tryDeleteDirectory);
-        return monitoringInformationCoalesce.coalesce(callableMonitoringInformation, getMonitoringInformation());
+        return coalesce(callableMonitoringInformation, getMonitoringInformation());
     }
 
     private void tryDeleteDirectory(String directory) {

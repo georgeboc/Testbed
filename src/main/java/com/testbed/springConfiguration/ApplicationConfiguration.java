@@ -26,12 +26,15 @@ import com.testbed.interactors.converters.deserializedToLogical.DeserializedToLo
 import com.testbed.interactors.converters.logicalToPhysical.LogicalToPhysicalConverterManager;
 import com.testbed.interactors.invokers.InvocationPlanner;
 import com.testbed.interactors.invokers.InvokerManager;
+import com.testbed.interactors.monitors.CPUIoWaitTimeMonitor;
+import com.testbed.interactors.monitors.CPUSystemTimeMonitor;
+import com.testbed.interactors.monitors.CPUTotalTimeMonitor;
+import com.testbed.interactors.monitors.CPUUserTimeMonitor;
 import com.testbed.interactors.monitors.ChronometerMonitor;
 import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
-import com.testbed.interactors.monitors.Monitor;
+import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
 import com.testbed.interactors.monitors.MonitorComposer;
-import com.testbed.interactors.monitors.MonitoringInformationCoalesce;
 import com.testbed.interactors.monitors.NoMonitor;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
 import com.testbed.interactors.validators.syntactic.NotNullOnAllFieldsValidatorManager;
@@ -144,11 +147,6 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public MonitoringInformationCoalesce monitoringInformationCoalesce() {
-        return new MonitoringInformationCoalesce();
-    }
-
-    @Bean
     public List<OperationInstrumentation> operationInstrumentations() {
         return Lists.newArrayList();
     }
@@ -211,18 +209,42 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public ChronometerMonitor chronometerMonitor(MonitoringInformationCoalesce monitoringInformationCoalesce) {
-        return new ChronometerMonitor(monitoringInformationCoalesce);
+    public ChronometerMonitor chronometerMonitor() {
+        return new ChronometerMonitor();
     }
 
     @Bean
-    public ExecutionInstantsMonitor executionInstantsMonitor(MonitoringInformationCoalesce monitoringInformationCoalesce) {
-        return new ExecutionInstantsMonitor(monitoringInformationCoalesce);
+    public ExecutionInstantsMonitor executionInstantsMonitor() {
+        return new ExecutionInstantsMonitor();
     }
 
     @Bean
-    public DistributedFileSystemMonitor distributedFileSystemMonitor(FileSystem fileSystem,
-                                                                     MonitoringInformationCoalesce monitoringInformationCoalesce) {
-        return new DistributedFileSystemMonitor(fileSystem, monitoringInformationCoalesce);
+    public InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator(MetricsQuery metricsQuery) {
+        return new InstantMetricsDifferencesCalculator(metricsQuery);
+    }
+
+    @Bean
+    public CPUIoWaitTimeMonitor cpuIoWaitTimeMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new CPUIoWaitTimeMonitor(instantMetricsDifferencesCalculator);
+    }
+
+    @Bean
+    public CPUSystemTimeMonitor cpuSystemTimeMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new CPUSystemTimeMonitor(instantMetricsDifferencesCalculator);
+    }
+
+    @Bean
+    public CPUTotalTimeMonitor cpuTotalTimeMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new CPUTotalTimeMonitor(instantMetricsDifferencesCalculator);
+    }
+
+    @Bean
+    public CPUUserTimeMonitor cpuUserTimeMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new CPUUserTimeMonitor(instantMetricsDifferencesCalculator);
+    }
+
+    @Bean
+    public DistributedFileSystemMonitor distributedFileSystemMonitor(FileSystem fileSystem) {
+        return new DistributedFileSystemMonitor(fileSystem);
     }
 }

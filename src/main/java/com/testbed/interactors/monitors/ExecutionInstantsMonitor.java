@@ -7,22 +7,22 @@ import lombok.SneakyThrows;
 import java.time.Instant;
 import java.util.concurrent.Callable;
 
+import static com.testbed.interactors.monitors.MonitorCommons.coalesce;
+
 @RequiredArgsConstructor
 public class ExecutionInstantsMonitor implements Monitor {
     private static final String INITIAL_INSTANT = "initialInstant";
     private static final String FINAL_INSTANT = "finalInstant";
 
-    private final MonitoringInformationCoalesce monitoringInformationCoalesce;
-
     @SneakyThrows
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable,
-                                         InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
         Instant initialInstant = Instant.now();
+
         MonitoringInformation callableMonitoringInformation = callable.call();
+
         Instant finalInstant = Instant.now();
-        return monitoringInformationCoalesce.coalesce(callableMonitoringInformation,
-                getMonitoringInformation(initialInstant, finalInstant));
+        return coalesce(callableMonitoringInformation, getMonitoringInformation(initialInstant, finalInstant));
     }
 
     private MonitoringInformation getMonitoringInformation(Instant initialInstant, Instant finalInstant) {
