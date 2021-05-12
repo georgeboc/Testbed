@@ -1,10 +1,22 @@
 #! /bin/bash
 # Execute from Testbed root directory
 
-export EXPERIMENTS_RUNNER_SCRIPT_PATH="/bin/bash scripts/experiments_runner.sh"
+export SCRIPTS_PATH=scripts
+export EXPERIMENTS_RUNNER_SCRIPT_PATH="/bin/bash $SCRIPTS_PATH/experiments_runner.sh"
 
-PIPELINE=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json \
-OUTPUT=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx \
-SHEET_NAME=New \
-INSTRUMENTED_SHEET_NAME="New Instrumented" \
-$($EXPERIMENTS_RUNNER_SCRIPT_PATH)
+function install_last_version {
+  echo "Installing Testbed's last version"
+  git pull
+  sh $SCRIPTS_PATH/install.sh
+}
+
+function execute_batch () {
+  PIPELINE=hdfs://dtim:27000/user/bochileanu/pipelines/pipeline.json \
+  OUTPUT=hdfs://dtim:27000/user/bochileanu/output/operation_instrumentations.xlsx \
+  SHEET_NAME=New \
+  INSTRUMENTED_SHEET_NAME="New Instrumented" \
+  $($EXPERIMENTS_RUNNER_SCRIPT_PATH)
+}
+
+install_last_version
+execute_batch

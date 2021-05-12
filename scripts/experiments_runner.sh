@@ -15,7 +15,6 @@ export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 
 function execute_experiments () {
     clear_output
-    install_last_version
     for i in {1..3}
     do
         clear_caches
@@ -30,12 +29,6 @@ function execute_experiments () {
 function clear_output () {
   echo "Ensuring output is a new file"
   hdfs dfs -rm $OUTPUT
-}
-
-function install_last_version {
-  echo "Installing Testbed's last version"
-  git pull
-  sh $SCRIPTS_PATH/install.sh
 }
 
 function clear_caches () {
