@@ -104,7 +104,7 @@ def get_sheet_name(pipeline_filename):
     pattern = r'(.*)_percent_(.*).json'
     match = re.search(pattern, unparsed_sheet_name)
     percentage, dataset_name = match.groups()
-    return f"{DATASETS_MAPPING[dataset_name]} {percentage}%SF"
+    return f"\"{DATASETS_MAPPING[dataset_name]} {percentage}%SF\""
 
 if __name__ == "__main__":
     main()
