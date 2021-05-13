@@ -16,15 +16,20 @@ export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 echo "Parameters read: $PIPELINE, $OUTPUT, $SHEET_NAME, $INSTRUMENTED_SHEET_NAME"
 
 function execute_experiments () {
-    for i in {1..3}
-    do
-        clear_caches
-        execute_timed_experiment_with_MapReduce
-        clear_caches
-        execute_timed_experiment_with_Spark
-    done
-    execute_instrumented_experiment
-    upload_results_to_google_drive
+  clear_output_file_caches
+  for i in {1..3}
+  do
+      clear_caches
+      execute_timed_experiment_with_MapReduce
+      clear_caches
+      execute_timed_experiment_with_Spark
+  done
+  execute_instrumented_experiment
+  upload_results_to_google_drive
+}
+
+function clear_output_file_caches () {
+  hdfs debug recoverLease -path "$OUTPUT" -retries 3
 }
 
 function clear_caches () {
