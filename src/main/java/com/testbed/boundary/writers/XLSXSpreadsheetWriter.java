@@ -1,5 +1,6 @@
 package com.testbed.boundary.writers;
 
+import com.google.common.collect.Maps;
 import com.testbed.entities.parameters.OutputParameters;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -14,6 +15,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,6 +23,8 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
+    private static final int FORMULA_CELL_WIDTH = 4000;
+
     private final FileSystem fileSystem;
 
     @Override
@@ -37,14 +41,12 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     @Override
     public void writeWithColor(OutputParameters outputParameters, Position position, String value, String colorName) {
         Workbook workbook = tryGetWorkbook(outputParameters);
-        CellStyle cellStyle = workbook.createCellStyle();
-        cellStyle.setFillForegroundColor(IndexedColors.valueOf(colorName).getIndex());
-        cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
         Cell cell = row.createCell(position.getColumn());
+        CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
+        CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_FOREGROUND_COLOR, IndexedColors.valueOf(colorName).getIndex());
         cell.setCellValue(value);
-        cell.setCellStyle(cellStyle);
         sheet.autoSizeColumn(position.getColumn());
         tryWriteWorkbook(outputParameters, workbook);
     }
@@ -56,7 +58,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         Row row = getOrCreateRow(sheet, position.getRow());
         Cell cell = row.createCell(position.getColumn());
         cell.setCellFormula(formula);
-        sheet.autoSizeColumn(position.getColumn());
+        sheet.setColumnWidth(position.getColumn(), FORMULA_CELL_WIDTH);
         tryWriteWorkbook(outputParameters, workbook);
     }
 
@@ -88,9 +90,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
                 endPosition.getColumn()));
         Row row = sheet.getRow(startPosition.getRow());
         Cell cell = row.getCell(startPosition.getColumn());
-        CellStyle cellStyle = cell.getCellStyle();
-        cellStyle.setAlignment(CellStyle.ALIGN_CENTER);
-        cell.setCellStyle(cellStyle);
+        CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_CENTER);
         tryWriteWorkbook(outputParameters, workbook);
     }
 

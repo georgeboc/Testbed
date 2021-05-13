@@ -64,7 +64,7 @@ function execute_timed_experiment_with_Spark () {
 }
 
 function execute_instrumented_experiment () {
-    echo "Executing instrumented experiment #$i"
+    echo "Executing instrumented experiment"
     timeout 10m spark-submit \
     --master yarn \
     --deploy-mode cluster \
