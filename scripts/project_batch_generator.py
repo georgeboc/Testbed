@@ -22,7 +22,12 @@ BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 OUTPUT_FILENAME_FORMAT = "project_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/project_batch_runner.sh"
 
-SELECTIVITY_FACTOR_PERCENTAGES = [15.5, 31, 46, 62, 77, 93, 100]
+DATASETS_SELECTIVITY_FACTORS_MAPPING = {
+    "Ad_click_on_taobao_512m": [16.67, 33.33, 50, 66.67, 83.33, 100],
+    "Ad_click_on_taobao_1g": [16.67, 33.33, 50, 66.67, 83.33, 100],
+    "Obama_visitor_logs_1g": [3.57, 7.14, 10.71, 17.86, 35.71, 53.57, 71.43, 89.29, 100],
+    "Thunderbird_30g": [14.29, 28.57, 42.86, 57.14, 71.43, 85.71, 100]
+}
 
 BATCH_ENTRY = """  
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
@@ -40,7 +45,7 @@ def main():
     create_bash_runner(dataset_names)
 
 def create_pipelines(dataset_name):
-    for selectivity_factor_percentage in SELECTIVITY_FACTOR_PERCENTAGES:
+    for selectivity_factor_percentage in DATASETS_SELECTIVITY_FACTORS_MAPPING[dataset_name]:
         pipeline_content = Template(read_file_contents(PIPELINE_TEMPLATE)).render(dataset_name=dataset_name,
                                                                  selectivity_factor=get_normalized_selectivity_factor(
                                                                          selectivity_factor_percentage))
@@ -86,7 +91,7 @@ def get_pipeline_filenames(dataset_names):
     for dataset_name in dataset_names:
         pipeline_filenames.extend([Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
                                                                            selectivity_factor_percentage=selectivity_factor_percentage)
-                                   for selectivity_factor_percentage in SELECTIVITY_FACTOR_PERCENTAGES])
+                                   for selectivity_factor_percentage in DATASETS_SELECTIVITY_FACTORS_MAPPING[dataset_name]])
     return pipeline_filenames
 
 def get_output_filename(pipeline_filename):
