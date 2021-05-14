@@ -16,54 +16,42 @@ DATASETS_MAPPING = {
     "Thunderbird_30g": "big (30G)"
 }
 
-PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/select_pipeline.json.template"
+PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/project_pipeline.json.template"
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
-OUTPUT_FILENAME_FORMAT = "select_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
-OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/select_batch_runner.sh"
+OUTPUT_FILENAME_FORMAT = "project_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
+OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/project_batch_runner.sh"
 
-SELECTIVITY_FACTOR_PERCENTAGES = [1, 3, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+SELECTIVITY_FACTOR_PERCENTAGES = [15.5, 31, 46, 62, 77, 93, 100]
 
 BATCH_ENTRY = """  
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
   OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
   SHEET_NAME="{{sheet_name}}"
   INSTRUMENTED_SHEET_NAME="{{instrumented_sheet_name}}"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME' '$INSTRUMENTED_SHEET_NAME'"
+  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME' '$INSTRUMENTED_SHEET_NAME' '9'"
   
 """
 
 def main():
-    dataset_names_and_column_names = get_dataset_names_and_column_names()
-    for dataset_name_and_column_name in dataset_names_and_column_names:
-        dataset_name, column_name = dataset_name_and_column_name
-        create_pipelines(column_name, dataset_name)
-    dataset_names = get_dataset_names(dataset_names_and_column_names)
+    dataset_names = get_dataset_names()
+    for dataset_name in dataset_names:
+        create_pipelines(dataset_name)
     create_bash_runner(dataset_names)
 
-def create_pipelines(column_name, dataset_name):
+def create_pipelines(dataset_name):
     for selectivity_factor_percentage in SELECTIVITY_FACTOR_PERCENTAGES:
         pipeline_content = Template(read_file_contents(PIPELINE_TEMPLATE)).render(dataset_name=dataset_name,
                                                                  selectivity_factor=get_normalized_selectivity_factor(
-                                                                         selectivity_factor_percentage),
-                                                                 column_name=column_name)
+                                                                         selectivity_factor_percentage))
         print("Pipeline content:", pipeline_content)
         filename = Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
                                                            selectivity_factor_percentage=selectivity_factor_percentage)
         print("Filename generated:", filename)
         write_file_contents(filename, pipeline_content)
 
-def get_dataset_names_and_column_names():
-    dataset_names_and_column_names = []
-    while True:
-        dataset_name = input("Insert Dataset Name: ")
-        column_name = input("Column Name: ")
-        dataset_names_and_column_names.append((dataset_name, column_name))
-        if input("Insert another dataset and column name? (y/N): ") != "y":
-            return dataset_names_and_column_names
-
-def get_dataset_names(dataset_names_and_column_names):
-    return [dataset_name_and_column_name[0] for dataset_name_and_column_name in dataset_names_and_column_names]
+def get_dataset_names():
+    return list(DATASETS_MAPPING.keys())
 
 def read_file_contents(filename):
     with open(filename, 'r') as file:
@@ -98,7 +86,7 @@ def get_pipeline_filenames(dataset_names):
     for dataset_name in dataset_names:
         pipeline_filenames.extend([Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
                                                                            selectivity_factor_percentage=selectivity_factor_percentage)
-                for selectivity_factor_percentage in SELECTIVITY_FACTOR_PERCENTAGES])
+                                   for selectivity_factor_percentage in SELECTIVITY_FACTOR_PERCENTAGES])
     return pipeline_filenames
 
 def get_output_filename(pipeline_filename):
@@ -109,7 +97,7 @@ def get_sheet_name(pipeline_filename):
     pattern = r'(.*)_percent_(.*).json'
     match = re.search(pattern, unparsed_sheet_name)
     percentage, dataset_name = match.groups()
-    return f"{DATASETS_MAPPING[dataset_name]} | {percentage}% SF"
+    return f"{DATASETS_MAPPING[dataset_name]} | {percentage}% SF" # Column Selection Factor
 
 if __name__ == "__main__":
     main()
