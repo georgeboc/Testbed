@@ -31,6 +31,8 @@ import com.testbed.interactors.monitors.MaxSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MinSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.NetworkReceivedBytesMonitor;
+import com.testbed.interactors.monitors.NetworkTransmittedBytesMonitor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -144,7 +146,9 @@ public class TimedMapReduceInvocablesConfiguration {
                                            AverageMemoryUtilizationMonitor averageMemoryUtilizationMonitor,
                                            MinSwapUtilizationMonitor minSwapUtilizationMonitor,
                                            MaxSwapUtilizationMonitor maxSwapUtilizationMonitor,
-                                           AverageSwapUtilizationMonitor averageSwapUtilizationMonitor) {
+                                           AverageSwapUtilizationMonitor averageSwapUtilizationMonitor,
+                                           NetworkReceivedBytesMonitor networkReceivedBytesMonitor,
+                                           NetworkTransmittedBytesMonitor networkTransmittedBytesMonitor) {
         // Leftmost monitor is the one that will get executed first. In this case, it is fundamental that the
         // chronometer gets executed first to avoid to interfere in execution time.
         return new MonitorComposer(Arrays.asList(chronometerMonitor,
@@ -161,6 +165,8 @@ public class TimedMapReduceInvocablesConfiguration {
                 averageMemoryUtilizationMonitor,
                 minSwapUtilizationMonitor,
                 maxSwapUtilizationMonitor,
-                averageSwapUtilizationMonitor));
+                averageSwapUtilizationMonitor,
+                networkReceivedBytesMonitor,
+                networkTransmittedBytesMonitor));
     }
 }

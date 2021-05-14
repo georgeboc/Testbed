@@ -41,6 +41,8 @@ import com.testbed.interactors.monitors.MaxSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MinSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.MonitorComposer;
+import com.testbed.interactors.monitors.NetworkReceivedBytesMonitor;
+import com.testbed.interactors.monitors.NetworkTransmittedBytesMonitor;
 import com.testbed.interactors.monitors.NoMonitor;
 import com.testbed.interactors.monitors.RangeMetricsAggregateCalculator;
 import com.testbed.interactors.validators.semantic.InputsCountValidatorManager;
@@ -279,6 +281,16 @@ public class ApplicationConfiguration {
     @Bean
     public AverageSwapUtilizationMonitor averageSwapUtilizationMonitor(RangeMetricsAggregateCalculator rangeMetricsAggregateCalculator) {
         return new AverageSwapUtilizationMonitor(rangeMetricsAggregateCalculator);
+    }
+
+    @Bean
+    public NetworkReceivedBytesMonitor networkReceivedBytesMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new NetworkReceivedBytesMonitor(instantMetricsDifferencesCalculator);
+    }
+
+    @Bean
+    public NetworkTransmittedBytesMonitor networkTransmittedBytesMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new NetworkTransmittedBytesMonitor(instantMetricsDifferencesCalculator);
     }
 
     @Bean
