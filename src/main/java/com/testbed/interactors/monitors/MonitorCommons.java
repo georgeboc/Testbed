@@ -28,6 +28,6 @@ public class MonitorCommons {
     }
 
     public static Long getAverage(List<Long> values) {
-        return (long) ((double) values.stream().reduce(Math::max).get()/values.size());
+        return (long) ((double) values.stream().reduce(Math::addExact).get()/values.size());
     }
 }
