@@ -1,12 +1,12 @@
 package com.testbed.boundary.writers;
 
-import com.google.common.collect.Maps;
 import com.testbed.entities.parameters.OutputParameters;
 import lombok.RequiredArgsConstructor;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -23,7 +23,8 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
-    private static final int FORMULA_CELL_WIDTH = 4000;
+    private static final String EMPTY = "";
+    private static final boolean USE_UNMERGED_CELLS = true;
 
     private final FileSystem fileSystem;
 
@@ -32,8 +33,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
-        Cell cell = row.createCell(position.getColumn());
-        cell.setCellValue(value);
+        CellUtil.createCell(row, position.getColumn(), value);
         sheet.autoSizeColumn(position.getColumn());
         tryWriteWorkbook(outputParameters, workbook);
     }
@@ -43,10 +43,9 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
-        Cell cell = row.createCell(position.getColumn());
+        Cell cell = CellUtil.createCell(row, position.getColumn(), value);
         CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_PATTERN, CellStyle.SOLID_FOREGROUND);
         CellUtil.setCellStyleProperty(cell, workbook, CellUtil.FILL_FOREGROUND_COLOR, IndexedColors.valueOf(colorName).getIndex());
-        cell.setCellValue(value);
         sheet.autoSizeColumn(position.getColumn());
         tryWriteWorkbook(outputParameters, workbook);
     }
@@ -56,9 +55,10 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
-        Cell cell = row.createCell(position.getColumn());
+        Cell cell = CellUtil.createCell(row, position.getColumn(), EMPTY);
         cell.setCellFormula(formula);
-        sheet.setColumnWidth(position.getColumn(), FORMULA_CELL_WIDTH);
+        HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+        sheet.autoSizeColumn(position.getColumn(), USE_UNMERGED_CELLS);
         tryWriteWorkbook(outputParameters, workbook);
     }
 
@@ -89,7 +89,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
                 startPosition.getColumn(),
                 endPosition.getColumn()));
         Row row = sheet.getRow(startPosition.getRow());
-        Cell cell = row.getCell(startPosition.getColumn());
+        Cell cell = CellUtil.getCell(row, startPosition.getColumn());
         CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_CENTER);
         tryWriteWorkbook(outputParameters, workbook);
     }
