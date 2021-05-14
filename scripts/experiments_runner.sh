@@ -3,16 +3,15 @@
 
 export JAR_PATH=target/Testbed-1.0-SNAPSHOT.jar
 export SCRIPTS_PATH=scripts
-export LOCAL_FILESYSTEM_LOGS_PATH=/tmp/testbed/log
-export GOOGLE_DRIVE_LOGS_PATH=Testbed/log
-export GOOGLE_DRIVE_PATH=Testbed/analysis_results
-export GOOGLE_DRIVE_ACCOUNT=gdrive
 
 export PIPELINE="$1"
 export OUTPUT="$2"
 export SHEET_NAME="$3"
 export INSTRUMENTED_SHEET_NAME="$4"
 export TOLERABLE_ERROR_PERCENTAGE="$5"
+
+export GOOGLE_DRIVE_ACCOUNT=gdrive
+export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 
 echo "Parameters read: $PIPELINE, $OUTPUT, $SHEET_NAME, $INSTRUMENTED_SHEET_NAME"
 
@@ -22,13 +21,10 @@ function execute_experiments () {
   do
       clear_caches
       execute_timed_experiment_with_MapReduce
-      move_logs_to_google_drive
       clear_caches
       execute_timed_experiment_with_Spark
-      move_logs_to_google_drive
   done
   execute_instrumented_experiment
-  move_logs_to_google_drive
   upload_results_to_google_drive
 }
 
@@ -50,12 +46,6 @@ function execute_timed_experiment_with_MapReduce () {
     --pipeline "$PIPELINE" \
     --framework-name MapReduce \
     --sheet-name "$SHEET_NAME"
-}
-
-function move_logs_to_google_drive () {
-    echo "Moving logs to google drive"
-    rclone copy "$LOCAL_FILESYSTEM_LOGS_PATH" "$GOOGLE_DRIVE_LOGS_PATH"
-    rm -r $LOCAL_FILESYSTEM_LOGS_PATH
 }
 
 function execute_timed_experiment_with_Spark () {
