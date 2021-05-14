@@ -23,10 +23,10 @@ OUTPUT_FILENAME_FORMAT = "project_pipeline-{{selectivity_factor_percentage}}_per
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/project_batch_runner.sh"
 
 DATASETS_SELECTIVITY_FACTORS_MAPPING = {
-    "Ad_click_on_taobao_512m": [16.67, 33.33, 50, 66.67, 83.33, 100],
-    "Ad_click_on_taobao_1g": [16.67, 33.33, 50, 66.67, 83.33, 100],
-    "Obama_visitor_logs_1g": [3.57, 7.14, 10.71, 17.86, 35.71, 53.57, 71.43, 89.29, 100],
-    "Thunderbird_30g": [14.29, 28.57, 42.86, 57.14, 71.43, 85.71, 100]
+    "Ad_click_on_taobao_512m": [16.67, 33.34, 50, 66.67, 83.34, 100],
+    "Ad_click_on_taobao_1g": [16.67, 33.34, 50, 66.67, 83.34, 100],
+    "Obama_visitor_logs_1g": [3.58, 7.15, 10.72, 17.86, 35.72, 53.58, 71.43, 89.29, 100],
+    "Thunderbird_30g": [14.29, 28.58, 42.86, 57.15, 71.43, 85.72, 100]
 }
 
 BATCH_ENTRY = """  
@@ -34,7 +34,7 @@ BATCH_ENTRY = """
   OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
   SHEET_NAME="{{sheet_name}}"
   INSTRUMENTED_SHEET_NAME="{{instrumented_sheet_name}}"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME' '$INSTRUMENTED_SHEET_NAME' '9'"
+  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME' '$INSTRUMENTED_SHEET_NAME' '5'"
   
 """
 
