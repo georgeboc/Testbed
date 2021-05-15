@@ -7,7 +7,7 @@
   {
     "operation": "LOAD",
     "outputTag": "rightDataset",
-    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/{{dataset_name}}"
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/{{dataset_name}}_copy"
   },
   {
     "operation": "JOIN",
