@@ -16,17 +16,17 @@ DATASETS_MAPPING = {
     "Thunderbird_30g": "big (30G)"
 }
 
-PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/project_pipeline.json.template"
+PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/self_join_pipeline.json.template"
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
-OUTPUT_FILENAME_FORMAT = "project_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
-OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/project_batch_runner.sh"
+OUTPUT_FILENAME_FORMAT = "self_join_pipeline-column_number_{{column_index}}_{{dataset_name}}.json"
+OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/self_join_batch_runner.sh"
 
-DATASETS_SELECTIVITY_FACTORS_MAPPING = {
-    "Ad_click_on_taobao_512m": [16.67, 33.34, 50, 66.67, 83.34, 100],
-    "Ad_click_on_taobao_1g": [16.67, 33.34, 50, 66.67, 83.34, 100],
-    "Obama_visitor_logs_1g": [3.58, 7.15, 10.72, 17.86, 35.72, 53.58, 71.43, 89.29, 100],
-    "Thunderbird_30g": [14.29, 28.58, 42.86, 57.15, 71.43, 85.72, 100]
+DATASETS_COLUMN_NAMES_MAPPING = {
+    "Ad_click_on_taobao_512m": ["User", "DateTime", "AdGroupId", "PID", "NonClk", "Clk"],
+    "Ad_click_on_taobao_1g": ["User", "DateTime", "AdGroupId", "PID", "NonClk", "Clk"],
+    "Obama_visitor_logs_1g": ["NAMELAST", "NAMEFIRST", "NAMEMID", "UIN", "BDGNBR", "TYPE_OF_ACCESS", "TOA", "POA", "TOD", "POD", "APPT_MADE_DATE", "APPT_START_DATE", "APPT_END_DATE", "APPT_CANCEL_DATE", "Total_People", "LAST_UPDATEDBY", "POST", "LastEntryDate", "TERMINAL_SUFFIX", "visitee_namelast", "visitee_namefirst", "MEETING_LOC", "MEETING_ROOM", "CALLER_NAME_LAST", "CALLER_NAME_FIRST", "CALLER_ROOM", "Description", "RELEASE_DATE"],
+    "Thunderbird_30g": ["IsAlertMessage?", "Timestamp", "Date", "Node", "DateTime", "URI", "Content"]
 }
 
 BATCH_ENTRY = """  
@@ -45,13 +45,12 @@ def main():
     create_bash_runner(dataset_names)
 
 def create_pipelines(dataset_name):
-    for selectivity_factor_percentage in DATASETS_SELECTIVITY_FACTORS_MAPPING[dataset_name]:
+    for column_index, column_name in enumerate(DATASETS_COLUMN_NAMES_MAPPING[dataset_name]):
         pipeline_content = Template(read_file_contents(PIPELINE_TEMPLATE)).render(dataset_name=dataset_name,
-                                                                 selectivity_factor=get_normalized_selectivity_factor(
-                                                                         selectivity_factor_percentage))
+                                                                                  column_name=column_name)
         print("Pipeline content:", pipeline_content)
         filename = Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
-                                                           selectivity_factor_percentage=selectivity_factor_percentage)
+                                                           column_index=column_index)
         print("Filename generated:", filename)
         write_file_contents(filename, pipeline_content)
 
@@ -90,8 +89,8 @@ def get_pipeline_filenames(dataset_names):
     pipeline_filenames = []
     for dataset_name in dataset_names:
         pipeline_filenames.extend([Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
-                                                                           selectivity_factor_percentage=selectivity_factor_percentage)
-                                   for selectivity_factor_percentage in DATASETS_SELECTIVITY_FACTORS_MAPPING[dataset_name]])
+                                                                           column_index=column_index)
+                                   for column_index in range(len(DATASETS_COLUMN_NAMES_MAPPING[dataset_name]))])
     return pipeline_filenames
 
 def get_output_filename(pipeline_filename):
@@ -99,10 +98,10 @@ def get_output_filename(pipeline_filename):
 
 def get_sheet_name(pipeline_filename):
     unparsed_sheet_name = pipeline_filename.split('-')[1]
-    pattern = r'(.*)_percent_(.*).json'
+    pattern = r'column_number_(\d+)_(.*).json'
     match = re.search(pattern, unparsed_sheet_name)
-    percentage, dataset_name = match.groups()
-    return f"{DATASETS_MAPPING[dataset_name]} | {percentage}% SF"
+    column_index, dataset_name = match.groups()
+    return f"{DATASETS_MAPPING[dataset_name]} | col. #{int(column_index) + 1}"
 
 if __name__ == "__main__":
     main()
