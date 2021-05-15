@@ -40,7 +40,7 @@ function clear_caches () {
 
 function execute_timed_experiment_with_MapReduce () {
     echo "Executing MapReduce timed experiment #$i"
-    timeout 10m hadoop jar $JAR_PATH \
+    hadoop jar $JAR_PATH \
     --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
     --output "$OUTPUT" \
     --pipeline "$PIPELINE" \
@@ -50,7 +50,7 @@ function execute_timed_experiment_with_MapReduce () {
 
 function execute_timed_experiment_with_Spark () {
     echo "Executing Spark timed experiment #$i"
-    timeout 10m spark-submit \
+    spark-submit \
     --master yarn \
     --deploy-mode cluster \
     --conf spark.driver.memory="11301M" \
@@ -70,7 +70,7 @@ function execute_timed_experiment_with_Spark () {
 
 function execute_instrumented_experiment () {
     echo "Executing instrumented experiment"
-    timeout 10m spark-submit \
+    spark-submit \
     --master yarn \
     --deploy-mode cluster \
     --conf spark.driver.memory="11301M" \
