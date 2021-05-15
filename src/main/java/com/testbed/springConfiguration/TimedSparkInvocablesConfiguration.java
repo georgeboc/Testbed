@@ -114,18 +114,6 @@ public class TimedSparkInvocablesConfiguration {
     }
 
     @Bean
-    public LocalFileSystemWrittenBytesMonitor localFileSystemWrittenBytesMonitor(@Value("${localFileSystemDevice.spark}") String deviceName,
-                                                                                 InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
-        return new LocalFileSystemWrittenBytesMonitor(instantMetricsDifferencesCalculator, deviceName);
-    }
-
-    @Bean
-    public LocalFileSystemReadBytesMonitor localFileSystemReadBytesMonitor(@Value("${localFileSystemDevice.spark}") String deviceName,
-                                                                           InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
-        return new LocalFileSystemReadBytesMonitor(instantMetricsDifferencesCalculator, deviceName);
-    }
-
-    @Bean
     public MonitorComposer monitorComposer(ChronometerMonitor chronometerMonitor,
                                            ExecutionInstantsMonitor executionInstantsMonitor,
                                            DistributedFileSystemMonitor distributedFileSystemMonitor,

@@ -36,6 +36,8 @@ import com.testbed.interactors.monitors.ChronometerMonitor;
 import com.testbed.interactors.monitors.DistributedFileSystemMonitor;
 import com.testbed.interactors.monitors.ExecutionInstantsMonitor;
 import com.testbed.interactors.monitors.InstantMetricsDifferencesCalculator;
+import com.testbed.interactors.monitors.LocalFileSystemReadBytesMonitor;
+import com.testbed.interactors.monitors.LocalFileSystemWrittenBytesMonitor;
 import com.testbed.interactors.monitors.MaxMemoryUtilizationMonitor;
 import com.testbed.interactors.monitors.MaxSwapUtilizationMonitor;
 import com.testbed.interactors.monitors.MinMemoryUtilizationMonitor;
@@ -64,6 +66,7 @@ import org.w3c.dom.ranges.Range;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.testbed.interactors.InteractorName.INSTRUMENTED;
@@ -291,6 +294,18 @@ public class ApplicationConfiguration {
     @Bean
     public NetworkTransmittedBytesMonitor networkTransmittedBytesMonitor(InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
         return new NetworkTransmittedBytesMonitor(instantMetricsDifferencesCalculator);
+    }
+
+    @Bean
+    public LocalFileSystemWrittenBytesMonitor localFileSystemWrittenBytesMonitor(@Value("${yarnLocalDevice}") String deviceName,
+                                                                                 InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new LocalFileSystemWrittenBytesMonitor(instantMetricsDifferencesCalculator, deviceName);
+    }
+
+    @Bean
+    public LocalFileSystemReadBytesMonitor localFileSystemReadBytesMonitor(@Value("${yarnLocalDevice}") String deviceName,
+                                                                           InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator) {
+        return new LocalFileSystemReadBytesMonitor(instantMetricsDifferencesCalculator, deviceName);
     }
 
     @Bean
