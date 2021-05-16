@@ -12,8 +12,6 @@ PIPELINES = "pipelines"
 DATASETS_MAPPING = {
     "Ad_click_on_taobao_512m": "little (512M)",
     "Ad_click_on_taobao_1g": "little (1G)",
-    "Obama_visitor_logs_1g": "medium (1G)",
-    "Thunderbird_30g": "big (30G)"
 }
 
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/self_join_pipeline.json.template"
