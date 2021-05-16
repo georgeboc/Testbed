@@ -1,0 +1,20 @@
+[
+  {
+    "operation": "LOAD",
+    "outputTag": "leftDataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/{{left_dataset_name}}"
+  },
+  {
+    "operation": "LOAD",
+    "outputTag": "rightDataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/{{right_dataset_name}}"
+  },
+  {
+    "operation": "JOIN",
+    "leftInputTag": "leftDataset",
+    "rightInputTag": "rightDataset",
+    "outputTag": "joinedDataset",
+    "joinLeftColumnName": "{{left_column_name}}",
+    "joinRightColumnName": "{{right_column_name}}"
+  }
+]
