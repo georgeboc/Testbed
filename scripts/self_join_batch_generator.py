@@ -23,10 +23,8 @@ OUTPUT_FILENAME_FORMAT = "self_join_pipeline-column_number_{{column_index}}_{{da
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/self_join_batch_runner.sh"
 
 DATASETS_COLUMN_NAMES_MAPPING = {
-    "Ad_click_on_taobao_512m": ["User", "DateTime", "AdGroupId", "PID", "NonClk", "Clk"],
-    "Ad_click_on_taobao_1g": ["User", "DateTime", "AdGroupId", "PID", "NonClk", "Clk"],
-    "Obama_visitor_logs_1g": ["NAMELAST", "NAMEFIRST", "NAMEMID", "UIN", "BDGNBR", "TYPE_OF_ACCESS", "TOA", "POA", "TOD", "POD", "APPT_MADE_DATE", "APPT_START_DATE", "APPT_END_DATE", "APPT_CANCEL_DATE", "Total_People", "LAST_UPDATEDBY", "POST", "LastEntryDate", "TERMINAL_SUFFIX", "visitee_namelast", "visitee_namefirst", "MEETING_LOC", "MEETING_ROOM", "CALLER_NAME_LAST", "CALLER_NAME_FIRST", "CALLER_ROOM", "Description", "RELEASE_DATE"],
-    "Thunderbird_30g": ["IsAlertMessage?", "Timestamp", "Date", "Node", "DateTime", "URI", "Content"]
+    "Ad_click_on_taobao_512m": ["User", "DateTime"],
+    "Ad_click_on_taobao_1g": ["User", "DateTime"]
 }
 
 BATCH_ENTRY = """  
