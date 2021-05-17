@@ -25,8 +25,8 @@ RELATIONS = {
 DATASETS_MAPPING = {
     "Ad_click_on_taobao_512m": "little (512M)",
     "Ad_click_on_taobao_1g": "little (1G)",
-    "Ad_click_on_taobao_Ad_feature": "ad_feature",
-    "Ad_click_on_taobao_User_profile": "user_profile"
+    "Ad_click_on_taobao_Ad_feature": "AdFeature",
+    "Ad_click_on_taobao_User_profile": "UserProfile"
 }
 
 LEFT = 0
@@ -94,7 +94,7 @@ def get_sheet_name(pipeline_filename):
     pattern = re.sub("{{[^}]+}}", "(.*)", OUTPUT_FILENAME_FORMAT)
     match = re.search(pattern, pipeline_filename)
     left_dataset_name, _, _, right_dataset_name = match.groups()
-    return f"{DATASETS_MAPPING[left_dataset_name]} <-> {DATASETS_MAPPING[right_dataset_name]}"
+    return f"{DATASETS_MAPPING[left_dataset_name]} - {DATASETS_MAPPING[right_dataset_name]}"
 
 if __name__ == "__main__":
     main()
