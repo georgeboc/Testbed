@@ -3,7 +3,6 @@ package com.testbed.interactors.monitors;
 import com.google.common.base.Stopwatch;
 import com.testbed.entities.invocations.InvocationPlan;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -14,11 +13,10 @@ import static com.testbed.interactors.monitors.MonitorCommons.coalesce;
 public class ChronometerMonitor implements Monitor {
     private static final String INVOCATION_TIME_IN_NANOSECONDS = "invocationTimeInNanoseconds";
 
-    @SneakyThrows
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
         Stopwatch stopWatch = Stopwatch.createStarted();
-        MonitoringInformation callableMonitoringInformation = callable.call();
+        MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(callable);
         stopWatch.stop();
         return coalesce(callableMonitoringInformation, getMonitoringInformation(stopWatch));
     }

@@ -4,7 +4,6 @@ import com.testbed.boundary.metrics.InstantMetric;
 import com.testbed.boundary.metrics.MetricsQuery;
 import com.testbed.boundary.metrics.RangeMetric;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.time.Instant;
 import java.util.AbstractMap;
@@ -21,10 +20,9 @@ public class RangeMetricsAggregateCalculator {
     private static final double STEP_IN_SECONDS = 1.0;
     private final MetricsQuery metricsQuery;
 
-    @SneakyThrows
     public MonitoringInformation calculate(RangeMetricsAggregateCalculatorParameters parameters) {
         Instant start = Instant.now();
-        MonitoringInformation callableMonitoringInformation = parameters.getCallable().call();
+        MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(parameters.getCallable());
         Instant end = Instant.now();
         Map<String, RangeMetric> rangeResultByHostname = metricsQuery.getRangeQueryByHostname(parameters.getQuery(),
                 start,

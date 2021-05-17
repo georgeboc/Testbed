@@ -2,7 +2,6 @@ package com.testbed.interactors.monitors;
 
 import com.testbed.entities.invocations.InvocationPlan;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.util.concurrent.Callable;
 
@@ -14,7 +13,6 @@ public class CPUUserTimeMonitor implements Monitor {
 
     private final InstantMetricsDifferencesCalculator instantMetricsDifferencesCalculator;
 
-    @SneakyThrows
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
         return instantMetricsDifferencesCalculator.calculate(InstantMetricsDifferencesCalculatorParameters.builder()

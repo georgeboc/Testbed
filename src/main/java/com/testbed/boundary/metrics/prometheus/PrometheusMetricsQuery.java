@@ -11,12 +11,12 @@ import com.testbed.boundary.metrics.prometheus.schemas.InstantSchema;
 import com.testbed.boundary.metrics.prometheus.schemas.RangeResult;
 import com.testbed.boundary.metrics.prometheus.schemas.RangeSchema;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -31,19 +31,25 @@ public class PrometheusMetricsQuery implements MetricsQuery {
 
     private final String baseUrl;
 
-    @SneakyThrows
     @Override
     public Map<String, InstantMetric> getInstantQueryByHostname(String query) {
         Call<InstantSchema> call = getPrometheusAPI().instantQuery(query);
-        Response<InstantSchema> instantResponse = call.execute();
+        Response<InstantSchema> instantResponse = tryExecuteCall(call);
         return getInstantMetricByHostnameFromResponse(instantResponse);
     }
 
-    @SneakyThrows
+    private <T> Response<T> tryExecuteCall(Call<T> call) {
+        try {
+            return call.execute();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
     @Override
     public Map<String, RangeMetric> getRangeQueryByHostname(String query, Instant start, Instant end, double stepInSeconds) {
         Call<RangeSchema> call = getPrometheusAPI().rangeQuery(query, start, end, stepInSeconds);
-        Response<RangeSchema> rangeResponse = call.execute();
+        Response<RangeSchema> rangeResponse = tryExecuteCall(call);
         return getInstantMetricsByHostnameFromResponse(rangeResponse);
     }
 

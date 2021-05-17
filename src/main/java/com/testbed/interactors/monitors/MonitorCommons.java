@@ -5,6 +5,7 @@ import org.apache.commons.lang.WordUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 public class MonitorCommons {
     public static MonitoringInformation coalesce(MonitoringInformation first, MonitoringInformation second) {
@@ -12,6 +13,14 @@ public class MonitorCommons {
         first.getResult().forEach(coalescedMap::put);
         second.getResult().forEach(coalescedMap::put);
         return new MonitoringInformation(coalescedMap);
+    }
+
+    public static MonitoringInformation tryCall(Callable<MonitoringInformation> callable) {
+        try {
+            return callable.call();
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     public static String getMonitorName(MonitorNameParameters monitorNameParameters, String hostname) {

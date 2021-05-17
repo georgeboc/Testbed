@@ -3,7 +3,6 @@ package com.testbed.interactors.monitors;
 import com.testbed.boundary.metrics.InstantMetric;
 import com.testbed.boundary.metrics.MetricsQuery;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -16,10 +15,9 @@ import static com.testbed.interactors.monitors.MonitorCommons.getMonitorName;
 public class InstantMetricsDifferencesCalculator {
     private final MetricsQuery metricsQuery;
 
-    @SneakyThrows
     public MonitoringInformation calculate(InstantMetricsDifferencesCalculatorParameters parameters) {
         Map<String, InstantMetric> initialInstantMetricByHostname = metricsQuery.getInstantQueryByHostname(parameters.getQuery());
-        MonitoringInformation callableMonitoringInformation = parameters.getCallable().call();
+        MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(parameters.getCallable());
         Map<String, InstantMetric> finalInstantMetricByHostname = metricsQuery.getInstantQueryByHostname(parameters.getQuery());
         return coalesce(callableMonitoringInformation,
                 getMonitorInformation(parameters.getMonitorNameParameters(),

@@ -2,7 +2,6 @@ package com.testbed.interactors.monitors;
 
 import com.testbed.entities.invocations.InvocationPlan;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import java.time.Instant;
 import java.util.concurrent.Callable;
@@ -14,12 +13,11 @@ public class ExecutionInstantsMonitor implements Monitor {
     private static final String INITIAL_INSTANT = "initialInstant";
     private static final String FINAL_INSTANT = "finalInstant";
 
-    @SneakyThrows
     @Override
     public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
         Instant initialInstant = Instant.now();
 
-        MonitoringInformation callableMonitoringInformation = callable.call();
+        MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(callable);
 
         Instant finalInstant = Instant.now();
         return coalesce(callableMonitoringInformation, getMonitoringInformation(initialInstant, finalInstant));
