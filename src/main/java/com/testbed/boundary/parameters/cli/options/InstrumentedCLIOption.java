@@ -4,10 +4,8 @@ import com.testbed.entities.parameters.InputParameters;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
-import static com.testbed.boundary.parameters.cli.options.CLIOptionConstants.HAS_ARG;
 import static com.testbed.boundary.parameters.cli.options.CLIOptionConstants.NOT_REQUIRED;
 import static com.testbed.boundary.parameters.cli.options.CLIOptionConstants.NO_ARGS;
-import static com.testbed.boundary.parameters.cli.options.CLIOptionConstants.REQUIRED;
 
 public class InstrumentedCLIOption implements CLIOption {
     private static final String I = "i";

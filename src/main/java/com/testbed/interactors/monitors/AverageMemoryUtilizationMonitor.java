@@ -3,7 +3,6 @@ package com.testbed.interactors.monitors;
 import com.testbed.entities.invocations.InvocationPlan;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 @RequiredArgsConstructor

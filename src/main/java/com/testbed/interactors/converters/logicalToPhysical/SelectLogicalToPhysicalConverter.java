@@ -8,13 +8,11 @@ import com.testbed.entities.operations.physical.PhysicalSelect;
 import com.testbed.entities.profiles.ColumnProfile;
 import com.testbed.entities.profiles.Profile;
 import com.testbed.entities.profiles.ProfileEstimation;
-import com.testbed.interactors.TimedInvocationsInteractor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static com.testbed.interactors.converters.ConvertersCommons.checkIfErrorIsTolerable;
-import static java.lang.Math.abs;
 
 @RequiredArgsConstructor
 public class SelectLogicalToPhysicalConverter implements LogicalToPhysicalConverter {

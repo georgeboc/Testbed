@@ -1,7 +1,6 @@
 package com.testbed.boundary.invocations.instrumentation;
 
 import com.testbed.boundary.invocations.InvocationParameters;
-import com.testbed.boundary.invocations.Nameable;
 import com.testbed.boundary.invocations.Operation;
 import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset;
 import com.testbed.boundary.invocations.intermediateDatasets.instrumentation.IntermediateDatasetInstrumentation;

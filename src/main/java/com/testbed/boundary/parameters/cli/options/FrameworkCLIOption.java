@@ -5,9 +5,6 @@ import com.testbed.entities.parameters.InputParameters;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import static com.testbed.boundary.parameters.cli.options.CLIOptionConstants.HAS_ARG;
 import static com.testbed.boundary.parameters.cli.options.CLIOptionConstants.REQUIRED;
 

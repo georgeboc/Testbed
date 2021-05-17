@@ -13,8 +13,6 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.lang.Math.min;
-
 @SuppressWarnings("UnstableApiUsage")
 @RequiredArgsConstructor
 public class TimedInvocationsViewer {
