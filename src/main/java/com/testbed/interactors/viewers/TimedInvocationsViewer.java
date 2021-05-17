@@ -43,9 +43,16 @@ public class TimedInvocationsViewer {
     public void view(final OutputParameters outputParameters,
                      final FrameworkName frameworkName,
                      final MonitoringInformation monitoringInformation) {
+        removeSheetIfOverwriteIsEnabled(outputParameters);
         writeTopHeaders(outputParameters);
         int frameworkColumn = FrameworksPosition.valueOf(frameworkName.name()).column;
         monitoringInformationViewer.view(outputParameters, monitoringInformation, frameworkColumn);
+    }
+
+    private void removeSheetIfOverwriteIsEnabled(OutputParameters outputParameters) {
+        if (outputParameters.isOverwriteSheetEnabled()) {
+            spreadsheetWriter.removeSheet(outputParameters);
+        }
     }
 
     private void writeTopHeaders(final OutputParameters outputParameters) {

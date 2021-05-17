@@ -13,6 +13,39 @@ export TOLERABLE_ERROR_PERCENTAGE="$5"
 export GOOGLE_DRIVE_ACCOUNT=gdrive
 export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 
+export OVERWRITE_SHEET=true
+
+export TIMED_EXECUTION_ARGS=(
+    --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
+    --output "$OUTPUT"
+    --pipeline "$PIPELINE"
+    --framework-name MapReduce
+    --sheet-name "$SHEET_NAME"
+)
+
+export INSTRUMENTED_EXECUTION_ARGS=(
+    --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
+    --output "$OUTPUT"
+    --pipeline "$PIPELINE"
+    --framework-name MapReduce
+    --sheet-name "$SHEET_NAME"
+    --instrumented
+)
+
+export HADOOP=hadoop jar
+
+export SPARK=spark-submit \
+    --master yarn \
+    --deploy-mode cluster \
+    --conf spark.driver.memory="11301M" \
+    --conf spark.driver.memoryOverhead="851M" \
+    --conf spark.executor.memory="11301M" \
+    --conf spark.executor.memoryOverhead="851M" \
+    --conf spark.driver.cores="8" \
+    --conf spark.executor.cores="8" \
+    --conf spark.executor.instances="5" \
+
+
 echo "Parameters read: $PIPELINE, $OUTPUT, $SHEET_NAME, $INSTRUMENTED_SHEET_NAME"
 
 function execute_experiments () {
@@ -40,53 +73,20 @@ function clear_caches () {
 
 function execute_timed_experiment_with_MapReduce () {
     echo "Executing MapReduce timed experiment #$i"
-    hadoop jar $JAR_PATH \
-    --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --output "$OUTPUT" \
-    --pipeline "$PIPELINE" \
-    --framework-name MapReduce \
-    --sheet-name "$SHEET_NAME"
+    $(HADOOP) $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
+    OVERWRITE_SHEET=false
 }
 
 function execute_timed_experiment_with_Spark () {
     echo "Executing Spark timed experiment #$i"
-    spark-submit \
-    --master yarn \
-    --deploy-mode cluster \
-    --conf spark.driver.memory="11301M" \
-    --conf spark.driver.memoryOverhead="851M" \
-    --conf spark.executor.memory="11301M" \
-    --conf spark.executor.memoryOverhead="851M" \
-    --conf spark.driver.cores="8" \
-    --conf spark.executor.cores="8" \
-    --conf spark.executor.instances="5" \
-    $JAR_PATH \
-    --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --framework-name Spark \
-    --pipeline "$PIPELINE" \
-    --output "$OUTPUT" \
-    --sheet-name "$SHEET_NAME"
+    $(SPARK) $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
+    OVERWRITE_SHEET=false
 }
 
 function execute_instrumented_experiment () {
     echo "Executing instrumented experiment"
-    spark-submit \
-    --master yarn \
-    --deploy-mode cluster \
-    --conf spark.driver.memory="11301M" \
-    --conf spark.driver.memoryOverhead="851M" \
-    --conf spark.executor.memory="11301M" \
-    --conf spark.executor.memoryOverhead="851M" \
-    --conf spark.driver.cores="8" \
-    --conf spark.executor.cores="8" \
-    --conf spark.executor.instances="5" \
-    $JAR_PATH \
-    --tolerable-error-percentage $TOLERABLE_ERROR_PERCENTAGE \
-    --framework-name Spark \
-    --instrumented \
-    --pipeline "$PIPELINE" \
-    --output "$OUTPUT" \
-    --sheet-name "$INSTRUMENTED_SHEET_NAME"
+    $(SPARK) "${INSTRUMENTED_SHEET_NAME[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
+    OVERWRITE_SHEET=false
 }
 
 function upload_results_to_google_drive () {

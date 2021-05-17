@@ -9,4 +9,5 @@ public interface SpreadsheetWriter {
     boolean isEmpty(final OutputParameters outputParameters, final Position position);
     int getFirstUnwrittenColumn(OutputParameters outputParameters, int row, int columnOffset);
     void makeMergedRegion(final OutputParameters outputParameters, final Position startPosition, final Position endPosition);
+    void removeSheet(final OutputParameters outputParameters);
 }

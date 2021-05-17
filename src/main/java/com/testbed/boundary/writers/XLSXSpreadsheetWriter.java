@@ -94,6 +94,14 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         tryWriteWorkbook(outputParameters, workbook);
     }
 
+    @Override
+    public void removeSheet(OutputParameters outputParameters) {
+        Workbook workbook = tryGetWorkbook(outputParameters);
+        Optional<Sheet> optionalSheet = Optional.ofNullable(workbook.getSheet(outputParameters.getSheetName()));
+        optionalSheet.ifPresent(sheet -> workbook.removeSheetAt(workbook.getSheetIndex(sheet)));
+        tryWriteWorkbook(outputParameters, workbook);
+    }
+
     private Sheet getOrCreateSheet(OutputParameters outputParameters, Workbook workbook) {
         return Optional.ofNullable(workbook.getSheet(outputParameters.getSheetName()))
                 .orElseGet(() -> workbook.createSheet(outputParameters.getSheetName()));

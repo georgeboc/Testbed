@@ -34,11 +34,18 @@ public class InstrumentatedInvocationsViewer {
 
     public void view(final OutputParameters outputParameters,
                      final List<OperationInstrumentation> operationInstrumentations) {
+        removeSheetIfOverwriteIsEnabled(outputParameters);
         LongStream naturalSuccession = LongStream.iterate(1, i -> i + 1);
         List<InvocationInstrumentationView> invocationInstrumentationViews =
                 Streams.zip(naturalSuccession.boxed(), operationInstrumentations.stream(), this::getInvocationInstrumentationView)
                 .collect(Collectors.toList());
         writeViews(outputParameters, invocationInstrumentationViews);
+    }
+
+    private void removeSheetIfOverwriteIsEnabled(OutputParameters outputParameters) {
+        if (outputParameters.isOverwriteSheetEnabled()) {
+            spreadsheetWriter.removeSheet(outputParameters);
+        }
     }
 
     private void writeViews(final OutputParameters outputParameters, final List<InvocationInstrumentationView> views) {

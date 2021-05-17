@@ -14,4 +14,5 @@ public class InputParameters {
     private final FrameworkName frameworkName;
     private final boolean isInstrumented;
     private final boolean isLocalEnvironment;
+    private final boolean isOverwriteSheetEnabled;
 }
