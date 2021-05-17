@@ -16,34 +16,36 @@ export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 export OVERWRITE_SHEET=true
 
 export TIMED_EXECUTION_ARGS=(
-    --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
-    --output "$OUTPUT"
-    --pipeline "$PIPELINE"
-    --framework-name MapReduce
-    --sheet-name "$SHEET_NAME"
+  --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
+  --output "$OUTPUT"
+  --pipeline "$PIPELINE"
+  --framework-name MapReduce
+  --sheet-name "$SHEET_NAME"
 )
 
 export INSTRUMENTED_EXECUTION_ARGS=(
-    --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
-    --output "$OUTPUT"
-    --pipeline "$PIPELINE"
-    --framework-name MapReduce
-    --sheet-name "$SHEET_NAME"
-    --instrumented
+  --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
+  --output "$OUTPUT"
+  --pipeline "$PIPELINE"
+  --framework-name MapReduce
+  --sheet-name "$SHEET_NAME"
+  --instrumented
 )
 
-export HADOOP=hadoop jar
+export SPARK_SUBMIT_ARGS=(
+  --master yarn
+  --deploy-mode cluster
+  --conf spark.driver.memory="11301M"
+  --conf spark.driver.memoryOverhead="851M"
+  --conf spark.executor.memory="11301M"
+  --conf spark.executor.memoryOverhead="851M"
+  --conf spark.driver.cores="8"
+  --conf spark.executor.cores="8"
+  --conf spark.executor.instances="5"
+)
 
-export SPARK=spark-submit \
-    --master yarn \
-    --deploy-mode cluster \
-    --conf spark.driver.memory="11301M" \
-    --conf spark.driver.memoryOverhead="851M" \
-    --conf spark.executor.memory="11301M" \
-    --conf spark.executor.memoryOverhead="851M" \
-    --conf spark.driver.cores="8" \
-    --conf spark.executor.cores="8" \
-    --conf spark.executor.instances="5" \
+export HADOOP="hadoop jar"
+export SPARK="spark-submit ${SPARK_SUBMIT_ARGS[*]}"
 
 
 echo "Parameters read: $PIPELINE, $OUTPUT, $SHEET_NAME, $INSTRUMENTED_SHEET_NAME"
@@ -72,29 +74,29 @@ function clear_caches () {
 }
 
 function execute_timed_experiment_with_MapReduce () {
-    echo "Executing MapReduce timed experiment #$i"
-    $(HADOOP) $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
-    OVERWRITE_SHEET=false
+  echo "Executing MapReduce timed experiment #$i"
+  ${HADOOP} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
+  OVERWRITE_SHEET=false
 }
 
 function execute_timed_experiment_with_Spark () {
-    echo "Executing Spark timed experiment #$i"
-    $(SPARK) $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
-    OVERWRITE_SHEET=false
+  echo "Executing Spark timed experiment #$i"
+  ${SPARK} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
+  OVERWRITE_SHEET=false
 }
 
 function execute_instrumented_experiment () {
-    echo "Executing instrumented experiment"
-    $(SPARK) "${INSTRUMENTED_SHEET_NAME[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
-    OVERWRITE_SHEET=false
+  echo "Executing instrumented experiment"
+  ${SPARK} "${INSTRUMENTED_SHEET_NAME[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
+  OVERWRITE_SHEET=false
 }
 
 function upload_results_to_google_drive () {
-    echo "Uploading results to google drive"
-    hdfs dfs -copyToLocal "$OUTPUT" .
-    OUTPUT_BASENAME=$(basename "$OUTPUT")
-    rclone copy "$OUTPUT_BASENAME" $GOOGLE_DRIVE_ACCOUNT:$GOOGLE_DRIVE_PATH
-    rm "$OUTPUT_BASENAME"
+  echo "Uploading results to google drive"
+  hdfs dfs -copyToLocal "$OUTPUT" .
+  OUTPUT_BASENAME=$(basename "$OUTPUT")
+  rclone copy "$OUTPUT_BASENAME" $GOOGLE_DRIVE_ACCOUNT:$GOOGLE_DRIVE_PATH
+  rm "$OUTPUT_BASENAME"
 }
 
 execute_experiments
