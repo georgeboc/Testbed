@@ -16,7 +16,7 @@ public class JobConfigurationCommons {
     public static final String INTERMEDIATE_DATASETS_DIRECTORY_PREFIX = "intermediate_datasets/";
     public static final boolean VERBOSE = true;
     private static final boolean RECURSIVELY = true;
-    private static final String JOB_NAME = "LocalMapReduce";
+    private static final String JOB_NAME = "Testbed - MapReduce";
     private static final int ZERO_REDUCE_TASKS = 0;
 
     private final Configuration configuration;
