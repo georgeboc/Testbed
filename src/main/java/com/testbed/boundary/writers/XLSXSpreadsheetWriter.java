@@ -8,14 +8,17 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -115,15 +118,15 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         try {
             return getWorkbook(outputParameters);
         } catch (FileNotFoundException fileNotFoundException) {
-            return new HSSFWorkbook();
-        } catch (IOException exception) {
+            return new XSSFWorkbook();
+        } catch (IOException | InvalidFormatException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    private Workbook getWorkbook(OutputParameters outputParameters) throws IOException {
+    private Workbook getWorkbook(OutputParameters outputParameters) throws IOException, InvalidFormatException {
         FSDataInputStream inputStream = fileSystem.open(new Path(outputParameters.getOutputPath()));
-        Workbook workbook = new HSSFWorkbook(inputStream);
+        Workbook workbook = WorkbookFactory.create(inputStream);
         inputStream.close();
         return workbook;
     }
