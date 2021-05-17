@@ -14,6 +14,9 @@ export GOOGLE_DRIVE_ACCOUNT=gdrive
 export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 
 export OVERWRITE_SHEET=true
+export OVERWRITE_SHEET_ARG="--overwrite-sheet"
+
+export ADDITIONAL_ARGS=()
 
 export TIMED_EXECUTION_ARGS=(
   --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
@@ -75,20 +78,30 @@ function clear_caches () {
 
 function execute_timed_experiment_with_MapReduce () {
   echo "Executing MapReduce timed experiment #$i"
-  ${HADOOP} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
-  OVERWRITE_SHEET=false
+  update_additional_args
+  ${HADOOP} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" "${ADDITIONAL_ARGS[@]}"
+}
+
+function update_additional_args () {
+  if [ "$OVERWRITE_SHEET" = true ]
+  then
+    ADDITIONAL_ARGS+=("$OVERWRITE_SHEET_ARG")
+    OVERWRITE_SHEET=false
+  else
+    ADDITIONAL_ARGS=("${ADDITIONAL_ARGS[@]/$OVERWRITE_SHEET_ARG}")
+  fi
 }
 
 function execute_timed_experiment_with_Spark () {
   echo "Executing Spark timed experiment #$i"
-  ${SPARK} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
-  OVERWRITE_SHEET=false
+  update_additional_args
+  ${SPARK} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" "${ADDITIONAL_ARGS[@]}"
 }
 
 function execute_instrumented_experiment () {
   echo "Executing instrumented experiment"
-  ${SPARK} "${INSTRUMENTED_SHEET_NAME[@]}" ${OVERWRITE_SHEET:+--overwrite-sheet}
-  OVERWRITE_SHEET=false
+  update_additional_args
+  ${SPARK} "${INSTRUMENTED_SHEET_NAME[@]}" "${ADDITIONAL_ARGS[@]}"
 }
 
 function upload_results_to_google_drive () {
