@@ -63,7 +63,7 @@ def create_bash_runner(pipeline_filenames):
 
 def get_sheet_name(pipeline_filename):
     left_dataset_name, _, _, right_dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
-    return f"{DATASETS_MAPPING[left_dataset_name]} - {DATASETS_MAPPING[right_dataset_name]}"
+    return f"{DATASETS_MAPPING[left_dataset_name]}j{DATASETS_MAPPING[right_dataset_name]}"
 
 if __name__ == "__main__":
     main()

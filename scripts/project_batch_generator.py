@@ -70,7 +70,7 @@ def create_bash_runner(pipeline_filenames):
 
 def get_sheet_name(pipeline_filename):
     projected_columns_count, dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
-    return f"{DATASETS_MAPPING[dataset_name]} | {projected_columns_count} cols"
+    return f"{DATASETS_MAPPING[dataset_name]}|{projected_columns_count}c"
 
 if __name__ == "__main__":
     main()

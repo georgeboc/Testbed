@@ -6,12 +6,12 @@ SCRIPTS = "scripts"
 PIPELINES = "pipelines"
 
 DATASETS_MAPPING = {
-    "Ad_click_on_taobao_512m": "little (512M)",
-    "Ad_click_on_taobao_1g": "little (1G)",
-    "Ad_click_on_taobao_Ad_feature": "AdFeature",
-    "Ad_click_on_taobao_User_profile": "UserProfile",
-    "Obama_visitor_logs_1g": "middle (1G)",
-    "Thunderbird_30g": "big (30G)",
+    "Ad_click_on_taobao_512m": "LL",
+    "Ad_click_on_taobao_1g": "LB",
+    "Ad_click_on_taobao_Ad_feature": "LA",
+    "Ad_click_on_taobao_User_profile": "LU",
+    "Obama_visitor_logs_1g": "M",
+    "Thunderbird_30g": "B",
 }
 
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"

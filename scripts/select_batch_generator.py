@@ -55,7 +55,7 @@ def create_bash_runner(pipeline_filenames):
 
 def get_sheet_name(pipeline_filename):
     seletivity_factor_percentage, dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
-    return f"{DATASETS_MAPPING[dataset_name]} | {seletivity_factor_percentage}% SF"
+    return f"{DATASETS_MAPPING[dataset_name]}|{seletivity_factor_percentage}"
 
 if __name__ == "__main__":
     main()

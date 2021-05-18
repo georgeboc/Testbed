@@ -48,7 +48,7 @@ def create_bash_runner(pipeline_filenames):
 
 def get_sheet_name(pipeline_filename):
     column_index_string, dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
-    return f"{DATASETS_MAPPING[dataset_name]} | col. #{int(column_index_string) + 1}"
+    return f"{DATASETS_MAPPING[dataset_name]}{int(column_index_string) + 1}"
 
 if __name__ == "__main__":
     main()
