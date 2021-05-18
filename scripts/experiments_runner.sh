@@ -20,7 +20,6 @@ export CONDITIONAL_ARGS=()
 
 export SPARK_EXECUTION_ARGS=(
   --framework-name Spark
-  --name "Testbed - Spark"
 )
 
 export MAPREDUCE_EXECUTION_ARGS=(
