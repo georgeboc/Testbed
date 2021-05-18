@@ -1,76 +1,58 @@
 #/bin/python3
 # Execute from Testbed root directory
 
-import re
+from batch_generators_commons import *
+from dataclasses import dataclass
 from jinja2 import Template
-
-SCRIPTS = "scripts"
-SCRIPTS_TEMPLATES = f"{SCRIPTS}/templates"
-SCRIPTS = "scripts"
-PIPELINES = "pipelines"
-
-DATASETS_MAPPING = {
-    "Ad_click_on_taobao_512m": "little (512M)",
-    "Ad_click_on_taobao_1g": "little (1G)",
-    "Obama_visitor_logs_1g": "medium (1G)",
-    "Thunderbird_30g": "big (30G)"
-}
+from typing import List
 
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/project_pipeline.json.template"
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
-OUTPUT_FILENAME_FORMAT = "project_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
+OUTPUT_FILENAME_FORMAT = "project_pipeline-{{projected_columns_count}}_projected_columns_{{dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/project_batch_runner.sh"
 
-DATASETS_SELECTIVITY_FACTORS_MAPPING = {
-    "Ad_click_on_taobao_512m": [16.67, 33.34, 50, 66.67, 83.34, 100],
-    "Ad_click_on_taobao_1g": [16.67, 33.34, 50, 66.67, 83.34, 100],
-    "Obama_visitor_logs_1g": [3.58, 7.15, 10.72, 17.86, 35.72, 53.58, 71.43, 89.29, 100],
-    "Thunderbird_30g": [14.29, 28.58, 42.86, 57.15, 71.43, 85.72, 100]
+@dataclass
+class DatasetInformation:
+    column_selectivity_factor_percentages: List[int]
+    columns_count: int
+
+DATASET_INFORMATIONS = {
+    "Ad_click_on_taobao_512m": DatasetInformation(column_selectivity_factor_percentages=[16.67, 33.34, 50, 66.67, 83.34, 100],
+                                                  columns_count=6),
+    "Ad_click_on_taobao_1g": DatasetInformation(column_selectivity_factor_percentages=[16.67, 33.34, 50, 66.67, 83.34, 100],
+                                                columns_count=6),
+    "Obama_visitor_logs_1g": DatasetInformation(column_selectivity_factor_percentages=[3.58, 7.15, 10.72, 17.86, 35.72, 53.58, 71.43, 89.29, 100],
+                                                columns_count=28),
+    "Thunderbird_30g": DatasetInformation(column_selectivity_factor_percentages=[14.29, 28.58, 42.86, 57.15, 71.43, 85.72, 100],
+                                          columns_count=7)
 }
 
-BATCH_ENTRY = """  
-  PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
-  OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
-  SHEET_NAME="{{sheet_name}}"
-  INSTRUMENTED_SHEET_NAME="{{instrumented_sheet_name}}"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME' '$INSTRUMENTED_SHEET_NAME' '5'"
-  
-"""
-
 def main():
-    dataset_names = get_dataset_names()
-    for dataset_name in dataset_names:
-        create_pipelines(dataset_name)
-    create_bash_runner(dataset_names)
+    pipeline_filenames = [pipeline_filename
+                          for dataset_name in DATASET_INFORMATIONS.keys()
+                          for pipeline_filename in create_pipelines(dataset_name)]
+    create_bash_runner(pipeline_filenames)
 
 def create_pipelines(dataset_name):
-    for selectivity_factor_percentage in DATASETS_SELECTIVITY_FACTORS_MAPPING[dataset_name]:
+    filenames = []
+    for column_selectivity_factor_percentage in DATASET_INFORMATIONS[dataset_name].column_selectivity_factor_percentages:
         pipeline_content = Template(read_file_contents(PIPELINE_TEMPLATE)).render(dataset_name=dataset_name,
-                                                                 selectivity_factor=get_normalized_selectivity_factor(
-                                                                         selectivity_factor_percentage))
+                                                                                  column_selectivity_factor=
+                                                                                  get_normalized_column_selectivity_factor(
+                                                                                      column_selectivity_factor_percentage))
+        projected_columns_count = get_projected_columns_count(column_selectivity_factor_percentage,
+                                                              dataset_name,
+                                                              DATASET_INFORMATIONS)
         print("Pipeline content:", pipeline_content)
         filename = Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
-                                                           selectivity_factor_percentage=selectivity_factor_percentage)
+                                                           projected_columns_count=projected_columns_count)
+        filenames.append(filename)
         print("Filename generated:", filename)
         write_file_contents(filename, pipeline_content)
+    return filenames
 
-def get_dataset_names():
-    return list(DATASETS_MAPPING.keys())
-
-def read_file_contents(filename):
-    with open(filename, 'r') as file:
-        return file.read()
-
-def get_normalized_selectivity_factor(selectivity_factor_percentage):
-    return selectivity_factor_percentage/100.0
-
-def write_file_contents(filename, contents):
-    with open(filename, 'w') as file:
-        return file.write(contents)
-
-def create_bash_runner(dataset_names):
-    pipeline_filenames = get_pipeline_filenames(dataset_names)
+def create_bash_runner(pipeline_filenames):
     batches = ""
     for pipeline_filename in pipeline_filenames:
         output_filename = get_output_filename(pipeline_filename)
@@ -83,26 +65,9 @@ def create_bash_runner(dataset_names):
     batch_runner_content = Template(read_file_contents(BATCH_RUNNER_TEMPLATE)).render(batches=batches)
     write_file_contents(OUTPUT_BATCH_RUNNER_FILENAME, batch_runner_content)
 
-def get_instrumented_sheet_name(sheet_name):
-    return f"{sheet_name} Ins."
-
-def get_pipeline_filenames(dataset_names):
-    pipeline_filenames = []
-    for dataset_name in dataset_names:
-        pipeline_filenames.extend([Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
-                                                                           selectivity_factor_percentage=selectivity_factor_percentage)
-                                   for selectivity_factor_percentage in DATASETS_SELECTIVITY_FACTORS_MAPPING[dataset_name]])
-    return pipeline_filenames
-
-def get_output_filename(pipeline_filename):
-    return f"{pipeline_filename.split('-')[0]}.xlsx"
-
 def get_sheet_name(pipeline_filename):
-    unparsed_sheet_name = pipeline_filename.split('-')[1]
-    pattern = r'(.*)_percent_(.*).json'
-    match = re.search(pattern, unparsed_sheet_name)
-    percentage, dataset_name = match.groups()
-    return f"{DATASETS_MAPPING[dataset_name]} | {percentage}% SF"
+    projected_columns_count_string, dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
+    return f"{DATASETS_MAPPING[dataset_name]} | {projected_columns_count_string} cols"
 
 if __name__ == "__main__":
     main()

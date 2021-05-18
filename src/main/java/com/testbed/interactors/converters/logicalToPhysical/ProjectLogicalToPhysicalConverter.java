@@ -17,19 +17,19 @@ public class ProjectLogicalToPhysicalConverter implements LogicalToPhysicalConve
     public PhysicalOperation convert(final ProfileEstimation profileEstimation) throws ColumnNotFoundException {
         Set<String> originalColumnNames = profileEstimation.getProfile().getColumns().keySet();
         LogicalProject logicalProject = (LogicalProject) profileEstimation.getLogicalOperation();
-        long realOutputColumnsCount = (long) (logicalProject.getApproximatedColumnsSelectivityFactor() * originalColumnNames.size());
+        long realOutputColumnsCount = (long) (logicalProject.getApproximatedColumnSelectivityFactor() * originalColumnNames.size());
         List<String> projectedColumnNames = originalColumnNames.stream()
                 .sorted()
                 .limit(realOutputColumnsCount)
                 .collect(Collectors.toList());
-        double realColumnsSelectivityFactor = (double) projectedColumnNames.size()/originalColumnNames.size();
-        checkIfErrorIsTolerable(realColumnsSelectivityFactor,
-                logicalProject.getApproximatedColumnsSelectivityFactor(),
+        double realColumnSelectivityFactor = (double) projectedColumnNames.size()/originalColumnNames.size();
+        checkIfErrorIsTolerable(realColumnSelectivityFactor,
+                logicalProject.getApproximatedColumnSelectivityFactor(),
                 profileEstimation.getTolerableErrorPercentage());
         return PhysicalProject.builder()
                 .id(logicalProject.getId())
                 .projectedColumnNames(projectedColumnNames)
-                .approximatedColumnsSelectivityFactor(logicalProject.getApproximatedColumnsSelectivityFactor())
+                .approximatedColumnSelectivityFactor(logicalProject.getApproximatedColumnSelectivityFactor())
                 .build();
     }
 }

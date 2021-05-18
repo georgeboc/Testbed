@@ -8,6 +8,6 @@
     "operation": "PROJECT",
     "inputTag": "dataset1",
     "outputTag": "projectedDataset1",
-    "columnsSelectivityFactor": {{selectivity_factor}}
+    "columnSelectivityFactor": {{column_selectivity_factor}}
   }
 ]

@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class LogicalProject implements LogicalOperation {
     private final String id;
-    private final double approximatedColumnsSelectivityFactor;
+    private final double approximatedColumnSelectivityFactor;
 }
