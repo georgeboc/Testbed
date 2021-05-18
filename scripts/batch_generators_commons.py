@@ -5,9 +5,6 @@ SCRIPTS_TEMPLATES = f"{SCRIPTS}/templates"
 SCRIPTS = "scripts"
 PIPELINES = "pipelines"
 
-LEFT = 0
-RIGHT = 1
-
 DATASETS_MAPPING = {
     "Ad_click_on_taobao_512m": "little (512M)",
     "Ad_click_on_taobao_1g": "little (1G)",

@@ -17,13 +17,17 @@ class DatasetInformation:
     columns_count: int
 
 DATASET_INFORMATIONS = {
-    "Ad_click_on_taobao_512m": DatasetInformation(column_selectivity_factor_percentages=[16.67, 33.34, 50, 66.67, 83.34, 100],
+    "Ad_click_on_taobao_512m": DatasetInformation(column_selectivity_factor_percentages=
+                                                  [16.67, 33.34, 50, 66.67, 83.34, 100],
                                                   columns_count=6),
-    "Ad_click_on_taobao_1g": DatasetInformation(column_selectivity_factor_percentages=[16.67, 33.34, 50, 66.67, 83.34, 100],
+    "Ad_click_on_taobao_1g": DatasetInformation(column_selectivity_factor_percentages=
+                                                [16.67, 33.34, 50, 66.67, 83.34, 100],
                                                 columns_count=6),
-    "Obama_visitor_logs_1g": DatasetInformation(column_selectivity_factor_percentages=[3.58, 7.15, 10.72, 17.86, 35.72, 53.58, 71.43, 89.29, 100],
+    "Obama_visitor_logs_1g": DatasetInformation(column_selectivity_factor_percentages=
+                                                [3.58, 7.15, 10.72, 17.86, 35.72, 53.58, 71.43, 89.29, 100],
                                                 columns_count=28),
-    "Thunderbird_30g": DatasetInformation(column_selectivity_factor_percentages=[14.29, 28.58, 42.86, 57.15, 71.43, 85.72, 100],
+    "Thunderbird_30g": DatasetInformation(column_selectivity_factor_percentages=
+                                          [14.29, 28.58, 42.86, 57.15, 71.43, 85.72, 100],
                                           columns_count=7)
 }
 
@@ -36,10 +40,10 @@ def main():
 def create_pipelines(dataset_name):
     filenames = []
     for column_selectivity_factor_percentage in DATASET_INFORMATIONS[dataset_name].column_selectivity_factor_percentages:
-        pipeline_content = Template(read_file_contents(PIPELINE_TEMPLATE)).render(dataset_name=dataset_name,
-                                                                                  column_selectivity_factor=
-                                                                                  get_normalized_column_selectivity_factor(
-                                                                                      column_selectivity_factor_percentage))
+        column_selectivity_factor = get_normalized_column_selectivity_factor(column_selectivity_factor_percentage)
+        pipeline_template_content = read_file_contents(PIPELINE_TEMPLATE)
+        pipeline_content = Template(pipeline_template_content).render(dataset_name=dataset_name,
+                                                                      column_selectivity_factor=column_selectivity_factor)
         projected_columns_count = get_projected_columns_count(column_selectivity_factor_percentage,
                                                               dataset_name,
                                                               DATASET_INFORMATIONS)
@@ -65,8 +69,8 @@ def create_bash_runner(pipeline_filenames):
     write_file_contents(OUTPUT_BATCH_RUNNER_FILENAME, batch_runner_content)
 
 def get_sheet_name(pipeline_filename):
-    projected_columns_count_string, dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
-    return f"{DATASETS_MAPPING[dataset_name]} | {projected_columns_count_string} cols"
+    projected_columns_count, dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
+    return f"{DATASETS_MAPPING[dataset_name]} | {projected_columns_count} cols"
 
 if __name__ == "__main__":
     main()

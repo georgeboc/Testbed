@@ -2,6 +2,7 @@
 # Execute from Testbed root directory
 
 from batch_generators_commons import *
+from dataclasses import dataclass
 from jinja2 import Template
 
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/join_pipeline.json.template"
@@ -11,9 +12,15 @@ OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/join_batch_runner.sh"
 
 LEFT_DATASET_NAMES = ["Ad_click_on_taobao_512m", "Ad_click_on_taobao_1g"]
 RIGHT_DATASET_NAMES = ["Ad_click_on_taobao_Ad_feature", "Ad_click_on_taobao_User_profile"]
+
+@dataclass
+class DatasetsRelation:
+    left_column_name: str
+    right_column_name: str
+
 RELATIONS = {
-    "Ad_click_on_taobao_Ad_feature": ("AdGroupId", "AdGroupId"),
-    "Ad_click_on_taobao_User_profile": ("User", "UserId")
+    "Ad_click_on_taobao_Ad_feature": DatasetsRelation(left_column_name="AdGroupId", right_column_name="AdGroupId"),
+    "Ad_click_on_taobao_User_profile": DatasetsRelation(left_column_name="User", right_column_name="UserId")
 }
 
 def main():
@@ -24,15 +31,18 @@ def create_pipelines():
     filenames = []
     for left_dataset_name in LEFT_DATASET_NAMES:
         for right_dataset_name in RIGHT_DATASET_NAMES:
-            pipeline_content = Template(read_file_contents(PIPELINE_TEMPLATE)).render(left_dataset_name=left_dataset_name,
-                                                                                      right_dataset_name=right_dataset_name,
-                                                                                      left_column_name=RELATIONS[right_dataset_name][LEFT],
-                                                                                      right_column_name=RELATIONS[right_dataset_name][RIGHT])
+            left_column_name = RELATIONS[right_dataset_name].left_column_name
+            right_column_name = RELATIONS[right_dataset_name].right_column_name
+            pipeline_template_content = read_file_contents(PIPELINE_TEMPLATE)
+            pipeline_content = Template(pipeline_template_content).render(left_dataset_name=left_dataset_name,
+                                                                          right_dataset_name=right_dataset_name,
+                                                                          left_column_name=left_column_name,
+                                                                          right_column_name=right_column_name)
             print("Pipeline content:", pipeline_content)
             filename = Template(OUTPUT_FILENAME_FORMAT).render(left_dataset_name=left_dataset_name,
                                                                right_dataset_name=right_dataset_name,
-                                                               left_column_name=RELATIONS[right_dataset_name][LEFT],
-                                                               right_column_name=RELATIONS[right_dataset_name][RIGHT])
+                                                               left_column_name=left_column_name,
+                                                               right_column_name=right_column_name)
             filenames.append(filename)
             print("Filename generated:", filename)
             write_file_contents(filename, pipeline_content)
