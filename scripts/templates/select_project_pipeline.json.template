@@ -5,8 +5,15 @@
     "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/{{dataset_name}}"
   },
   {
-    "operation": "PROJECT",
+    "operation": "SELECT",
     "inputTag": "dataset",
+    "outputTag": "selectedDataset",
+    "rowsSelectivityFactor": {{selectivity_factor}},
+    "columnName": "{{selection_column_name}}"
+  },
+  {
+    "operation": "PROJECT",
+    "inputTag": "selectedDataset",
     "outputTag": "projectedDataset",
     "columnSelectivityFactor": {{column_selectivity_factor}}
   }

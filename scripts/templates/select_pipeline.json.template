@@ -1,13 +1,13 @@
 [
   {
     "operation": "LOAD",
-    "outputTag": "dataset1",
+    "outputTag": "dataset",
     "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/{{dataset_name}}"
   },
   {
     "operation": "SELECT",
-    "inputTag": "dataset1",
-    "outputTag": "selectedDataset1",
+    "inputTag": "dataset",
+    "outputTag": "selectedDataset",
     "rowsSelectivityFactor": {{selectivity_factor}},
     "columnName": "{{column_name}}"
   }

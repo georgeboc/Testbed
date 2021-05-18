@@ -7,7 +7,6 @@ from jinja2 import Template
 from typing import List
 
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/project_pipeline.json.template"
-BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
 OUTPUT_FILENAME_FORMAT = "project_pipeline-{{projected_columns_count}}_projected_columns_{{dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/project_batch_runner.sh"

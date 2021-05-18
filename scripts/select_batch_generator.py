@@ -5,7 +5,6 @@ from batch_generators_commons import *
 from jinja2 import Template
 
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/select_pipeline.json.template"
-BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
 OUTPUT_FILENAME_FORMAT = "select_pipeline-{{selectivity_factor_percentage}}_percent_{{dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/select_batch_runner.sh"

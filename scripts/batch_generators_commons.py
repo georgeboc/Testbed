@@ -17,6 +17,8 @@ DATASETS_MAPPING = {
     "Thunderbird_30g": "big (30G)",
 }
 
+BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
+
 BATCH_ENTRY = """  
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
   OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"

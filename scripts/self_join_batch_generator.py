@@ -5,7 +5,6 @@ from batch_generators_commons import *
 from jinja2 import Template
 
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/self_join_pipeline.json.template"
-BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 
 OUTPUT_FILENAME_FORMAT = "self_join_pipeline-column_number-{{column_index}}-{{dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/self_join_batch_runner.sh"
