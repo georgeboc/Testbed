@@ -50,7 +50,7 @@ import static com.testbed.springConfiguration.OperationsNamesConstants.PHYSICAL_
 @Configuration
 @Profile(TIMED_SPARK)
 public class TimedSparkInvocablesConfiguration {
-    private static final String APP_NAME = "Testbed - Spark";
+    private static final String APP_NAME = "Testbed-1.0-SNAPSHOT.jar";
     private static final String COMPRESSION_CODEC_CONFIG = "spark.sql.parquet.compression.codec";
     private static final String NONE = "none";
 
