@@ -37,7 +37,7 @@ export INSTRUMENTED_EXECUTION_ARGS=(
   --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
   --output "$OUTPUT"
   --pipeline "$PIPELINE"
-  --sheet-name "$SHEET_NAME"
+  --sheet-name "$INSTRUMENTED_SHEET_NAME"
   --instrumented
 )
 
