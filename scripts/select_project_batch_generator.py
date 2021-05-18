@@ -10,7 +10,7 @@ PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/select_project_pipeline.json.template"
 
 OUTPUT_FILENAME_FORMAT = "select_project_pipeline-{{projected_columns_count}}_projected_columns_{{selectivity_" + \
                          "factor_percentage}}_percent_sf_{{dataset_name}}.json"
-OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/project_batch_runner.sh"
+OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/select_project_batch_runner.sh"
 
 @dataclass
 class DatasetInformation:
