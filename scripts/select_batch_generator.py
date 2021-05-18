@@ -47,7 +47,7 @@ def create_bash_runner(pipeline_filenames):
         sheet_name = get_sheet_name(pipeline_filename)
         batch_entry = Template(BATCH_ENTRY).render(pipeline_filename=pipeline_filename,
                                                    output_filename=output_filename,
-                                                   sheet_name=sheet_name,
+                                                   timed_sheet_name=get_timed_sheet_name(sheet_name),
                                                    instrumented_sheet_name=get_instrumented_sheet_name(sheet_name))
         batches += batch_entry
     batch_runner_content = Template(read_file_contents(BATCH_RUNNER_TEMPLATE)).render(batches=batches)

@@ -19,9 +19,9 @@ BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
 BATCH_ENTRY = """  
   PIPELINE="hdfs://dtim:27000/user/bochileanu/pipelines/{{pipeline_filename}}"
   OUTPUT="hdfs://dtim:27000/user/bochileanu/analysis_results/{{output_filename}}"
-  SHEET_NAME="{{sheet_name}}"
+  TIMED_SHEET_NAME="{{timed_sheet_name}}"
   INSTRUMENTED_SHEET_NAME="{{instrumented_sheet_name}}"
-  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$SHEET_NAME' '$INSTRUMENTED_SHEET_NAME' '5'"
+  bash -c "$EXPERIMENTS_RUNNER_SCRIPT_PATH '$PIPELINE' '$OUTPUT' '$TIMED_SHEET_NAME' '$INSTRUMENTED_SHEET_NAME' '5'"
   
 """
 
@@ -34,7 +34,10 @@ def write_file_contents(filename, contents):
         return file.write(contents)
 
 def get_instrumented_sheet_name(sheet_name):
-    return f"{sheet_name} Ins."
+    return f"I|{sheet_name}"
+
+def get_timed_sheet_name(sheet_name):
+    return f"T|{sheet_name}"
 
 def get_output_filename(pipeline_filename):
     return f"{pipeline_filename.split('-')[0]}.xlsx"
