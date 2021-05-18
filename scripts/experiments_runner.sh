@@ -107,7 +107,7 @@ function execute_timed_experiment_with_Spark () {
 function execute_instrumented_experiment () {
   echo "Executing instrumented experiment"
   update_conditional_args
-  ${SPARK} $JAR_PATH "${INSTRUMENTED_SHEET_NAME[@]}" "${CONDITIONAL_ARGS[@]}" "${SPARK_EXECUTION_ARGS[@]}"
+  ${SPARK} $JAR_PATH "${INSTRUMENTED_EXECUTION_ARGS[@]}" "${CONDITIONAL_ARGS[@]}" "${SPARK_EXECUTION_ARGS[@]}"
 }
 
 function upload_results_to_google_drive () {
