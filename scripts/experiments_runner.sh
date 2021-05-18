@@ -16,13 +16,21 @@ export GOOGLE_DRIVE_PATH=Testbed/analysis_results
 export OVERWRITE_SHEET=true
 export OVERWRITE_SHEET_ARG="--overwrite-sheet"
 
-export ADDITIONAL_ARGS=()
+export CONDITIONAL_ARGS=()
+
+export SPARK_EXECUTION_ARGS=(
+  --framework-name Spark
+  --name "Testbed - Spark"
+)
+
+export MAPREDUCE_EXECUTION_ARGS=(
+  --framework-name MapReduce
+)
 
 export TIMED_EXECUTION_ARGS=(
   --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
   --output "$OUTPUT"
   --pipeline "$PIPELINE"
-  --framework-name MapReduce
   --sheet-name "$SHEET_NAME"
 )
 
@@ -30,7 +38,6 @@ export INSTRUMENTED_EXECUTION_ARGS=(
   --tolerable-error-percentage "$TOLERABLE_ERROR_PERCENTAGE"
   --output "$OUTPUT"
   --pipeline "$PIPELINE"
-  --framework-name MapReduce
   --sheet-name "$SHEET_NAME"
   --instrumented
 )
@@ -78,30 +85,30 @@ function clear_caches () {
 
 function execute_timed_experiment_with_MapReduce () {
   echo "Executing MapReduce timed experiment #$i"
-  update_additional_args
-  ${HADOOP} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" "${ADDITIONAL_ARGS[@]}"
+  update_conditional_args
+  ${HADOOP} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" "${CONDITIONAL_ARGS[@]}" "${MAPREDUCE_EXECUTION_ARGS[@]}"
 }
 
-function update_additional_args () {
+function update_conditional_args () {
   if [ "$OVERWRITE_SHEET" = true ]
   then
-    ADDITIONAL_ARGS+=("$OVERWRITE_SHEET_ARG")
+    CONDITIONAL_ARGS+=("$OVERWRITE_SHEET_ARG")
     OVERWRITE_SHEET=false
   else
-    ADDITIONAL_ARGS=("${ADDITIONAL_ARGS[@]/$OVERWRITE_SHEET_ARG}")
+    CONDITIONAL_ARGS=("${CONDITIONAL_ARGS[@]/$OVERWRITE_SHEET_ARG}")
   fi
 }
 
 function execute_timed_experiment_with_Spark () {
   echo "Executing Spark timed experiment #$i"
-  update_additional_args
-  ${SPARK} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" "${ADDITIONAL_ARGS[@]}"
+  update_conditional_args
+  ${SPARK} $JAR_PATH "${TIMED_EXECUTION_ARGS[@]}" "${CONDITIONAL_ARGS[@]}" "${SPARK_EXECUTION_ARGS[@]}"
 }
 
 function execute_instrumented_experiment () {
   echo "Executing instrumented experiment"
-  update_additional_args
-  ${SPARK} "${INSTRUMENTED_SHEET_NAME[@]}" "${ADDITIONAL_ARGS[@]}"
+  update_conditional_args
+  ${SPARK} $JAR_PATH "${INSTRUMENTED_SHEET_NAME[@]}" "${CONDITIONAL_ARGS[@]}" "${SPARK_EXECUTION_ARGS[@]}"
 }
 
 function upload_results_to_google_drive () {
