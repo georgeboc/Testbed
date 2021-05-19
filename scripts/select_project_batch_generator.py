@@ -18,7 +18,7 @@ class DatasetInformation:
     columns_count: int
     selection_column_name: str
 
-SELECTIVITY_FACTOR_PERCENTAGES = [1, 3, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+SELECTIVITY_FACTOR_PERCENTAGES = [1, 5, 20, 50, 100]
 
 DATASET_INFORMATIONS = {
     "Ad_click_on_taobao_512m": DatasetInformation(column_selectivity_factor_percentages=
