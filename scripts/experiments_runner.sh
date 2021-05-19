@@ -48,8 +48,8 @@ export SPARK_SUBMIT_ARGS=(
   --conf spark.driver.memoryOverhead="851M"
   --conf spark.executor.memory="11301M"
   --conf spark.executor.memoryOverhead="851M"
-  --conf spark.driver.cores="8"
-  --conf spark.executor.cores="8"
+  --conf spark.driver.cores="4"
+  --conf spark.executor.cores="4"
   --conf spark.executor.instances="5"
 )
 
