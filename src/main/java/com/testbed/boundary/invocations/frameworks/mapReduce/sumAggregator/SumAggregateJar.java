@@ -23,7 +23,7 @@ public class SumAggregateJar {
         private static final int DEFAULT_POSITION = 0;
 
         @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        public void map(final LongWritable key, final Group value, final Context context) throws IOException, InterruptedException {
             String aggregateColumnName = context.getConfiguration().get(AGGREGATE_COLUMN_NAME);
             double columnValue = Double.parseDouble(value.getString(aggregateColumnName, DEFAULT_POSITION));
             context.write(NullWritable.get(), new DoubleWritable(columnValue));
@@ -34,7 +34,9 @@ public class SumAggregateJar {
         private static final double INITIAL_VALUE = 0.0;
 
         @Override
-        public void reduce(NullWritable key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
+        public void reduce(final NullWritable key,
+                           final Iterable<DoubleWritable> values,
+                           final Context context) throws IOException, InterruptedException {
             double aggregateValue = Streams.stream(values).map(DoubleWritable::get).reduce(INITIAL_VALUE, Double::sum);
             context.write(key, new DoubleWritable(aggregateValue));
         }
@@ -44,7 +46,9 @@ public class SumAggregateJar {
         private static final double INITIAL_VALUE = 0.0;
 
         @Override
-        public void reduce(NullWritable notUsed, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
+        public void reduce(final NullWritable notUsed,
+                           final Iterable<DoubleWritable> values,
+                           final Context context) throws IOException, InterruptedException {
             String aggregateColumnName = context.getConfiguration().get(AGGREGATE_COLUMN_NAME);
             String sumAggregatedColumnName = SUM_PREFIX + aggregateColumnName;
             Group aggregateGroup = createAggregateGroup(sumAggregatedColumnName);
@@ -53,11 +57,11 @@ public class SumAggregateJar {
             context.write(null, aggregateGroup);
         }
 
-        private Double getAggregateValue(Iterable<DoubleWritable> values) {
+        private Double getAggregateValue(final Iterable<DoubleWritable> values) {
             return Streams.stream(values).map(DoubleWritable::get).reduce(INITIAL_VALUE, Double::sum);
         }
 
-        private Group createAggregateGroup(String sumAggregatedColumnName) {
+        private Group createAggregateGroup(final String sumAggregatedColumnName) {
             Type columnType = new PrimitiveType(Type.Repetition.OPTIONAL,
                     PrimitiveType.PrimitiveTypeName.BINARY,
                     sumAggregatedColumnName);

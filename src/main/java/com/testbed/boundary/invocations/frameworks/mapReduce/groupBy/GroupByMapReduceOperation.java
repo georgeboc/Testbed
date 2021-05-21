@@ -43,7 +43,7 @@ public class GroupByMapReduceOperation implements Operation {
     private final String name = GROUP_BY;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         try {
             return tryRunJob(invocationParameters);
         } catch (Exception exception) {
@@ -51,7 +51,7 @@ public class GroupByMapReduceOperation implements Operation {
         }
     }
 
-    private ReferenceIntermediateDataset tryRunJob(InvocationParameters invocationParameters) throws IOException,
+    private ReferenceIntermediateDataset tryRunJob(final InvocationParameters invocationParameters) throws IOException,
             InterruptedException, ClassNotFoundException {
         PhysicalGroupBy physicalGroupBy = (PhysicalGroupBy) invocationParameters.getPhysicalOperation();
         String inputPath = invocationParameters.getInputIntermediateDatasets().get(FIRST)
@@ -83,7 +83,7 @@ public class GroupByMapReduceOperation implements Operation {
         return new ReferenceIntermediateDataset(outputPath);
     }
 
-    private MessageType getGroupBySchema(List<String> columnNames, MessageType schema) {
+    private MessageType getGroupBySchema(final List<String> columnNames, final MessageType schema) {
         Set<String> columnNamesSet = new HashSet<>(columnNames);
         List<Type> projectedFields = schema.getFields().stream()
                 .filter(field -> columnNamesSet.contains(field.getName()))
@@ -91,7 +91,7 @@ public class GroupByMapReduceOperation implements Operation {
         return new MessageType(schema.getName(), projectedFields);
     }
 
-    private String[] getGroupByColumnIndexes(List<String> columnNames, MessageType schema) {
+    private String[] getGroupByColumnIndexes(final List<String> columnNames, final MessageType schema) {
         return columnNames.stream()
                 .map(schema::getFieldIndex)
                 .map(String::valueOf)

@@ -15,7 +15,7 @@ import static com.testbed.interactors.monitors.MonitorCommons.getMonitorName;
 public class InstantMetricsDifferencesCalculator {
     private final MetricsQuery metricsQuery;
 
-    public MonitoringInformation calculate(InstantMetricsDifferencesCalculatorParameters parameters) {
+    public MonitoringInformation calculate(final InstantMetricsDifferencesCalculatorParameters parameters) {
         Map<String, InstantMetric> initialInstantMetricByHostname = metricsQuery.getInstantQueryByHostname(parameters.getQuery());
         MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(parameters.getCallable());
         Map<String, InstantMetric> finalInstantMetricByHostname = metricsQuery.getInstantQueryByHostname(parameters.getQuery());
@@ -25,18 +25,18 @@ public class InstantMetricsDifferencesCalculator {
                         finalInstantMetricByHostname));
     }
 
-    public MonitoringInformation getMonitorInformation(MonitorNameParameters monitorNameParameters,
-                                                       Map<String, InstantMetric> initialInstantMetricByHost,
-                                                       Map<String, InstantMetric> finalInstantMetricByHost) {
+    public MonitoringInformation getMonitorInformation(final MonitorNameParameters monitorNameParameters,
+                                                       final Map<String, InstantMetric> initialInstantMetricByHost,
+                                                       final Map<String, InstantMetric> finalInstantMetricByHost) {
         Map<String, String> differences = initialInstantMetricByHost.entrySet().stream()
                 .map(entry -> getDifferenceEntry(monitorNameParameters, finalInstantMetricByHost, entry))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return new MonitoringInformation(differences);
     }
 
-    public Map.Entry<String, String> getDifferenceEntry(MonitorNameParameters monitorNameParameters,
-                                                        Map<String, InstantMetric> finalInstantMetricByHostname,
-                                                        Map.Entry<String, InstantMetric> initialInstantMetricEntry) {
+    public Map.Entry<String, String> getDifferenceEntry(final MonitorNameParameters monitorNameParameters,
+                                                        final Map<String, InstantMetric> finalInstantMetricByHostname,
+                                                        final Map.Entry<String, InstantMetric> initialInstantMetricEntry) {
         String hostname = initialInstantMetricEntry.getKey();
         InstantMetric initialInstantMetric = initialInstantMetricEntry.getValue();
         InstantMetric finalInstantMetric = finalInstantMetricByHostname.get(hostname);

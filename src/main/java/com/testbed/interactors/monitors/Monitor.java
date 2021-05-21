@@ -5,5 +5,5 @@ import com.testbed.entities.invocations.InvocationPlan;
 import java.util.concurrent.Callable;
 
 public interface Monitor {
-    MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan);
+    MonitoringInformation monitor(final Callable<MonitoringInformation> callable, final InvocationPlan invocationPlan);
 }

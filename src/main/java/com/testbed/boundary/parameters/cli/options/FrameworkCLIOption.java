@@ -21,7 +21,8 @@ public class FrameworkCLIOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
+    public void addParameter(final CommandLine commandLine,
+                             final InputParameters.InputParametersBuilder inputParametersBuilder) {
         String parsedFrameworkName = commandLine.getOptionValue(FRAMEWORK_NAME);
         inputParametersBuilder.frameworkName(FrameworkName.valueOf(parsedFrameworkName));
     }

@@ -20,7 +20,8 @@ public class PipelineCLIOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
+    public void addParameter(final CommandLine commandLine,
+                             final InputParameters.InputParametersBuilder inputParametersBuilder) {
         inputParametersBuilder.pipelineFileName(commandLine.getOptionValue(PIPELINE));
     }
 }

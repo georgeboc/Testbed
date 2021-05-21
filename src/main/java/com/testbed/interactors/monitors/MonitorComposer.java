@@ -12,7 +12,8 @@ public class MonitorComposer implements Monitor {
     private final List<Monitor> monitors;
 
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(final Callable<MonitoringInformation> callable,
+                                         final InvocationPlan invocationPlan) {
         return monitors.stream()
                 .map(monitor -> getFunction(monitor, invocationPlan))
                 .reduce(Function::andThen)
@@ -21,8 +22,8 @@ public class MonitorComposer implements Monitor {
                 .orElseGet(MonitoringInformation::createNew);
     }
 
-    private Function<Callable<MonitoringInformation>, Callable<MonitoringInformation>> getFunction(Monitor monitor,
-                                                                                                   InvocationPlan invocationPlan) {
+    private Function<Callable<MonitoringInformation>, Callable<MonitoringInformation>> getFunction(final Monitor monitor,
+                                                                                                   final InvocationPlan invocationPlan) {
         return callable -> () -> monitor.monitor(callable, invocationPlan);
     }
 }

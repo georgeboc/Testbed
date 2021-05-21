@@ -21,7 +21,7 @@ public class CLIInputInputParametersParser implements InputParametersParser {
     private final HelpFormatter helpFormatter;
 
     @Override
-    public InputParameters getParameters(String[] arguments) {
+    public InputParameters getParameters(final String[] arguments) {
         cliOptions.forEach(cliOption -> options.addOption(cliOption.getOption()));
         CommandLine commandLine = tryParseArguments(arguments);
         InputParameters.InputParametersBuilder inputParametersBuilder = InputParameters.builder();
@@ -29,7 +29,7 @@ public class CLIInputInputParametersParser implements InputParametersParser {
         return inputParametersBuilder.build();
     }
 
-    private CommandLine tryParseArguments(String[] arguments) {
+    private CommandLine tryParseArguments(final String[] arguments) {
         try {
             return commandLineParser.parse(options, arguments);
         } catch (ParseException exception) {

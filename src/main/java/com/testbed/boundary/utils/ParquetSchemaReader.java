@@ -16,14 +16,14 @@ public class ParquetSchemaReader {
     private final Configuration configuration;
     private final DirectoryUtils directoryUtils;
 
-    public MessageType readSchema(String inputPath) {
+    public MessageType readSchema(final String inputPath) {
         Path parquetFilePath = new Path(directoryUtils.tryGetFilesInDirectoryByPattern(inputPath,
                 Pattern.compile(".*part-.*parquet$")).get(FIRST));
         ParquetMetadata readFooter = tryReadFooter(parquetFilePath);
         return readFooter.getFileMetaData().getSchema();
     }
 
-    private ParquetMetadata tryReadFooter(Path parquetFilePath) {
+    private ParquetMetadata tryReadFooter(final Path parquetFilePath) {
         try {
             return ParquetFileReader.readFooter(configuration, parquetFilePath);
         } catch (Exception exception) {

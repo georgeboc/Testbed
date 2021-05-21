@@ -16,7 +16,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Application {
     private static final String COMPONENT_SCAN_FILENAME = "ComponentScan.xml";
 
-    public void run(String[] arguments) throws Exception {
+    public void run(final String[] arguments) throws Exception {
         LoggerPropertySetup.setup();
         Logger log = LoggerFactory.getLogger(Application.class.getName());
         log.info("Parsing parameters");

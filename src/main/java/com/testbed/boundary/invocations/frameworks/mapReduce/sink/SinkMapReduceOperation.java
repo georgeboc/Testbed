@@ -13,7 +13,7 @@ public class SinkMapReduceOperation implements Operation {
     private final String name = SINK;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         return new NoIntermediateDataset();
     }
 }

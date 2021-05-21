@@ -36,7 +36,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     private final FileSystem fileSystem;
 
     @Override
-    public void write(OutputParameters outputParameters, Position position, String value) {
+    public void write(final OutputParameters outputParameters, final Position position, final String value) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
@@ -47,7 +47,10 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public void writeWithColor(OutputParameters outputParameters, Position position, String value, String colorName) {
+    public void writeWithColor(final OutputParameters outputParameters,
+                               final Position position,
+                               final String value,
+                               final String colorName) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
@@ -60,7 +63,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public void addFormula(OutputParameters outputParameters, Position position, String formula) {
+    public void addFormula(final OutputParameters outputParameters, final Position position, final String formula) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
@@ -73,7 +76,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public boolean isEmpty(OutputParameters outputParameters, Position position) {
+    public boolean isEmpty(final OutputParameters outputParameters, final Position position) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         Row row = getOrCreateRow(sheet, position.getRow());
@@ -82,7 +85,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public int getFirstUnwrittenColumn(OutputParameters outputParameters, int row, int columnOffset) {
+    public int getFirstUnwrittenColumn(final OutputParameters outputParameters, final int row, final int columnOffset) {
         int i = columnOffset;
         while (!isEmpty(outputParameters, Position.builder().row(row).column(i).build())) {
             ++i;
@@ -91,7 +94,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public void makeMergedRegion(OutputParameters outputParameters, Position startPosition, Position endPosition) {
+    public void makeMergedRegion(final OutputParameters outputParameters, final Position startPosition, final Position endPosition) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Sheet sheet = getOrCreateSheet(outputParameters, workbook);
         sheet.addMergedRegion(new CellRangeAddress(startPosition.getRow(),
@@ -106,14 +109,14 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
     }
 
     @Override
-    public void removeSheet(OutputParameters outputParameters) {
+    public void removeSheet(final OutputParameters outputParameters) {
         Workbook workbook = tryGetWorkbook(outputParameters);
         Optional<Sheet> optionalSheet = Optional.ofNullable(workbook.getSheet(outputParameters.getSheetName()));
         optionalSheet.ifPresent(sheet -> workbook.removeSheetAt(workbook.getSheetIndex(sheet)));
         tryWriteWorkbook(outputParameters, workbook);
     }
 
-    private void setDefaultFont(Workbook workbook, Cell cell) {
+    private void setDefaultFont(final Workbook workbook, final Cell cell) {
         Font font = workbook.getFontAt(cell.getCellStyle().getFontIndex());
         font.setFontName(DEFAULT_FONT_NAME);
         font.setFontHeightInPoints(DEFAULT_FONT_HEIGHT);
@@ -121,16 +124,16 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         CellUtil.setFont(cell, workbook, font);
     }
 
-    private Sheet getOrCreateSheet(OutputParameters outputParameters, Workbook workbook) {
+    private Sheet getOrCreateSheet(final OutputParameters outputParameters, final Workbook workbook) {
         return Optional.ofNullable(workbook.getSheet(outputParameters.getSheetName()))
                 .orElseGet(() -> workbook.createSheet(outputParameters.getSheetName()));
     }
 
-    private Row getOrCreateRow(Sheet sheet, int position) {
+    private Row getOrCreateRow(final Sheet sheet, final int position) {
         return Optional.ofNullable(sheet.getRow(position)).orElseGet(() -> sheet.createRow(position));
     }
 
-    private Workbook tryGetWorkbook(OutputParameters outputParameters) {
+    private Workbook tryGetWorkbook(final OutputParameters outputParameters) {
         try {
             return getWorkbook(outputParameters);
         } catch (FileNotFoundException fileNotFoundException) {
@@ -140,14 +143,14 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         }
     }
 
-    private Workbook getWorkbook(OutputParameters outputParameters) throws IOException, InvalidFormatException {
+    private Workbook getWorkbook(final OutputParameters outputParameters) throws IOException, InvalidFormatException {
         FSDataInputStream inputStream = fileSystem.open(new Path(outputParameters.getOutputPath()));
         Workbook workbook = WorkbookFactory.create(inputStream);
         inputStream.close();
         return workbook;
     }
 
-    private void tryWriteWorkbook(OutputParameters outputParameters, Workbook workbook) {
+    private void tryWriteWorkbook(final OutputParameters outputParameters, final Workbook workbook) {
         try {
             writeWorkbook(outputParameters, workbook);
         } catch (IOException exception) {
@@ -155,7 +158,7 @@ public class XLSXSpreadsheetWriter implements SpreadsheetWriter {
         }
     }
 
-    private void writeWorkbook(OutputParameters outputParameters, Workbook workbook) throws IOException {
+    private void writeWorkbook(final OutputParameters outputParameters, final Workbook workbook) throws IOException {
         FSDataOutputStream outputStream = fileSystem.create(new Path(outputParameters.getOutputPath()));
         workbook.write(outputStream);
         outputStream.close();

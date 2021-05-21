@@ -47,7 +47,7 @@ public class TimedInvocationsViewer {
         monitoringInformationViewer.view(outputParameters, monitoringInformation, frameworkColumn);
     }
 
-    private void removeSheetIfOverwriteIsEnabled(OutputParameters outputParameters) {
+    private void removeSheetIfOverwriteIsEnabled(final OutputParameters outputParameters) {
         if (outputParameters.isOverwriteSheetEnabled()) {
             spreadsheetWriter.removeSheet(outputParameters);
         }
@@ -64,7 +64,7 @@ public class TimedInvocationsViewer {
         writeTopHeaders(outputParameters, INVOCATIONS_HEADERS, SECOND_ROW_TOP_HEADERS);
     }
 
-    private void writeTopHeaders(final OutputParameters outputParameters, String[] headers, int row) {
+    private void writeTopHeaders(final OutputParameters outputParameters, final String[] headers, final int row) {
         Stream<Position> positionStream = IntStream.iterate(FIRST_COLUMN, i -> i + 1)
                 .mapToObj(column -> Position.builder().column(column).row(row).build());
         Streams.forEachPair(positionStream, Arrays.stream(headers),

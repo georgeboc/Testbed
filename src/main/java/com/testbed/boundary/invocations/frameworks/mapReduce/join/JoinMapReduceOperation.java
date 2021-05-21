@@ -47,7 +47,7 @@ public class JoinMapReduceOperation implements Operation {
     private final String name = JOIN;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         try {
             return tryRunJob(invocationParameters);
         } catch (Exception exception) {
@@ -55,7 +55,7 @@ public class JoinMapReduceOperation implements Operation {
         }
     }
 
-    private ReferenceIntermediateDataset tryRunJob(InvocationParameters invocationParameters) throws IOException,
+    private ReferenceIntermediateDataset tryRunJob(final InvocationParameters invocationParameters) throws IOException,
             InterruptedException, ClassNotFoundException {
         PhysicalJoin physicalJoin = (PhysicalJoin) invocationParameters.getPhysicalOperation();
         String leftInputPath = getInputPath(invocationParameters, LEFT_POSITION);
@@ -91,14 +91,14 @@ public class JoinMapReduceOperation implements Operation {
         return new ReferenceIntermediateDataset(outputPath);
     }
 
-    private String getInputPath(InvocationParameters invocationParameters, int position) {
+    private String getInputPath(final InvocationParameters invocationParameters, final int position) {
         return invocationParameters.getInputIntermediateDatasets().get(position)
                 .getValue()
                 .get()
                 .toString();
     }
 
-    private MessageType getJoinSchema(MessageType leftSchema, MessageType rightSchema) {
+    private MessageType getJoinSchema(final MessageType leftSchema, final MessageType rightSchema) {
         List<Type> leftSchemaFields = getSchemaFields(leftSchema, LEFT_PREFIX);
         List<Type> rightSchemaFields = getSchemaFields(rightSchema, RIGHT_PREFIX);
         List<Type> joinedFields = Streams.concat(leftSchemaFields.stream(), rightSchemaFields.stream())
@@ -106,7 +106,7 @@ public class JoinMapReduceOperation implements Operation {
         return new MessageType(JOINED_SCHEMA_NAME, joinedFields);
     }
 
-    private List<Type> getSchemaFields(MessageType leftSchema, String fieldNamePrefix) {
+    private List<Type> getSchemaFields(final MessageType leftSchema, final String fieldNamePrefix) {
         return leftSchema.getFields().stream()
                 .map(field -> new PrimitiveType(field.getRepetition(),
                         field.asPrimitiveType().getPrimitiveTypeName(),

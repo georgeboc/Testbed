@@ -20,28 +20,36 @@ public class UnionJar {
 
     public static class LeftSourceUnionMapper extends Mapper<LongWritable, Group, Text, NullWritable> {
         @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        public void map(final LongWritable key,
+                        final Group value,
+                        final Context context) throws IOException, InterruptedException {
             context.write(new Text(value.toString()), NullWritable.get());
         }
     }
 
     public static class RightSourceUnionMapper extends Mapper<LongWritable, Group, Text, NullWritable> {
         @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        public void map(final LongWritable key,
+                        final Group value,
+                        final Context context) throws IOException, InterruptedException {
             context.write(new Text(value.toString()), NullWritable.get());
         }
     }
 
     public static class UnionCombiner extends Reducer<Text, NullWritable, Text, NullWritable> {
         @Override
-        public void reduce(Text key, Iterable<NullWritable> notUsed, Context context) throws IOException, InterruptedException {
+        public void reduce(final Text key,
+                           final Iterable<NullWritable> notUsed,
+                           final Context context) throws IOException, InterruptedException {
             context.write(key, NullWritable.get());
         }
     }
 
     public static class UnionReducer extends Reducer<Text, NullWritable, LongWritable, Group> {
         @Override
-        public void reduce(Text key, Iterable<NullWritable> notUsed, Context context) {
+        public void reduce(final Text key,
+                           final Iterable<NullWritable> notUsed,
+                           final Context context) {
             String unionSchemaString = context.getConfiguration().get(UNION_SCHEMA);
             MessageType unionSchema = MessageTypeParser.parseMessageType(unionSchemaString);
             MapReduceCommons.Row row = parseRow(key.toString());

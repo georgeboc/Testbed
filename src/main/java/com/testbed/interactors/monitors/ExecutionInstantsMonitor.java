@@ -14,7 +14,8 @@ public class ExecutionInstantsMonitor implements Monitor {
     private static final String FINAL_INSTANT = "finalInstant";
 
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(final Callable<MonitoringInformation> callable,
+                                         final InvocationPlan invocationPlan) {
         Instant initialInstant = Instant.now();
 
         MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(callable);
@@ -23,7 +24,7 @@ public class ExecutionInstantsMonitor implements Monitor {
         return coalesce(callableMonitoringInformation, getMonitoringInformation(initialInstant, finalInstant));
     }
 
-    private MonitoringInformation getMonitoringInformation(Instant initialInstant, Instant finalInstant) {
+    private MonitoringInformation getMonitoringInformation(final Instant initialInstant, final Instant finalInstant) {
         MonitoringInformation monitoringInformation = MonitoringInformation.createNew();
         monitoringInformation.getResult().put(INITIAL_INSTANT, initialInstant.toString());
         monitoringInformation.getResult().put(FINAL_INSTANT, finalInstant.toString());

@@ -70,12 +70,12 @@ public class JobConfigurationCommons {
         fileSystem.delete(new Path(outputPath), RECURSIVELY);
     }
 
-    private void setMapperOutputClasses(OperationJobConfiguration jobConfiguration, Job job) {
+    private void setMapperOutputClasses(final OperationJobConfiguration jobConfiguration, final Job job) {
         job.setMapOutputKeyClass(jobConfiguration.getMapOutputKeyClass());
         job.setMapOutputValueClass(jobConfiguration.getMapOutputValueClass());
     }
 
-    private Job createUnarySourceJob(UnaryOperationJobConfiguration jobConfiguration) throws IOException {
+    private Job createUnarySourceJob(final UnaryOperationJobConfiguration jobConfiguration) throws IOException {
         Job job = Job.getInstance(configuration, JOB_NAME);
         job.setInputFormatClass(jobConfiguration.getInputFormatClass());
         FileInputFormat.addInputPath(job, new Path(jobConfiguration.getInputPath()));
@@ -84,7 +84,7 @@ public class JobConfigurationCommons {
         return job;
     }
 
-    private Job createBinarySourceJob(BinaryOperationJobConfiguration jobConfiguration) throws IOException {
+    private Job createBinarySourceJob(final BinaryOperationJobConfiguration jobConfiguration) throws IOException {
         Job job = Job.getInstance(configuration, JOB_NAME);
         MultipleInputs.addInputPath(job,
                 new Path(jobConfiguration.getLeftInputPath()),
@@ -99,7 +99,7 @@ public class JobConfigurationCommons {
         return job;
     }
 
-    private void setJobOutputClasses(OperationJobConfiguration jobConfiguration, Job job) {
+    private void setJobOutputClasses(final OperationJobConfiguration jobConfiguration, final Job job) {
         job.setOutputKeyClass(jobConfiguration.getOutputKeyClass());
         job.setOutputValueClass(jobConfiguration.getOutputValueClass());
         job.setOutputFormatClass(jobConfiguration.getOutputFormatClass());

@@ -41,7 +41,7 @@ public class ProjectMapReduceOperation implements Operation {
     private final String name = PROJECT;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         try {
             return tryRunJob(invocationParameters);
         } catch (Exception exception) {
@@ -49,7 +49,7 @@ public class ProjectMapReduceOperation implements Operation {
         }
     }
 
-    private ReferenceIntermediateDataset tryRunJob(InvocationParameters invocationParameters) throws IOException,
+    private ReferenceIntermediateDataset tryRunJob(final InvocationParameters invocationParameters) throws IOException,
             InterruptedException, ClassNotFoundException {
         PhysicalProject physicalProject = (PhysicalProject) invocationParameters.getPhysicalOperation();
         String inputPath = invocationParameters.getInputIntermediateDatasets().get(FIRST)
@@ -77,7 +77,7 @@ public class ProjectMapReduceOperation implements Operation {
         return new ReferenceIntermediateDataset(outputPath);
     }
 
-    private MessageType getProjectedSchema(List<String> columnNames, MessageType schema) {
+    private MessageType getProjectedSchema(final List<String> columnNames, final MessageType schema) {
         Set<String> columnNamesSet = new HashSet<>(columnNames);
         List<Type> projectedFields = schema.getFields().stream()
                 .filter(field -> columnNamesSet.contains(field.getName()))
@@ -86,7 +86,7 @@ public class ProjectMapReduceOperation implements Operation {
         return new MessageType(schema.getName(), projectedFields);
     }
 
-    private String[] getProjectedColumnIndexes(List<String> columnNames, MessageType schema) {
+    private String[] getProjectedColumnIndexes(final List<String> columnNames, final MessageType schema) {
         return columnNames.stream()
                 .map(schema::getFieldIndex)
                 .map(String::valueOf)

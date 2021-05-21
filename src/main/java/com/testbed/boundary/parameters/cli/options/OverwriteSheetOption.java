@@ -23,7 +23,8 @@ public class OverwriteSheetOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
+    public void addParameter(final CommandLine commandLine,
+                             final InputParameters.InputParametersBuilder inputParametersBuilder) {
         inputParametersBuilder.isOverwriteSheetEnabled(commandLine.hasOption(OVERWRITE_SHEET));
     }
 }

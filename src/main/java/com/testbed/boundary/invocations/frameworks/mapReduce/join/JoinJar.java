@@ -34,7 +34,7 @@ public class JoinJar {
         private static final String LEFT_MAPPER = "leftMapper";
 
         @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        public void map(final LongWritable key, final Group value, final Context context) throws IOException, InterruptedException {
             int leftSourceJoinColumnIndex = context.getConfiguration().getInt(LEFT_SOURCE_JOIN_COLUMN_INDEX, DEFAULT_VALUE);
             String rowValue = value.getString(leftSourceJoinColumnIndex, DEFAULT_POSITION);
             context.write(new Text(rowValue), new Text(LEFT_MAPPER + MAPPER_TYPE_AND_ROW_DELIMITER + value));
@@ -48,7 +48,7 @@ public class JoinJar {
         private static final String RIGHT_MAPPER = "rightMapper";
 
         @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        public void map(final LongWritable key, final Group value, final Context context) throws IOException, InterruptedException {
             int rightSourceJoinColumnIndex = context.getConfiguration().getInt(RIGHT_SOURCE_JOIN_COLUMN_INDEX, DEFAULT_VALUE);
             String rowValue = value.getString(rightSourceJoinColumnIndex, DEFAULT_POSITION);
             context.write(new Text(rowValue), new Text(RIGHT_MAPPER + MAPPER_TYPE_AND_ROW_DELIMITER + value));
@@ -64,19 +64,19 @@ public class JoinJar {
         private static final String RIGHT_PREFIX = "Right";
 
         @Override
-        public void reduce(Text key, Iterable<Text> values, Context context) {
+        public void reduce(final Text key, final Iterable<Text> values, final Context context) {
             String joinSchemaString = context.getConfiguration().get(JOIN_SCHEMA);
             MessageType joinSchema = MessageTypeParser.parseMessageType(joinSchemaString);
             doJoin(values, joinSchema, context);
         }
 
-        private void doJoin(Iterable<Text> rows, MessageType joinSchema, Context context) {
+        private void doJoin(final Iterable<Text> rows, final MessageType joinSchema, final Context context) {
             LeftRightRows leftRightRows = getLeftRightRows(rows);
             Stream<MapReduceCommons.Row> crossProductStream = getCrossProductStream(leftRightRows);
             crossProductStream.forEach(row -> tryWriteRow(row, joinSchema, context));
         }
 
-        private LeftRightRows getLeftRightRows(Iterable<Text> rows) {
+        private LeftRightRows getLeftRightRows(final Iterable<Text> rows) {
             List<MapReduceCommons.Row> leftRows = Lists.newArrayList();
             List<MapReduceCommons.Row> rightRows = Lists.newArrayList();
             Streams.stream(rows)
@@ -88,7 +88,9 @@ public class JoinJar {
                     .build();
         }
 
-        private void classifyByMapperType(String[] mapperTypeAndRows, List<MapReduceCommons.Row> leftRows, List<MapReduceCommons.Row> rightRows) {
+        private void classifyByMapperType(final String[] mapperTypeAndRows,
+                                          final List<MapReduceCommons.Row> leftRows,
+                                          final List<MapReduceCommons.Row> rightRows) {
             if (mapperTypeAndRows[MAPPER_TYPE_POSITION].equals(LEFT_MAPPER)) {
                 leftRows.add(addPrefixToRowsFieldName(parseRow(mapperTypeAndRows[ROW_POSITION]), LEFT_PREFIX));
             } else {
@@ -96,13 +98,13 @@ public class JoinJar {
             }
         }
 
-        private Stream<MapReduceCommons.Row> getCrossProductStream(LeftRightRows leftRightRows) {
+        private Stream<MapReduceCommons.Row> getCrossProductStream(final LeftRightRows leftRightRows) {
             return leftRightRows.getLeftRows().stream()
                     .flatMap(leftRow -> leftRightRows.getRightRows().stream()
                             .map(rightRow -> uniteFields(leftRow, rightRow)));
         }
 
-        private MapReduceCommons.Row uniteFields(MapReduceCommons.Row leftRow, MapReduceCommons.Row rightRow) {
+        private MapReduceCommons.Row uniteFields(final MapReduceCommons.Row leftRow, final MapReduceCommons.Row rightRow) {
             return new MapReduceCommons.Row(ListUtils.union(leftRow.getFields(), rightRow.getFields()));
         }
 

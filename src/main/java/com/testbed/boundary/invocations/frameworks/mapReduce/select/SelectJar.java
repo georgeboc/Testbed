@@ -14,7 +14,7 @@ public class SelectJar {
         private static final int DEFAULT_POSITION = 0;
 
         @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        public void map(final LongWritable key, final Group value, final Context context) throws IOException, InterruptedException {
             int columnIndex = context.getConfiguration().getInt(COLUMN_INDEX, DEFAULT_POSITION);
             String columnValue = value.getValueToString(columnIndex, DEFAULT_POSITION);
             String lessThanOrEqualValue = context.getConfiguration().get(LESS_THAN_OR_EQUAL_VALUE);

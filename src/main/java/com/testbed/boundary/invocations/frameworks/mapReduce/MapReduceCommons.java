@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MapReduceCommons {
-    public static void tryWriteRow(Row row, MessageType schema, Context context) {
+    public static void tryWriteRow(final Row row, final MessageType schema, final Context context) {
         try {
             writeRow(row, schema, context);
         } catch (IOException | InterruptedException exception) {
@@ -21,7 +21,9 @@ public class MapReduceCommons {
         }
     }
 
-    private static void writeRow(Row row, MessageType schema, Context context) throws IOException, InterruptedException {
+    private static void writeRow(final Row row,
+                                 final MessageType schema,
+                                 final Context context) throws IOException, InterruptedException {
         Group group = new SimpleGroup(schema);
         row.getFields().forEach(field -> group.append(field.name, field.value));
         context.write(null, group);
@@ -33,7 +35,7 @@ public class MapReduceCommons {
         private static final String FIELD_DELIMITER = "\n";
         private static final String TYPE_DELIMITER = ": ";
 
-        public static Row parseRow(String rowString) {
+        public static Row parseRow(final String rowString) {
             String[] fields = rowString.split(FIELD_DELIMITER);
             return new Row(Arrays.stream(fields)
                     .map(field -> field.split(TYPE_DELIMITER))
@@ -44,7 +46,7 @@ public class MapReduceCommons {
                     .collect(Collectors.toList()));
         }
 
-        public static Row addPrefixToRowsFieldName(Row row, String fieldNamePrefix) {
+        public static Row addPrefixToRowsFieldName(final Row row, final String fieldNamePrefix) {
             return new Row(row.getFields().stream()
                     .map(field -> Field.builder()
                             .name(fieldNamePrefix + field.getName())

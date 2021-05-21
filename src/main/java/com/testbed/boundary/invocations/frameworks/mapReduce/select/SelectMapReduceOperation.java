@@ -36,7 +36,7 @@ public class SelectMapReduceOperation implements Operation {
     private final String name = SELECT;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         try {
             return tryRunJob(invocationParameters);
         } catch (Exception exception) {
@@ -44,7 +44,7 @@ public class SelectMapReduceOperation implements Operation {
         }
     }
 
-    private ReferenceIntermediateDataset tryRunJob(InvocationParameters invocationParameters) throws IOException,
+    private ReferenceIntermediateDataset tryRunJob(final InvocationParameters invocationParameters) throws IOException,
             InterruptedException, ClassNotFoundException {
         PhysicalSelect physicalSelect = (PhysicalSelect) invocationParameters.getPhysicalOperation();
         String inputPath = invocationParameters.getInputIntermediateDatasets().get(FIRST)

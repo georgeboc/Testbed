@@ -64,7 +64,7 @@ public class CountMapReduceOperation {
         return Long.parseLong(Optional.ofNullable(readLine(resultFilePath)).orElse(ZERO_COUNT));
     }
 
-    private String readLine(String filename) throws IOException {
+    private String readLine(final String filename) throws IOException {
         FSDataInputStream inputStream = fileSystem.open(new Path(filename));
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String line = bufferedReader.readLine();

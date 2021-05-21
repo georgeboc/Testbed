@@ -15,7 +15,7 @@ public class LoadMapReduceOperation implements Operation {
     private final String name = LOAD;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         PhysicalLoad physicalLoad = (PhysicalLoad) invocationParameters.getPhysicalOperation();
         return new ReferenceIntermediateDataset(String.format("%s/%s",
                 physicalLoad.getDatasetDirectoryPath(),

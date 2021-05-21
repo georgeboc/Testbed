@@ -46,7 +46,8 @@ public class LogicalToPhysicalConverterManager {
                 .build();
     }
 
-    private List<ProfileEstimation> getLoadProfileEstimations(final List<LogicalLoad> logicalLoads, final double tolerableError) {
+    private List<ProfileEstimation> getLoadProfileEstimations(final List<LogicalLoad> logicalLoads,
+                                                              final double tolerableError) {
         return logicalLoads.stream()
                 .map(logicalLoad -> ProfileEstimation.builder()
                         .logicalOperation(logicalLoad)
@@ -66,15 +67,20 @@ public class LogicalToPhysicalConverterManager {
         Set<ProfileEstimation> visitedProfileEstimations = Sets.newHashSet();
         while (!operationsStack.isEmpty()) {
             ProfileEstimation currentProfileEstimation = operationsStack.pop();
-            Collection<LogicalOperation> successiveLogicalOperations = logicalPlan.getGraph().successors(currentProfileEstimation.getLogicalOperation());
-            List<ProfileEstimation> successiveProfileEstimations = getSuccessiveProfileEstimations(currentProfileEstimation, successiveLogicalOperations);
-            operationsStack.addAll(getUnvisitedSuccessiveProfileEstimations(successiveProfileEstimations, visitedProfileEstimations));
+            Collection<LogicalOperation> successiveLogicalOperations = logicalPlan.getGraph()
+                    .successors(currentProfileEstimation.getLogicalOperation());
+            List<ProfileEstimation> successiveProfileEstimations = getSuccessiveProfileEstimations(currentProfileEstimation,
+                    successiveLogicalOperations);
+            operationsStack.addAll(getUnvisitedSuccessiveProfileEstimations(successiveProfileEstimations,
+                    visitedProfileEstimations));
             PhysicalOperation currentPhysicalOperation = convertFromProfileEstimationToPhysicalOperation(currentProfileEstimation);
             successiveProfileEstimations.stream()
                     .map(this::convertFromProfileEstimationToPhysicalOperation)
-                    .forEach(successivePhysicalOperation -> physicalGraph.putEdge(currentPhysicalOperation, successivePhysicalOperation));
+                    .forEach(successivePhysicalOperation ->
+                            physicalGraph.putEdge(currentPhysicalOperation, successivePhysicalOperation));
             if (successiveProfileEstimations.isEmpty()) {
-                physicalGraph.putEdge(currentPhysicalOperation, new PhysicalSink(SINK_PREFIX_ID + currentPhysicalOperation.getId()));
+                physicalGraph.putEdge(currentPhysicalOperation,
+                        new PhysicalSink(SINK_PREFIX_ID + currentPhysicalOperation.getId()));
             }
             visitedProfileEstimations.add(currentProfileEstimation);
         }

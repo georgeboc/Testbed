@@ -37,12 +37,14 @@ public class InstrumentatedInvocationsViewer {
         removeSheetIfOverwriteIsEnabled(outputParameters);
         LongStream naturalSuccession = LongStream.iterate(1, i -> i + 1);
         List<InvocationInstrumentationView> invocationInstrumentationViews =
-                Streams.zip(naturalSuccession.boxed(), operationInstrumentations.stream(), this::getInvocationInstrumentationView)
+                Streams.zip(naturalSuccession.boxed(),
+                        operationInstrumentations.stream(),
+                        this::getInvocationInstrumentationView)
                 .collect(Collectors.toList());
         writeViews(outputParameters, invocationInstrumentationViews);
     }
 
-    private void removeSheetIfOverwriteIsEnabled(OutputParameters outputParameters) {
+    private void removeSheetIfOverwriteIsEnabled(final OutputParameters outputParameters) {
         if (outputParameters.isOverwriteSheetEnabled()) {
             spreadsheetWriter.removeSheet(outputParameters);
         }
@@ -55,7 +57,7 @@ public class InstrumentatedInvocationsViewer {
                 (row, view) -> writeView(outputParameters, view, row));
     }
 
-    private void writeHeaders(OutputParameters outputParameters) {
+    private void writeHeaders(final OutputParameters outputParameters) {
         IntStream columnsSuccession = IntStream.iterate(FIRST_COLUMN, i -> i + 1);
         Stream<Position> positionStream = columnsSuccession.mapToObj(column -> Position.builder()
                 .column(column).row(FIRST_ROW).build());
@@ -64,7 +66,9 @@ public class InstrumentatedInvocationsViewer {
                 (position, header) -> spreadsheetWriter.writeWithColor(outputParameters, position, header, HEADER_COLOR_NAME));
     }
 
-    private void writeView(OutputParameters outputParameters, InvocationInstrumentationView view, int row) {
+    private void writeView(final OutputParameters outputParameters,
+                           final InvocationInstrumentationView view,
+                           final int row) {
         IntStream columnsSuccession = IntStream.iterate(FIRST_COLUMN, i -> i + 1);
         Stream<Position> positionStream = columnsSuccession.mapToObj(column -> Position.builder().row(row).column(column).build());
         Stream<String> values = Arrays.stream(InvocationInstrumentationView.class.getDeclaredFields())

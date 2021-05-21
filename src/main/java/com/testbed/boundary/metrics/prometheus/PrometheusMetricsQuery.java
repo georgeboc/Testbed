@@ -32,13 +32,13 @@ public class PrometheusMetricsQuery implements MetricsQuery {
     private final String baseUrl;
 
     @Override
-    public Map<String, InstantMetric> getInstantQueryByHostname(String query) {
+    public Map<String, InstantMetric> getInstantQueryByHostname(final String query) {
         Call<InstantSchema> call = getPrometheusAPI().instantQuery(query);
         Response<InstantSchema> instantResponse = tryExecuteCall(call);
         return getInstantMetricByHostnameFromResponse(instantResponse);
     }
 
-    private <T> Response<T> tryExecuteCall(Call<T> call) {
+    private <T> Response<T> tryExecuteCall(final Call<T> call) {
         try {
             return call.execute();
         } catch (IOException exception) {
@@ -47,7 +47,10 @@ public class PrometheusMetricsQuery implements MetricsQuery {
     }
 
     @Override
-    public Map<String, RangeMetric> getRangeQueryByHostname(String query, Instant start, Instant end, double stepInSeconds) {
+    public Map<String, RangeMetric> getRangeQueryByHostname(final String query,
+                                                            final Instant start,
+                                                            final Instant end,
+                                                            final double stepInSeconds) {
         Call<RangeSchema> call = getPrometheusAPI().rangeQuery(query, start, end, stepInSeconds);
         Response<RangeSchema> rangeResponse = tryExecuteCall(call);
         return getInstantMetricsByHostnameFromResponse(rangeResponse);
@@ -64,7 +67,7 @@ public class PrometheusMetricsQuery implements MetricsQuery {
         return retrofit.create(PrometheusAPI.class);
     }
 
-    private Map<String, InstantMetric> getInstantMetricByHostnameFromResponse(Response<InstantSchema> instantResponse) {
+    private Map<String, InstantMetric> getInstantMetricByHostnameFromResponse(final Response<InstantSchema> instantResponse) {
         Preconditions.checkArgument(instantResponse.body() != null,
                 "Instant Response body is null");
         InstantSchema instantSchema = instantResponse.body();
@@ -73,13 +76,13 @@ public class PrometheusMetricsQuery implements MetricsQuery {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Map.Entry<String, InstantMetric> getInstantMetricByHostname(InstantResult instantResult) {
+    private Map.Entry<String, InstantMetric> getInstantMetricByHostname(final InstantResult instantResult) {
         List<String> valueList = instantResult.getValue();
         InstantMetric instantMetric = getInstantMetric(valueList);
         return new AbstractMap.SimpleEntry<>(getHostnameFromInstance(instantResult.getMetric().getInstance()), instantMetric);
     }
 
-    private InstantMetric getInstantMetric(List<String> valueList) {
+    private InstantMetric getInstantMetric(final List<String> valueList) {
         long timestamp = (long) Double.parseDouble(valueList.get(TIMESTAMP_POSITION));
         long value = (long) Double.parseDouble(valueList.get(VALUE_POSITION));
         return InstantMetric.builder()
@@ -88,11 +91,11 @@ public class PrometheusMetricsQuery implements MetricsQuery {
                 .build();
     }
 
-    private String getHostnameFromInstance(String instance) {
+    private String getHostnameFromInstance(final String instance) {
         return Arrays.stream(instance.split(":")).findFirst().get();
     }
 
-    private Map<String, RangeMetric> getInstantMetricsByHostnameFromResponse(Response<RangeSchema> rangeResponse) {
+    private Map<String, RangeMetric> getInstantMetricsByHostnameFromResponse(final Response<RangeSchema> rangeResponse) {
         Preconditions.checkArgument(rangeResponse.body() != null,
                 "Range Response body is null");
         RangeSchema rangeSchema = rangeResponse.body();
@@ -101,7 +104,7 @@ public class PrometheusMetricsQuery implements MetricsQuery {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Map.Entry<String, RangeMetric> getRangeMetricByHostname(RangeResult rangeResult) {
+    private Map.Entry<String, RangeMetric> getRangeMetricByHostname(final RangeResult rangeResult) {
         List<List<String>> valuesList = rangeResult.getValues();
         List<InstantMetric> instantMetrics = valuesList.stream()
                 .map(this::getInstantMetric)

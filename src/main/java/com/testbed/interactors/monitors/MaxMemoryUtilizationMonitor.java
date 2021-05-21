@@ -16,7 +16,8 @@ public class MaxMemoryUtilizationMonitor implements Monitor {
 
 
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(final Callable<MonitoringInformation> callable,
+                                         final InvocationPlan invocationPlan) {
         return rangeMetricsAggregateCalculator.calculate(RangeMetricsAggregateCalculatorParameters.builder()
                 .monitorNameParameters(MonitorNameParameters.builder()
                         .monitorNamePrefix(MONITOR_NAME_PREFIX)

@@ -38,7 +38,7 @@ public class UnionMapReduceOperation implements Operation {
     private final String name = UNION;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         try {
             return tryRunJob(invocationParameters);
         } catch (Exception exception) {
@@ -46,7 +46,7 @@ public class UnionMapReduceOperation implements Operation {
         }
     }
 
-    private ReferenceIntermediateDataset tryRunJob(InvocationParameters invocationParameters) throws IOException,
+    private ReferenceIntermediateDataset tryRunJob(final InvocationParameters invocationParameters) throws IOException,
             InterruptedException, ClassNotFoundException {
         PhysicalUnion physicalUnion = (PhysicalUnion) invocationParameters.getPhysicalOperation();
         String leftInputPath = getInputPath(invocationParameters, LEFT_POSITION);
@@ -77,7 +77,7 @@ public class UnionMapReduceOperation implements Operation {
         return new ReferenceIntermediateDataset(outputPath);
     }
 
-    private String getInputPath(InvocationParameters invocationParameters, int position) {
+    private String getInputPath(final InvocationParameters invocationParameters, int position) {
         return invocationParameters.getInputIntermediateDatasets().get(position)
                 .getValue()
                 .get()

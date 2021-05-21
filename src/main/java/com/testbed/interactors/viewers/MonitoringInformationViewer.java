@@ -28,7 +28,9 @@ public class MonitoringInformationViewer {
 
     private final SpreadsheetWriter spreadsheetWriter;
 
-    public void view(OutputParameters outputParameters, MonitoringInformation monitoringInformation, int firstColumn) {
+    public void view(final OutputParameters outputParameters,
+                     final MonitoringInformation monitoringInformation,
+                     final int firstColumn) {
         writeLateralColumnHeaders(outputParameters, monitoringInformation);
         int rowsCount = monitoringInformation.getResult().size();
         Stream<Position> columnPositionsStream = getColumnPositionStream(outputParameters, firstColumn, rowsCount);
@@ -36,7 +38,9 @@ public class MonitoringInformationViewer {
         writeMedianFormulas(outputParameters, firstColumn, rowsCount);
     }
 
-    private Stream<Position> getColumnPositionStream(OutputParameters outputParameters, int firstColumn, int rowsCount) {
+    private Stream<Position> getColumnPositionStream(final OutputParameters outputParameters,
+                                                     final int firstColumn,
+                                                     final int rowsCount) {
         int firstUnwrittenColumn = spreadsheetWriter.getFirstUnwrittenColumn(outputParameters,
                 FIRST_MONITORING_INFORMATION_ROW,
                 firstColumn);
@@ -49,7 +53,8 @@ public class MonitoringInformationViewer {
                 .map(row -> Position.builder().row(row).column(firstUnwrittenColumn).build());
     }
 
-    private void writeLateralColumnHeaders(OutputParameters outputParameters, MonitoringInformation monitoringInformation) {
+    private void writeLateralColumnHeaders(final OutputParameters outputParameters,
+                                           final MonitoringInformation monitoringInformation) {
         Stream<String> monitoringInformationHeadersStream = monitoringInformation.getResult().keySet().stream().sorted();
         Stream<Position> positionStream = IntStream.iterate(FIRST_MONITORING_INFORMATION_ROW, i -> i + 1)
                 .mapToObj(row -> Position.builder().column(LATERAL_HEADER_COLUMN).row(row).build());
@@ -60,15 +65,15 @@ public class MonitoringInformationViewer {
                         TOP_HEADER_COLOR_NAME));
     }
 
-    private String getPrettyHeader(String monitoringInformationHeader) {
+    private String getPrettyHeader(final String monitoringInformationHeader) {
         String headerWithUnderscores = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, monitoringInformationHeader);
         String headerWithSpaces = headerWithUnderscores.replace(UNDERSCORE, SPACE);
         return StringUtils.capitalize(headerWithSpaces);
     }
 
-    private void writeToPositionsStream(OutputParameters outputParameters,
-                                        MonitoringInformation monitoringInformation,
-                                        Stream<Position> positionStream) {
+    private void writeToPositionsStream(final OutputParameters outputParameters,
+                                        final MonitoringInformation monitoringInformation,
+                                        final Stream<Position> positionStream) {
         Stream<String> columnValuesStream = monitoringInformation.getResult().entrySet().stream()
                 .sorted(Map.Entry.comparingByKey(String::compareTo))
                 .map(Map.Entry::getValue);
@@ -77,7 +82,9 @@ public class MonitoringInformationViewer {
                 (columnValue, position) -> spreadsheetWriter.write(outputParameters, position, columnValue));
     }
 
-    private void writeMedianFormulas(OutputParameters outputParameters, int firstColumn, int rowsCount) {
+    private void writeMedianFormulas(final OutputParameters outputParameters,
+                                     final int firstColumn,
+                                     final int rowsCount) {
         Stream<Position> positionStream = IntStream.iterate(FIRST_MONITORING_INFORMATION_ROW, i -> i + 1)
                 .mapToObj(row -> Position.builder().column(firstColumn + MEDIAN_RELATIVE_COLUMN).row(row).build());
         Stream<String> formulas = IntStream.iterate(FIRST_MONITORING_INFORMATION_ROW + ONE_BASED, i -> i + 1)
@@ -92,7 +99,7 @@ public class MonitoringInformationViewer {
                 (position, formula) -> spreadsheetWriter.addFormula(outputParameters, position, formula));
     }
 
-    private char getLexicographicalColumn(int column) {
+    private char getLexicographicalColumn(final int column) {
         return (char) ('A' + column);
     }
 }

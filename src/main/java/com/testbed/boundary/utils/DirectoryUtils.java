@@ -33,7 +33,7 @@ public class DirectoryUtils {
         }
     }
 
-    private Stream<LocatedFileStatus> getStream(RemoteIterator<LocatedFileStatus> files) throws IOException {
+    private Stream<LocatedFileStatus> getStream(final RemoteIterator<LocatedFileStatus> files) throws IOException {
         Stream.Builder<LocatedFileStatus> locatedFileStatusStreamBuilder = Stream.builder();
         while (files.hasNext()) {
             locatedFileStatusStreamBuilder.accept(files.next());

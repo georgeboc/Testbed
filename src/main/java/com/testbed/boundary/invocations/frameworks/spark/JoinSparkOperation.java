@@ -50,12 +50,14 @@ public class JoinSparkOperation implements Operation {
         return leftInputDatasetRenamed.join(rightInputDatasetRenamed, joinExpression);
     }
 
-    private Column getJoinExpression(Dataset<Row> leftDataset, Dataset<Row> rightDataset, PhysicalJoin physicalJoin) {
+    private Column getJoinExpression(final Dataset<Row> leftDataset,
+                                     final Dataset<Row> rightDataset,
+                                     final PhysicalJoin physicalJoin) {
         return leftDataset.col(LEFT_PREFIX + physicalJoin.getJoinLeftColumnName())
                 .equalTo(rightDataset.col(RIGHT_PREFIX + physicalJoin.getJoinRightColumnName()));
     }
 
-    private Dataset<Row> addPrefixToDataset(String prefix, Dataset<Row> dataset) {
+    private Dataset<Row> addPrefixToDataset(final String prefix, final Dataset<Row> dataset) {
         String[] columnNames = dataset.columns();
         Dataset<Row> newDataset = dataset;
         for (String columnName: columnNames) {

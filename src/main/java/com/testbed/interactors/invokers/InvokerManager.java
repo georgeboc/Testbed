@@ -38,20 +38,20 @@ public class InvokerManager {
                 intermediateDataset), invocationPlan);
     }
 
-    private Callable<MonitoringInformation> getInvokeOperationsCallable(double tolerableErrorPercentage,
-                                                                        Stream<Invokable> invokableStream,
-                                                                        Stream<OperationInvocation> operationInvocationStream,
-                                                                        Stack<IntermediateDataset> intermediateDataset) {
+    private Callable<MonitoringInformation> getInvokeOperationsCallable(final double tolerableErrorPercentage,
+                                                                        final Stream<Invokable> invokableStream,
+                                                                        final Stream<OperationInvocation> operationInvocationStream,
+                                                                        final Stack<IntermediateDataset> intermediateDataset) {
         return Executors.callable(() -> invokeOperations(tolerableErrorPercentage,
                 invokableStream,
                 operationInvocationStream,
                 intermediateDataset), MonitoringInformation.createNew());
     }
 
-    private void invokeOperations(double tolerableErrorPercentage,
-                                  Stream<Invokable> invokableStream,
-                                  Stream<OperationInvocation> operationInvocationStream,
-                                  Stack<IntermediateDataset> intermediateDataset) {
+    private void invokeOperations(final double tolerableErrorPercentage,
+                                  final Stream<Invokable> invokableStream,
+                                  final Stream<OperationInvocation> operationInvocationStream,
+                                  final Stack<IntermediateDataset> intermediateDataset) {
         Streams.forEachPair(invokableStream,
                 operationInvocationStream,
                 (invokable, operationInvocation) -> invokeOperation(invokable,

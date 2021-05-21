@@ -20,7 +20,8 @@ public class SheetNameCLIOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
+    public void addParameter(final CommandLine commandLine,
+                             final InputParameters.InputParametersBuilder inputParametersBuilder) {
         inputParametersBuilder.sheetName(commandLine.getOptionValue(SHEET_NAME));
     }
 }

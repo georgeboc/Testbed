@@ -10,7 +10,7 @@ import java.util.List;
 
 public class SparkIntermediateDatasetInstrumentation implements IntermediateDatasetInstrumentation{
     @Override
-    public long count(IntermediateDataset intermediateDataset) {
+    public long count(final IntermediateDataset intermediateDataset) {
         if (intermediateDataset.getValue().isEmpty()) {
             return 0L;
         }
@@ -18,7 +18,7 @@ public class SparkIntermediateDatasetInstrumentation implements IntermediateData
     }
 
     @Override
-    public List<String> getColumnNames(IntermediateDataset intermediateDataset) {
+    public List<String> getColumnNames(final IntermediateDataset intermediateDataset) {
         if (intermediateDataset.getValue().isEmpty()) {
             return Collections.emptyList();
         }

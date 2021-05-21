@@ -14,7 +14,8 @@ public class LocalFileSystemReadBytesMonitor implements Monitor {
     private final String deviceName;
 
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(final Callable<MonitoringInformation> callable,
+                                         final InvocationPlan invocationPlan) {
         String query = String.format("node_disk_read_bytes_total{device='%s'}", deviceName);
         return instantMetricsDifferencesCalculator.calculate(InstantMetricsDifferencesCalculatorParameters.builder()
                 .monitorNameParameters(MonitorNameParameters.builder()

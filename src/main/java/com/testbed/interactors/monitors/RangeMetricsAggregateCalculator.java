@@ -20,7 +20,7 @@ public class RangeMetricsAggregateCalculator {
     private static final double STEP_IN_SECONDS = 1.0;
     private final MetricsQuery metricsQuery;
 
-    public MonitoringInformation calculate(RangeMetricsAggregateCalculatorParameters parameters) {
+    public MonitoringInformation calculate(final RangeMetricsAggregateCalculatorParameters parameters) {
         Instant start = Instant.now();
         MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(parameters.getCallable());
         Instant end = Instant.now();
@@ -31,27 +31,28 @@ public class RangeMetricsAggregateCalculator {
         return coalesce(callableMonitoringInformation, getMonitorInformation(rangeResultByHostname, parameters));
     }
 
-    private MonitoringInformation getMonitorInformation(Map<String, RangeMetric> rangeResultByHostname,
-                                                        RangeMetricsAggregateCalculatorParameters parameters) {
+    private MonitoringInformation getMonitorInformation(final Map<String, RangeMetric> rangeResultByHostname,
+                                                        final RangeMetricsAggregateCalculatorParameters parameters) {
         Map<String, String> aggregatedValues = aggregateValues(rangeResultByHostname, parameters);
         return new MonitoringInformation(aggregatedValues);
     }
 
-    private Map<String, String> aggregateValues(Map<String, RangeMetric> rangeResultByHostname,
-                                                RangeMetricsAggregateCalculatorParameters parameters) {
+    private Map<String, String> aggregateValues(final Map<String, RangeMetric> rangeResultByHostname,
+                                                final RangeMetricsAggregateCalculatorParameters parameters) {
         return rangeResultByHostname.entrySet().stream()
                 .map(entry -> aggregateEntryValues(entry, parameters))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Map.Entry<String, String> aggregateEntryValues(Map.Entry<String, RangeMetric> rangeMetricEntry,
-                                                           RangeMetricsAggregateCalculatorParameters parameters) {
+    private Map.Entry<String, String> aggregateEntryValues(final Map.Entry<String, RangeMetric> rangeMetricEntry,
+                                                           final RangeMetricsAggregateCalculatorParameters parameters) {
         String monitorName = getMonitorName(parameters.getMonitorNameParameters(), rangeMetricEntry.getKey());
         String reductionStringValue = String.valueOf(aggregate(rangeMetricEntry, parameters.getAggregationFunction()));
         return new AbstractMap.SimpleEntry<>(monitorName, reductionStringValue);
     }
 
-    private long aggregate(Map.Entry<String, RangeMetric> entry, Function<List<Long>, Long> aggregationFunction) {
+    private long aggregate(final Map.Entry<String, RangeMetric> entry,
+                           final Function<List<Long>, Long> aggregationFunction) {
         List<Long> values = entry.getValue().getInstantMetrics().stream()
                 .map(InstantMetric::getValue)
                 .collect(Collectors.toList());

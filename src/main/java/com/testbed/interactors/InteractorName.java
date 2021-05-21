@@ -10,7 +10,7 @@ public enum InteractorName {
     public static final String INSTRUMENTED = "Instrumented";
     public static final String TIMED = "Timed";
 
-    public static InteractorName getInteractor(boolean isInstrumented) {
+    public static InteractorName getInteractor(final boolean isInstrumented) {
         if (isInstrumented) {
             return Instrumented;
         }

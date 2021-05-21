@@ -8,14 +8,14 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class MonitorCommons {
-    public static MonitoringInformation coalesce(MonitoringInformation first, MonitoringInformation second) {
+    public static MonitoringInformation coalesce(final MonitoringInformation first, final MonitoringInformation second) {
         Map<String, String> coalescedMap = Maps.newHashMap();
         first.getResult().forEach(coalescedMap::put);
         second.getResult().forEach(coalescedMap::put);
         return new MonitoringInformation(coalescedMap);
     }
 
-    public static MonitoringInformation tryCall(Callable<MonitoringInformation> callable) {
+    public static MonitoringInformation tryCall(final Callable<MonitoringInformation> callable) {
         try {
             return callable.call();
         } catch (Exception exception) {
@@ -23,20 +23,20 @@ public class MonitorCommons {
         }
     }
 
-    public static String getMonitorName(MonitorNameParameters monitorNameParameters, String hostname) {
+    public static String getMonitorName(final MonitorNameParameters monitorNameParameters, final String hostname) {
         return monitorNameParameters.getMonitorNamePrefix() + WordUtils.capitalizeFully(hostname) +
                 monitorNameParameters.getMonitorNameSuffix();
     }
 
-    public static Long getMin(List<Long> values) {
+    public static Long getMin(final List<Long> values) {
         return values.stream().reduce(Math::min).get();
     }
 
-    public static Long getMax(List<Long> values) {
+    public static Long getMax(final List<Long> values) {
         return values.stream().reduce(Math::max).get();
     }
 
-    public static Long getAverage(List<Long> values) {
+    public static Long getAverage(final List<Long> values) {
         return (long) ((double) values.stream().reduce(Math::addExact).get()/values.size());
     }
 }

@@ -20,7 +20,7 @@ public class ProjectJar {
         private static final int DEFAULT_POSITION = 0;
 
         @Override
-        public void map(LongWritable key, Group value, Context context) throws IOException, InterruptedException {
+        public void map(final LongWritable key, final Group value, final Context context) throws IOException, InterruptedException {
             int[] projectedColumnIndexes = context.getConfiguration().getInts(PROJECTED_COLUMN_INDEXES);
             GroupType originalGroupType = value.getType();
             List<Type> projectedColumns = getProjectedColumns(projectedColumnIndexes, originalGroupType);
@@ -29,18 +29,22 @@ public class ProjectJar {
             context.write(key, projectedGroup);
         }
 
-        private List<Type> getProjectedColumns(int[] projectedColumnIndexes, GroupType originalGroupType) {
+        private List<Type> getProjectedColumns(final int[] projectedColumnIndexes, final GroupType originalGroupType) {
             return Arrays.stream(projectedColumnIndexes)
                     .mapToObj(originalGroupType::getType)
                     .collect(Collectors.toList());
         }
 
-        private Group createProjectedGroup(GroupType originalGroupType, List<Type> projectedColumns) {
-            GroupType projectedGroupType = new GroupType(originalGroupType.getRepetition(), PROJECTED_COLUMNS, projectedColumns);
+        private Group createProjectedGroup(final GroupType originalGroupType, final List<Type> projectedColumns) {
+            GroupType projectedGroupType = new GroupType(originalGroupType.getRepetition(),
+                    PROJECTED_COLUMNS,
+                    projectedColumns);
             return new SimpleGroup(projectedGroupType);
         }
 
-        private void writeProjectedColumnsToGroup(Group value, List<Type> projectedColumns, Group projectedGroup) {
+        private void writeProjectedColumnsToGroup(final Group value,
+                                                  final List<Type> projectedColumns,
+                                                  final Group projectedGroup) {
             projectedColumns.stream()
                     .map(Type::getName)
                     .forEach(projectedColumnName -> projectedGroup.append(projectedColumnName,

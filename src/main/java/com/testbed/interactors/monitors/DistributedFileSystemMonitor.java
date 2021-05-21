@@ -25,7 +25,8 @@ public class DistributedFileSystemMonitor implements Monitor {
     private final FileSystem fileSystem;
 
     @Override
-    public MonitoringInformation monitor(Callable<MonitoringInformation> callable, InvocationPlan invocationPlan) {
+    public MonitoringInformation monitor(final Callable<MonitoringInformation> callable,
+                                         final InvocationPlan invocationPlan) {
         tryDeleteDirectory(INTERMEDIATE_DATASETS_DIRECTORY_PREFIX);
 
         MonitoringInformation callableMonitoringInformation = MonitorCommons.tryCall(callable);
@@ -35,7 +36,7 @@ public class DistributedFileSystemMonitor implements Monitor {
         return coalesce(callableMonitoringInformation, getMonitoringInformation());
     }
 
-    private void tryDeleteDirectory(String directory) {
+    private void tryDeleteDirectory(final String directory) {
         try {
             fileSystem.delete(new Path(directory), RECURSIVELY);
         } catch (IOException exception) {
@@ -43,7 +44,7 @@ public class DistributedFileSystemMonitor implements Monitor {
         }
     }
 
-    private List<String> getDirectoriesToExclude(InvocationPlan invocationPlan) {
+    private List<String> getDirectoriesToExclude(final InvocationPlan invocationPlan) {
         return invocationPlan.getOperationInvocations().stream()
                 .filter(operationInvocation -> operationInvocation.isLastOperationBeforeSink() ||
                         operationInvocation.getSucceedingPhysicalOperationsCount() == 0)

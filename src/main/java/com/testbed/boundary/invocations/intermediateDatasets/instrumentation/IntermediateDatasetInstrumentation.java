@@ -5,6 +5,6 @@ import com.testbed.boundary.invocations.intermediateDatasets.IntermediateDataset
 import java.util.List;
 
 public interface IntermediateDatasetInstrumentation {
-    long count(IntermediateDataset intermediateDataset);
-    List<String> getColumnNames(IntermediateDataset intermediateDataset);
+    long count(final IntermediateDataset intermediateDataset);
+    List<String> getColumnNames(final IntermediateDataset intermediateDataset);
 }

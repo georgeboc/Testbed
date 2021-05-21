@@ -39,7 +39,7 @@ public class SumAggregateMapReduceOperation implements Operation {
     private final String name = AGGREGATE;
 
     @Override
-    public IntermediateDataset invoke(InvocationParameters invocationParameters) {
+    public IntermediateDataset invoke(final InvocationParameters invocationParameters) {
         try {
             return tryRunJob(invocationParameters);
         } catch (Exception exception) {
@@ -47,7 +47,7 @@ public class SumAggregateMapReduceOperation implements Operation {
         }
     }
 
-    private ReferenceIntermediateDataset tryRunJob(InvocationParameters invocationParameters) throws IOException,
+    private ReferenceIntermediateDataset tryRunJob(final InvocationParameters invocationParameters) throws IOException,
             InterruptedException, ClassNotFoundException {
         PhysicalAggregate physicalAggregate = (PhysicalAggregate) invocationParameters.getPhysicalOperation();
         String inputPath = invocationParameters.getInputIntermediateDatasets().get(FIRST)
@@ -77,7 +77,7 @@ public class SumAggregateMapReduceOperation implements Operation {
         return new ReferenceIntermediateDataset(outputPath);
     }
 
-    private MessageType getAggregateSchema(PhysicalAggregate physicalAggregate) {
+    private MessageType getAggregateSchema(final PhysicalAggregate physicalAggregate) {
         String sumAggregatedColumnName = SUM_PREFIX + physicalAggregate.getAggregationColumnName();
         Type sumAggregatedColumn = new PrimitiveType(Type.Repetition.OPTIONAL,
                 PrimitiveType.PrimitiveTypeName.BINARY,

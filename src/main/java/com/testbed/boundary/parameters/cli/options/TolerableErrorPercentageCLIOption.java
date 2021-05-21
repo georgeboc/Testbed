@@ -23,7 +23,8 @@ public class TolerableErrorPercentageCLIOption implements CLIOption {
     }
 
     @Override
-    public void addParameter(CommandLine commandLine, InputParameters.InputParametersBuilder inputParametersBuilder) {
+    public void addParameter(final CommandLine commandLine,
+                             final InputParameters.InputParametersBuilder inputParametersBuilder) {
         String parsedTolerableErrorPercentage = commandLine.getOptionValue(TOLERABLE_ERROR_PERCENTAGE);
         String tolerableErrorPercentageString = StringUtils.defaultString(parsedTolerableErrorPercentage,
                 DEFAULT_TOLERABLE_ERROR_PERCENTAGE);
