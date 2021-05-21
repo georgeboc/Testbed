@@ -85,4 +85,4 @@ $ bash scripts/experiments_runner.sh
 ```
 
 [comment]: # (TODO: Add link)
-For more information, check the thesis associated to this project.
+For more information, check the dissertation associated to this project.
