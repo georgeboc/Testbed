@@ -12,6 +12,7 @@ DATASETS_MAPPING = {
     "Ad_click_on_taobao_User_profile": "LU",
     "Obama_visitor_logs_1g": "M",
     "Thunderbird_30g": "B",
+    "Edgar_1t": "G"
 }
 
 BATCH_RUNNER_TEMPLATE = f"{SCRIPTS_TEMPLATES}/batch_runner.sh.template"
