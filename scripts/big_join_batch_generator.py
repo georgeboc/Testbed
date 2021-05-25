@@ -7,8 +7,8 @@ from jinja2 import Template
 
 PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/join_pipeline.json.template"
 
-OUTPUT_FILENAME_FORMAT = "join_pipeline-{{left_dataset_name}}-{{left_column_name}}-{{right_column_name}}-{{right_dataset_name}}.json"
-OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/join_batch_runner.sh"
+OUTPUT_FILENAME_FORMAT = "big_join_pipeline-{{left_dataset_name}}-{{left_column_name}}-{{right_column_name}}-{{right_dataset_name}}.json"
+OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/big_join_batch_runner.sh"
 
 LEFT_DATASET_NAMES = ["Edgar_1t"]
 RIGHT_DATASET_NAMES = ["Thunderbird_30g"]
