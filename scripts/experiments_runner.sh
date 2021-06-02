@@ -44,10 +44,10 @@ export INSTRUMENTED_EXECUTION_ARGS=(
 export SPARK_SUBMIT_ARGS=(
   --master yarn
   --deploy-mode cluster
-  --conf spark.driver.memory="11301M"
-  --conf spark.driver.memoryOverhead="851M"
-  --conf spark.executor.memory="11301M"
-  --conf spark.executor.memoryOverhead="851M"
+  --conf spark.driver.memory="167M"
+  --conf spark.driver.memoryOverhead="13M"
+  --conf spark.executor.memory="167M"
+  --conf spark.executor.memoryOverhead="13M"
   --conf spark.driver.cores="8"
   --conf spark.executor.cores="8"
   --conf spark.executor.instances="5"
