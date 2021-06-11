@@ -55,8 +55,7 @@ public class InvocationPlanner {
                                                           final Graph<PhysicalOperation> graph) {
         return OperationInvocation.builder()
                 .physicalOperation(currentPhysicalOperation)
-                .precedingPhysicalOperationsCount(graph.inDegree(currentPhysicalOperation))
-                .succeedingPhysicalOperationsCount(graph.outDegree(currentPhysicalOperation))
+                .succeedingPhysicalOperations(graph.successors(currentPhysicalOperation))
                 .isLastOperationBeforeSink(graph.successors(currentPhysicalOperation).stream()
                         .anyMatch(physicalOperation -> physicalOperation instanceof PhysicalSink))
                 .build();

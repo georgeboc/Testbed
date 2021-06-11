@@ -47,7 +47,7 @@ public class DistributedFileSystemMonitor implements Monitor {
     private List<String> getDirectoriesToExclude(final InvocationPlan invocationPlan) {
         return invocationPlan.getOperationInvocations().stream()
                 .filter(operationInvocation -> operationInvocation.isLastOperationBeforeSink() ||
-                        operationInvocation.getSucceedingPhysicalOperationsCount() == 0)
+                        operationInvocation.getSucceedingPhysicalOperations().isEmpty())
                 .map(operationInvocation -> INTERMEDIATE_DATASETS_DIRECTORY_PREFIX + operationInvocation.getPhysicalOperation().getId())
                 .collect(Collectors.toList());
     }
