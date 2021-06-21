@@ -1,0 +1,14 @@
+[
+  {
+    "operation": "LOAD",
+    "outputTag": "dataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/Ad_click_on_taobao_1g"
+  },
+  {
+    "operation": "SELECT",
+    "inputTag": "dataset",
+    "outputTag": "selectedDataset",
+    "rowsSelectivityFactor": 0.01,
+    "columnName": "DateTime"
+  }
+]

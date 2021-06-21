@@ -1,0 +1,20 @@
+[
+  {
+    "operation": "LOAD",
+    "outputTag": "dataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/Thunderbird_30g"
+  },
+  {
+    "operation": "SELECT",
+    "inputTag": "dataset",
+    "outputTag": "selectedDataset",
+    "rowsSelectivityFactor": 1.0,
+    "columnName": "Content"
+  },
+  {
+    "operation": "PROJECT",
+    "inputTag": "selectedDataset",
+    "outputTag": "projectedDataset",
+    "columnSelectivityFactor": 0.1429
+  }
+]

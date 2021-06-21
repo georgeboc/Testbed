@@ -1,0 +1,20 @@
+[
+  {
+    "operation": "LOAD",
+    "outputTag": "leftDataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/Ad_click_on_taobao_1g"
+  },
+  {
+    "operation": "LOAD",
+    "outputTag": "rightDataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/Ad_click_on_taobao_User_profile"
+  },
+  {
+    "operation": "JOIN",
+    "leftInputTag": "leftDataset",
+    "rightInputTag": "rightDataset",
+    "outputTag": "joinedDataset",
+    "joinLeftColumnName": "User",
+    "joinRightColumnName": "UserId"
+  }
+]

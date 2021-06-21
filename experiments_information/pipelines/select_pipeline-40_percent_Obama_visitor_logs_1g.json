@@ -1,0 +1,14 @@
+[
+  {
+    "operation": "LOAD",
+    "outputTag": "dataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/Obama_visitor_logs_1g"
+  },
+  {
+    "operation": "SELECT",
+    "inputTag": "dataset",
+    "outputTag": "selectedDataset",
+    "rowsSelectivityFactor": 0.4,
+    "columnName": "NAMELAST"
+  }
+]

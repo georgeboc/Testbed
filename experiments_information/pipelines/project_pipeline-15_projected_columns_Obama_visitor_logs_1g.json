@@ -1,0 +1,13 @@
+[
+  {
+    "operation": "LOAD",
+    "outputTag": "dataset",
+    "datasetDirectoryPath": "hdfs://dtim:27000/user/bochileanu/described_datasets/Obama_visitor_logs_1g"
+  },
+  {
+    "operation": "PROJECT",
+    "inputTag": "dataset",
+    "outputTag": "projectedDataset",
+    "columnSelectivityFactor": 0.5357999999999999
+  }
+]
