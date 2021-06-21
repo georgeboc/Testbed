@@ -10,7 +10,6 @@ OUTPUT_FILENAME_FORMAT = "select_pipeline-{{selectivity_factor_percentage}}_perc
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/select_batch_runner.sh"
 
 DATASET_COLUMN_NAMES = {
-    "Ad_click_on_taobao_512m": "DateTime",
     "Ad_click_on_taobao_1g": "DateTime",
     "Obama_visitor_logs_1g": "NAMELAST",
     "Thunderbird_30g": "Content"

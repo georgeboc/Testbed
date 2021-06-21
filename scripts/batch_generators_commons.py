@@ -6,7 +6,6 @@ SCRIPTS = "scripts"
 PIPELINES = "pipelines"
 
 DATASETS_MAPPING = {
-    "Ad_click_on_taobao_512m": "LL",
     "Ad_click_on_taobao_1g": "LB",
     "Ad_click_on_taobao_Ad_feature": "LA",
     "Ad_click_on_taobao_User_profile": "LU",

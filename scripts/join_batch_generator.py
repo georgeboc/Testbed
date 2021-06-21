@@ -10,7 +10,7 @@ PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/join_pipeline.json.template"
 OUTPUT_FILENAME_FORMAT = "join_pipeline-{{left_dataset_name}}-{{left_column_name}}-{{right_column_name}}-{{right_dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/join_batch_runner.sh"
 
-LEFT_DATASET_NAMES = ["Ad_click_on_taobao_512m", "Ad_click_on_taobao_1g"]
+LEFT_DATASET_NAMES = ["Ad_click_on_taobao_1g"]
 RIGHT_DATASET_NAMES = ["Ad_click_on_taobao_Ad_feature", "Ad_click_on_taobao_User_profile"]
 
 @dataclass

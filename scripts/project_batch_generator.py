@@ -17,9 +17,6 @@ class DatasetInformation:
     columns_count: int
 
 DATASET_INFORMATIONS = {
-    "Ad_click_on_taobao_512m": DatasetInformation(column_selectivity_factor_percentages=
-                                                  [16.67, 33.34, 50, 66.67, 83.34, 100],
-                                                  columns_count=6),
     "Ad_click_on_taobao_1g": DatasetInformation(column_selectivity_factor_percentages=
                                                 [16.67, 33.34, 50, 66.67, 83.34, 100],
                                                 columns_count=6),

@@ -2,49 +2,34 @@
 # Execute from Testbed root directory
 
 from batch_generators_commons import *
-from dataclasses import dataclass
 from jinja2 import Template
 
-PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/join_pipeline.json.template"
+PIPELINE_TEMPLATE = f"{SCRIPTS_TEMPLATES}/big_join_pipeline.json.template"
 
-OUTPUT_FILENAME_FORMAT = "big_join_pipeline-{{left_dataset_name}}-{{left_column_name}}-{{right_column_name}}-{{right_dataset_name}}.json"
+OUTPUT_FILENAME_FORMAT = "big_join_pipeline-column_number-{{column_index}}-{{dataset_name}}.json"
 OUTPUT_BATCH_RUNNER_FILENAME = f"{SCRIPTS}/big_join_batch_runner.sh"
 
-LEFT_DATASET_NAMES = ["Edgar_1t"]
-RIGHT_DATASET_NAMES = ["Thunderbird_30g"]
-
-@dataclass
-class DatasetsRelation:
-    left_column_name: str
-    right_column_name: str
-
-RELATIONS = {
-    "Thunderbird_30g": DatasetsRelation(left_column_name="DateTime", right_column_name="Timestamp"),
+DATASETS_COLUMN_NAMES_MAPPING = {
+    "Ad_click_on_taobao_1g": ["User", "DateTime"]
 }
 
 def main():
-    pipeline_filenames = create_pipelines()
+    pipeline_filenames = []
+    for dataset_name in DATASETS_COLUMN_NAMES_MAPPING.keys():
+        pipeline_filenames.extend(create_pipelines(dataset_name))
     create_bash_runner(pipeline_filenames)
 
-def create_pipelines():
+def create_pipelines(dataset_name):
     filenames = []
-    for left_dataset_name in LEFT_DATASET_NAMES:
-        for right_dataset_name in RIGHT_DATASET_NAMES:
-            left_column_name = RELATIONS[right_dataset_name].left_column_name
-            right_column_name = RELATIONS[right_dataset_name].right_column_name
-            pipeline_template_content = read_file_contents(PIPELINE_TEMPLATE)
-            pipeline_content = Template(pipeline_template_content).render(left_dataset_name=left_dataset_name,
-                                                                          right_dataset_name=right_dataset_name,
-                                                                          left_column_name=left_column_name,
-                                                                          right_column_name=right_column_name)
-            print("Pipeline content:", pipeline_content)
-            filename = Template(OUTPUT_FILENAME_FORMAT).render(left_dataset_name=left_dataset_name,
-                                                               right_dataset_name=right_dataset_name,
-                                                               left_column_name=left_column_name,
-                                                               right_column_name=right_column_name)
-            filenames.append(filename)
-            print("Filename generated:", filename)
-            write_file_contents(filename, pipeline_content)
+    for column_index, column_name in enumerate(DATASETS_COLUMN_NAMES_MAPPING[dataset_name]):
+        pipeline_content = Template(read_file_contents(PIPELINE_TEMPLATE)).render(dataset_name=dataset_name,
+                                                                                  column_name=column_name)
+        print("Pipeline content:", pipeline_content)
+        filename = Template(OUTPUT_FILENAME_FORMAT).render(dataset_name=dataset_name,
+                                                           column_index=column_index)
+        filenames.append(filename)
+        print("Filename generated:", filename)
+        write_file_contents(filename, pipeline_content)
     return filenames
 
 def create_bash_runner(pipeline_filenames):
@@ -61,8 +46,8 @@ def create_bash_runner(pipeline_filenames):
     write_file_contents(OUTPUT_BATCH_RUNNER_FILENAME, batch_runner_content)
 
 def get_sheet_name(pipeline_filename):
-    left_dataset_name, _, _, right_dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
-    return f"{DATASETS_MAPPING[left_dataset_name]}j{DATASETS_MAPPING[right_dataset_name]}"
+    column_index_string, dataset_name = get_jinja_variables(pipeline_filename, OUTPUT_FILENAME_FORMAT)
+    return f"{DATASETS_MAPPING[dataset_name]}{int(column_index_string) + 1}"
 
 if __name__ == "__main__":
     main()

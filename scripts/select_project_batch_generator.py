@@ -21,10 +21,6 @@ class DatasetInformation:
 SELECTIVITY_FACTOR_PERCENTAGES = [1, 5, 20, 50, 100]
 
 DATASET_INFORMATIONS = {
-    "Ad_click_on_taobao_512m": DatasetInformation(column_selectivity_factor_percentages=
-                                                  [16.67, 33.34, 50, 66.67, 83.34, 100],
-                                                  columns_count=6,
-                                                  selection_column_name="DateTime"),
     "Ad_click_on_taobao_1g": DatasetInformation(column_selectivity_factor_percentages=
                                                 [16.67, 33.34, 50, 66.67, 83.34, 100],
                                                 columns_count=6,
